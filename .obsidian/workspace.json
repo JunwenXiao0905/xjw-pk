@@ -1,0 +1,274 @@
+{
+  "main": {
+    "id": "99b287831849d073",
+    "type": "split",
+    "children": [
+      {
+        "id": "380a989eb7e80cd5",
+        "type": "tabs",
+        "dimension": 69.0989847715736,
+        "children": [
+          {
+            "id": "45d561635a2b1932",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "PKOS架构设计.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "PKOS架构设计"
+            }
+          },
+          {
+            "id": "3f53b7ab6986f6ce",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "obsidian最佳实践.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "obsidian最佳实践"
+            }
+          }
+        ],
+        "currentTab": 1
+      },
+      {
+        "id": "f511fb5e1653b43b",
+        "type": "tabs",
+        "dimension": 30.9010152284264,
+        "children": [
+          {
+            "id": "6d2b29c02cf6c6d2",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "obsidian最佳实践.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "obsidian最佳实践 的大纲"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "559d6d68a05eeab9",
+    "type": "split",
+    "children": [
+      {
+        "id": "17b58b24501ba9fd",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "735e90d96e93291d",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
+            }
+          },
+          {
+            "id": "969ecdc48f3c39fd",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "搜索"
+            }
+          },
+          {
+            "id": "029ccd0d797ab6f8",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "书签"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "9670f9e1bf99fd91",
+    "type": "split",
+    "children": [
+      {
+        "id": "0c8f86bb6c0dfa41",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "09bf250328ce9fa5",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "obsidian最佳实践.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "obsidian最佳实践 的反向链接列表"
+            }
+          },
+          {
+            "id": "aeaaa1a9675e8014",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "obsidian最佳实践.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "obsidian最佳实践 的出链列表"
+            }
+          },
+          {
+            "id": "07f74aad55365612",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "标签"
+            }
+          },
+          {
+            "id": "7ff013891fe691e8",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "添加笔记属性"
+            }
+          },
+          {
+            "id": "08d81994ff529e4c",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "obsidian最佳实践.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "obsidian最佳实践 的大纲"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false,
+      "bases:新建数据库": false
+    }
+  },
+  "active": "3f53b7ab6986f6ce",
+  "lastOpenFiles": [
+    "PKOS架构设计.md",
+    "obsidian最佳实践.md",
+    "Resources/现代web布局/24.md",
+    "Resources/现代web布局/09.md",
+    "Resources/现代web布局/04.md",
+    "Resources/现代web布局/14.md",
+    "Resources/现代web布局/11.md",
+    "Resources/现代web布局/22.md",
+    "Resources/现代web布局/10.md",
+    "Resources/现代web布局/03.md",
+    "Resources/现代web布局/17.md",
+    "Resources/现代web布局/07.md",
+    "Resources/现代web布局/06.md",
+    "Resources/现代web布局/27.md",
+    "Resources/现代web布局/01.md",
+    "Resources/现代web布局/19.md",
+    "Resources/现代web布局/08.md",
+    "Resources/现代web布局/目录.txt",
+    "Resources/现代web布局/02.md",
+    "Resources/现代web布局/23.md",
+    "Resources/现代web布局/16.md",
+    "Resources/现代web布局/13.md",
+    "Resources/现代web布局/25.md",
+    "Resources/现代web布局/26.md",
+    "Resources/现代web布局/20.md",
+    "Resources/现代web布局/21.md",
+    "Resources/现代web布局/05.md",
+    "Resources/现代web布局",
+    "Resources/现代CSS",
+    "Resources/从 0 到 1 落地前端工程化/pdf/10 环境管理：不同项目使用不同Node版本，如何优雅切换？.pdf",
+    "Resources/从 0 到 1 落地前端工程化/pdf/14 应用打包：应用打包体积过大，聊聊Webpack那些构建策略！.pdf",
+    "Resources/从 0 到 1 落地前端工程化/pdf/18 多包仓库：多个仓库管理相同业务代码，真让人头大啊！.pdf",
+    "Resources/从 0 到 1 落地前端工程化/pdf/13 进程管理：Node服务运行起来无缘无故中断，如何常驻后台？.pdf",
+    "Resources/从 0 到 1 落地前端工程化/pdf/8 访问加密：还用HTTP访问URL，不怕被劫持吗？.pdf",
+    "Resources/从 0 到 1 落地前端工程化/pdf/11 镜像管理：依赖安装老出问题，聊聊Npm镜像那些险象环生的坑！.pdf",
+    "Resources/从 0 到 1 落地前端工程化/pdf/4 提交规范：团队成员提交代码不规范，如何统一习惯？.pdf",
+    "Resources/TypeScript 类型体操通关秘籍/images/jP9PfO3vKBDBTSju_JEFRU1lVOLY5hVaVrnp7JHKShE.webp",
+    "Resources/TypeScript 类型体操通关秘籍/images/KFKJmehaGFpGumlWaqy6y1MBWg3qH1_byfoA7SLNGJw.webp",
+    "Resources/TypeScript 类型体操通关秘籍/images/qG5byHZx2rh-ZQd_jjIbDcNhlWOa34f9vgtDktQyhfo.webp",
+    "Resources/TypeScript 类型体操通关秘籍/images/GuxChLtKZkD-z4Z6Y7-2I0lfAWIp8S3YFR-pwhLqOlk.webp",
+    "Resources/TypeScript 类型体操通关秘籍/images/nZUisSjYBmW8plRvZtY9iIchM1YT2Gd_JL8wdZbaNSw.webp",
+    "Resources/TypeScript 类型体操通关秘籍/images/fUGkmYBoFeB-wxDO8ySyRNdFxQ1Uqg0aXW37CUYJX-U.webp",
+    "Resources/TypeScript 类型体操通关秘籍/images/9_WpoXaPuOvivczSvfJDn8JXu8qTIcooZLiEHUUUZCw.webp",
+    "Resources/TypeScript 类型体操通关秘籍/images/EpzJKq5y6DBlg6j1n4GryzyGYZYiHcqWBtB_6aKLuGA.webp",
+    "Resources/TypeScript 类型体操通关秘籍/images/YCndr6rKOHDtUvEqaFYKDUDg8Fg9MeY0-sodGpHxgMU.webp",
+    "Resources/TypeScript 类型体操通关秘籍/images/DVSJ05SFs7sbrdu4ZIfzmYAjAWmKmxk39EEmlupEo4M.webp",
+    "未命名.canvas"
+  ]
+}
