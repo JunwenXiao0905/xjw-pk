@@ -28,6 +28,20 @@
             "state": {
               "type": "markdown",
               "state": {
+                "file": "Projects/PKOS/PKOS架构设计.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "PKOS架构设计"
+            }
+          },
+          {
+            "id": "26d89bdd52091005",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
                 "file": "obsidian最佳实践.md",
                 "mode": "source",
                 "source": false
@@ -35,9 +49,23 @@
               "icon": "lucide-file",
               "title": "obsidian最佳实践"
             }
+          },
+          {
+            "id": "0d71e9b351825d32",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Projects/烟草小程序/简历及细节.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "简历及细节"
+            }
           }
         ],
-        "currentTab": 1
+        "currentTab": 3
       },
       {
         "id": "f511fb5e1653b43b",
@@ -50,13 +78,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "obsidian最佳实践.md",
+                "file": "Projects/烟草小程序/简历及细节.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "obsidian最佳实践 的大纲"
+              "title": "简历及细节 的大纲"
             }
           }
         ]
@@ -132,7 +160,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "obsidian最佳实践.md",
+                "file": "PKOS架构设计.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -142,7 +170,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "obsidian最佳实践 的反向链接列表"
+              "title": "PKOS架构设计 的反向链接列表"
             }
           },
           {
@@ -151,12 +179,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "obsidian最佳实践.md",
+                "file": "PKOS架构设计.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "obsidian最佳实践 的出链列表"
+              "title": "PKOS架构设计 的出链列表"
             }
           },
           {
@@ -194,13 +222,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "obsidian最佳实践.md",
+                "file": "PKOS架构设计.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "obsidian最佳实践 的大纲"
+              "title": "PKOS架构设计 的大纲"
             }
           }
         ]
@@ -221,10 +249,25 @@
       "bases:新建数据库": false
     }
   },
-  "active": "3f53b7ab6986f6ce",
+  "active": "735e90d96e93291d",
   "lastOpenFiles": [
-    "PKOS架构设计.md",
+    "未命名 1.canvas",
+    "未命名.canvas",
+    "Projects/PKOS/PKOS架构设计.md",
+    "Projects/PKOS",
+    "Projects/南充机场/简历及细节.md",
+    "Resources/React通关秘籍(最新/React设计原理+).pdf",
+    "Resources/React通关秘籍(最新/Algorithm_Anagrams.md",
+    "Resources/React通关秘籍(最新/第90章—2025年CSS方案选型指南.md",
+    "Resources/React通关秘籍(最新/第89章—Vue3与React核心机制对比.md",
+    "Resources/react进阶实践指南/01.md",
+    "Projects/MapAI/简历及细节.md",
+    "Projects/MapAI",
+    "Projects/烟草小程序/简历及细节.md",
+    "Projects/南充机场",
     "obsidian最佳实践.md",
+    "Projects/烟草小程序",
+    "Projects",
     "Resources/现代web布局/24.md",
     "Resources/现代web布局/09.md",
     "Resources/现代web布局/04.md",
@@ -242,23 +285,9 @@
     "Resources/现代web布局/08.md",
     "Resources/现代web布局/目录.txt",
     "Resources/现代web布局/02.md",
-    "Resources/现代web布局/23.md",
-    "Resources/现代web布局/16.md",
-    "Resources/现代web布局/13.md",
-    "Resources/现代web布局/25.md",
-    "Resources/现代web布局/26.md",
-    "Resources/现代web布局/20.md",
-    "Resources/现代web布局/21.md",
-    "Resources/现代web布局/05.md",
     "Resources/现代web布局",
     "Resources/现代CSS",
     "Resources/从 0 到 1 落地前端工程化/pdf/10 环境管理：不同项目使用不同Node版本，如何优雅切换？.pdf",
-    "Resources/从 0 到 1 落地前端工程化/pdf/14 应用打包：应用打包体积过大，聊聊Webpack那些构建策略！.pdf",
-    "Resources/从 0 到 1 落地前端工程化/pdf/18 多包仓库：多个仓库管理相同业务代码，真让人头大啊！.pdf",
-    "Resources/从 0 到 1 落地前端工程化/pdf/13 进程管理：Node服务运行起来无缘无故中断，如何常驻后台？.pdf",
-    "Resources/从 0 到 1 落地前端工程化/pdf/8 访问加密：还用HTTP访问URL，不怕被劫持吗？.pdf",
-    "Resources/从 0 到 1 落地前端工程化/pdf/11 镜像管理：依赖安装老出问题，聊聊Npm镜像那些险象环生的坑！.pdf",
-    "Resources/从 0 到 1 落地前端工程化/pdf/4 提交规范：团队成员提交代码不规范，如何统一习惯？.pdf",
     "Resources/TypeScript 类型体操通关秘籍/images/jP9PfO3vKBDBTSju_JEFRU1lVOLY5hVaVrnp7JHKShE.webp",
     "Resources/TypeScript 类型体操通关秘籍/images/KFKJmehaGFpGumlWaqy6y1MBWg3qH1_byfoA7SLNGJw.webp",
     "Resources/TypeScript 类型体操通关秘籍/images/qG5byHZx2rh-ZQd_jjIbDcNhlWOa34f9vgtDktQyhfo.webp",
@@ -268,7 +297,6 @@
     "Resources/TypeScript 类型体操通关秘籍/images/9_WpoXaPuOvivczSvfJDn8JXu8qTIcooZLiEHUUUZCw.webp",
     "Resources/TypeScript 类型体操通关秘籍/images/EpzJKq5y6DBlg6j1n4GryzyGYZYiHcqWBtB_6aKLuGA.webp",
     "Resources/TypeScript 类型体操通关秘籍/images/YCndr6rKOHDtUvEqaFYKDUDg8Fg9MeY0-sodGpHxgMU.webp",
-    "Resources/TypeScript 类型体操通关秘籍/images/DVSJ05SFs7sbrdu4ZIfzmYAjAWmKmxk39EEmlupEo4M.webp",
-    "未命名.canvas"
+    "Resources/TypeScript 类型体操通关秘籍/images/DVSJ05SFs7sbrdu4ZIfzmYAjAWmKmxk39EEmlupEo4M.webp"
   ]
 }

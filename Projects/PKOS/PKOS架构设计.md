@@ -39,7 +39,7 @@ PKOS：Personal Knowledge OS
 
 # 二、基于Nx Monorepo 的代码结构
 
-你的仓库建议这样组织：（可能和实际不符合）
+你的仓库建议这样组织：（可能和实际不符合，实际在libs/features/knowledge/）
 
 ```
 xjw-monorepo
@@ -68,8 +68,6 @@ xjw-monorepo
 │   │
 │   └─ knowledge-types
 │
-├─ knowledge-vault
-│   └─ (你的 Obsidian vault)
 │
 └─ tools
     └─ knowledge-indexer.ts
@@ -77,16 +75,17 @@ xjw-monorepo
 
 这里有一个关键点：
 
-**knowledge vault 
+**knowledge vault
 
+单独一个github仓库
 
 ```
-git submodule
+https://github.com/JunwenXiao0905/xjw-pk
 ```
 
 ---
 
-# 二、知识库 Indexer（核心）
+# 三、知识库 Indexer（核心）
 
 真正的关键是：
 
@@ -168,9 +167,7 @@ buildIndex()
 
 ---
 
-# 三、知识库数据流
-
-
+# 四、知识库数据流
 
 ## 写入
 
@@ -299,10 +296,6 @@ Obsidian：
 remark-wiki-link
 ```
 
-或者简单 regex：
-
-```ts
-/\[\[(.*?)\]\]/g
 ```
 
 转换为：
@@ -318,7 +311,7 @@ remark-wiki-link
 你的 React 页面：
 
 ```
-/knowledge
+/knowledge/ui
 ```
 
 结构：
@@ -490,25 +483,209 @@ Obsidian Graph View。
 
 ---
 
-# 九、Nest API（可选）
+# 九、Nest API
 
-其实：
-
-**知识库不需要 API。**
-
-但如果你要 AI / 搜索：
-
-可以加：
+网关架构
 
 ```
-/api/knowledge/search
+GitHub Webhook
+      │
+      ▼
+Nest Webhook Controller
+      │
+      ▼
+Task Queue（任务队列）
+      │
+      ▼
+Indexer Worker
+      │
+ ┌────┴───────────────┐
+ ▼                    ▼
+Metadata Index       Embedding
+(JSON / DB)          (Vector DB)
+ │                    │
+ ▼                    ▼
+Website API         AI / OpenClaw
 ```
+## 1.Webhook 触发流程（入口）
+
+GitHub push 时：
 
 ```
-/api/knowledge/note
+POST /webhook/github
 ```
 
-# 十三、一个非常重要的优化建议
+Nest controller：
+
+```
+@Post('github')  
+async handleGithubWebhook() {  
+  await this.syncService.pullRepo()  
+  await this.queue.add('indexKnowledge')  
+}
+```
+
+只做两件事：
+
+1️⃣ pull repo  
+2️⃣ 推送任务
+
+不要在这里做解析。原因：解析可能需要几秒甚至几十秒，Webhook 必须 **快速返回**。
+## 2.Indexer（知识解析）
+
+Indexer 的工作：
+
+```
+markdown  
+↓  
+结构化数据
+```
+
+解析内容：
+
+```
+title  
+tags  
+links  
+content  
+slug
+```
+例如：
+```
+---  
+title: AI Agent  
+tags: [ai]  
+---  
+  
+AI Agent 介绍  
+  
+参考 [[RAG]]
+```
+
+解析后：
+
+```
+{  
+ "slug": "ai-agent",  
+ "title": "AI Agent",  
+ "tags": ["ai"],  
+ "links": ["rag"],  
+ "content": "AI Agent 介绍..."  
+}
+```
+
+存储位置：
+
+Postgres表：
+```
+knowledge_articles
+```
+字段：
+```
+id  
+slug  
+title  
+content  
+tags  
+links  
+updated_at
+```
+
+---
+
+## 3.Embedding（向量生成）
+
+这是 **第二个任务**。
+
+流程：
+
+```
+文章内容
+↓
+chunk
+↓
+embedding
+↓
+vector db
+```
+
+例如：
+
+```
+AI Agent
+```
+
+被拆分：
+
+```
+chunk1
+chunk2
+chunk3
+```
+
+生成：
+
+```
+vector
+```
+
+存储：
+
+```
+pgvector
+```
+
+Postgres 表：
+
+```
+knowledge_embeddings
+```
+
+结构：
+
+```
+id
+article_id
+content
+embedding
+```
+
+---
+
+## 4.openclaw调用接口
+
+
+OpenClaw 调用：
+
+```
+GET /knowledge/search
+POST /knowledge/rag
+```
+
+例如：
+
+```
+POST /knowledge/rag
+{
+  "query": "什么是 RAG"
+}
+```
+
+Nest：
+
+```
+embedding(query)
+↓
+vector search
+↓
+返回相关 chunk
+```
+
+---
+
+
+
+# 十、一个非常重要的优化建议
 
 在 markdown frontmatter 里加：
 
@@ -522,66 +699,57 @@ published: true
 公开文章
 可以分开。
 
-
-# 十、OpenClaw 接入（非常关键）
-
-你的知识库可以变成：
-
-**AI Agent 的长期记忆**
-
-方式：
-
-### 方法1
-
-直接读取：
-
-```
-knowledge/*.md
-```
-
 ---
 
-### 方法2（推荐）
+# 十一、性能策略
+
+**不要实时解析 markdown。**
+
+正确：
+
+```
+build step
+```
 
 生成：
 
 ```
-embedding
+knowledge-index.json
 ```
 
-流程：
+React 直接读取。
+
+网站会：
+
+**非常快。**
+
+**Incremental Index**
+
+只处理：
 
 ```
-markdown
-   ↓
-chunk
-   ↓
-embedding
-   ↓
-pgvector
+changed files
 ```
 
-因为你已经有：
+GitHub webhook payload：
 
 ```
-Postgres
+added
+modified
+removed
 ```
 
-安装：
+只解析变化的文章。
+
+这样：
 
 ```
-pgvector
+1000篇笔记
+更新1篇
+只处理1篇
 ```
 
-OpenClaw 查询：
-
-```
-RAG
-```
-
----
-
-# 十一、最终系统架构
+# 十二、最终系统架构
 
 最终系统会是：
 
@@ -611,29 +779,6 @@ pgvector
 OpenClaw
 ```
 
----
-
-# 十二、性能策略（很多人做错）
-
-**不要实时解析 markdown。**
-
-正确：
-
-```
-build step
-```
-
-生成：
-
-```
-knowledge-index.json
-```
-
-React 直接读取。
-
-网站会：
-
-**非常快。**
 
 ---
 
@@ -653,24 +798,6 @@ knowledge graph
 AI search
 ```
 
----
-
-# 十四、如果做到这个阶段
-
-你的系统会接近：
-
-这些产品的结合：
-
-- Obsidian
-    
-- Notion
-    
-- Logseq
-    
-
-但：
-
-**完全 self-hosted。**
 
 ---
 

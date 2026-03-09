@@ -1,3 +1,38 @@
+---
+published: "true"
+title: obsidian最佳实践
+---
+
+# 完整 Frontmatter（非常实用）
+
+建议你统一用这个结构：
+```
+
+---  
+title: 什么是RAG  
+published: true  
+tags: [AI, LLM, RAG]  
+created: 2026-03-06  
+updated: 2026-03-06  
+summary: RAG技术介绍  
+---  
+
+# 这是标题
+这个文章
+```
+  
+  在obsidian中输入：
+  ```
+  ---
+  ```
+它会自动提示。你也可以装插件：
+
+```
+- Obsidian Linter
+- MetaEdit
+```
+
+可以 **自动补全 frontmatter**。
 
 ### 4.2 Vault 组织结构设计
 推荐采用「PARA 法则」组织笔记（适用于个人和工作）：
