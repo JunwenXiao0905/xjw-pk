@@ -23,7 +23,7 @@ defaultPublished: true
 # 这些目录不会出现在网站文件树中
 ignoreDirs:
   - Resources
-  - private
+  - Projects
   - archive
   - secrets
 

@@ -56,12 +56,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "knowledge-publish-guide.md",
+                "file": "Areas/算法/25. K 个一组翻转链表.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "knowledge-publish-guide"
+              "title": "25. K 个一组翻转链表"
             }
           }
         ],
@@ -78,13 +78,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "knowledge-publish-guide.md",
+                "file": "Areas/算法/25. K 个一组翻转链表.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "knowledge-publish-guide 的大纲"
+              "title": "25. K 个一组翻转链表 的大纲"
             }
           }
         ]
@@ -251,16 +251,23 @@
   },
   "active": "0d71e9b351825d32",
   "lastOpenFiles": [
+    "Areas/算法/61. 旋转链表.md",
+    "Areas/算法/732. 我的日程安排表 III.md",
+    "Areas/算法/731. 我的日程安排表 II.md",
+    "Areas/算法/729. 我的日程安排表 I.md",
+    "Areas/算法/25. K 个一组翻转链表.md",
+    "Areas/算法/Algorithm_Anagrams.md",
+    "Areas/GIS/cesium基础.md",
+    "knowledge-publish-guide.md",
+    "Areas/算法",
     "obsidian最佳实践.md",
     "Projects/烟草小程序/简历及细节.md",
-    "knowledge-publish-guide.md",
     "未命名 1.canvas",
     "未命名.canvas",
     "Projects/PKOS/PKOS架构设计.md",
     "Projects/PKOS",
     "Projects/南充机场/简历及细节.md",
     "Resources/React通关秘籍(最新/React设计原理+).pdf",
-    "Resources/React通关秘籍(最新/Algorithm_Anagrams.md",
     "Resources/React通关秘籍(最新/第90章—2025年CSS方案选型指南.md",
     "Resources/React通关秘籍(最新/第89章—Vue3与React核心机制对比.md",
     "Resources/react进阶实践指南/01.md",
@@ -279,16 +286,9 @@
     "Resources/现代web布局/03.md",
     "Resources/现代web布局/17.md",
     "Resources/现代web布局/07.md",
-    "Resources/现代web布局/06.md",
-    "Resources/现代web布局/27.md",
-    "Resources/现代web布局/01.md",
-    "Resources/现代web布局/19.md",
-    "Resources/现代web布局/08.md",
     "Resources/现代web布局/目录.txt",
-    "Resources/现代web布局/02.md",
     "Resources/现代web布局",
     "Resources/现代CSS",
-    "Resources/从 0 到 1 落地前端工程化/pdf/10 环境管理：不同项目使用不同Node版本，如何优雅切换？.pdf",
     "Resources/TypeScript 类型体操通关秘籍/images/jP9PfO3vKBDBTSju_JEFRU1lVOLY5hVaVrnp7JHKShE.webp",
     "Resources/TypeScript 类型体操通关秘籍/images/KFKJmehaGFpGumlWaqy6y1MBWg3qH1_byfoA7SLNGJw.webp",
     "Resources/TypeScript 类型体操通关秘籍/images/qG5byHZx2rh-ZQd_jjIbDcNhlWOa34f9vgtDktQyhfo.webp",
