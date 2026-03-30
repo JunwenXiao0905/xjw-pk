@@ -6,141 +6,28 @@
       {
         "id": "380a989eb7e80cd5",
         "type": "tabs",
-        "dimension": 69.0989847715736,
+        "dimension": 79.33070866141732,
         "children": [
           {
-            "id": "45d561635a2b1932",
+            "id": "0f317bcaa14c529c",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "PKOS架构设计.md",
+                "file": "Areas/Agentic Engening/Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性1.0.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "PKOS架构设计"
-            }
-          },
-          {
-            "id": "3f53b7ab6986f6ce",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Projects/PKOS/PKOS架构设计.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "PKOS架构设计"
-            }
-          },
-          {
-            "id": "26d89bdd52091005",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "obsidian最佳实践.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "obsidian最佳实践"
-            }
-          },
-          {
-            "id": "0d71e9b351825d32",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Areas/算法/bfs/101. 对称二叉树.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "101. 对称二叉树"
-            }
-          },
-          {
-            "id": "da206d44469f032f",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Areas/算法/线性表/86. 分隔链表.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "86. 分隔链表"
-            }
-          },
-          {
-            "id": "be298a777bff8dab",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Tavily.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "Tavily"
-            }
-          },
-          {
-            "id": "149c14b809608191",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Projects/公众号/优秀文章/Draco正在VibeCoding/可能全网最全长的2万字Openclaw保姆教程.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "可能全网最全长的2万字Openclaw保姆教程"
-            }
-          },
-          {
-            "id": "14658e75dbc955f0",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Areas/算法/bfs/102. 二叉树的层序遍历.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "102. 二叉树的层序遍历"
-            }
-          },
-          {
-            "id": "17759337ca3d1f5a",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Areas/算法/dfs/1254. 统计封闭岛屿的数目.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "1254. 统计封闭岛屿的数目"
+              "title": "Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性1.0"
             }
           }
-        ],
-        "currentTab": 8
+        ]
       },
       {
         "id": "f511fb5e1653b43b",
         "type": "tabs",
-        "dimension": 30.9010152284264,
+        "dimension": 20.66929133858268,
         "children": [
           {
             "id": "6d2b29c02cf6c6d2",
@@ -148,13 +35,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Areas/算法/dfs/1254. 统计封闭岛屿的数目.md",
+                "file": "Areas/Agentic Engening/Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性1.0.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "1254. 统计封闭岛屿的数目 的大纲"
+              "title": "Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性1.0 的大纲"
             }
           }
         ]
@@ -214,7 +101,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 351.5
   },
   "right": {
     "id": "9670f9e1bf99fd91",
@@ -316,58 +203,58 @@
       "daily-notes:打开/创建今天的日记": false,
       "templates:插入模板": false,
       "command-palette:打开命令面板": false,
-      "bases:新建数据库": false
+      "bases:新建数据库": false,
+      "obsidian-excalidraw-plugin:新建绘图文件": false
     }
   },
-  "active": "735e90d96e93291d",
+  "active": "0f317bcaa14c529c",
   "lastOpenFiles": [
-    "Areas/算法/栈/117. 填充每个节点的下一个右侧节点指针 II.md",
-    "Areas/算法/栈/116. 填充每个节点的下一个右侧节点指针.md",
-    "Areas/算法/栈/946. 验证栈序列.md",
-    "Areas/算法/栈/895. 最大频率栈.md",
-    "Areas/算法/dfs/547. 省份数量.md",
-    "Areas/算法/dfs/494. 目标和.md",
-    "Areas/算法/dfs/1254. 统计封闭岛屿的数目.md",
-    "Areas/算法/dfs/98. 验证二叉搜索树.md",
-    "Areas/算法/dfs/112. 路径总和.md",
-    "Areas/算法/bfs/1129. 颜色交替的最短路径.md",
-    "Projects/知乎A2A/相关信息.md",
-    "Areas/算法/bfs/102. 二叉树的层序遍历.md",
-    "Projects/知乎A2A",
-    "Areas/算法/bfs/752. 打开转盘锁.md",
-    "Areas/Agentic Engening/skills/feature-development-personal/SKILL.md",
-    "Areas/Agentic Engening/skills/feature-development-personal/skill.md",
-    "Areas/算法/线性表/86. 分隔链表.md",
-    "未命名.md",
-    "Projects/公众号/优秀文章/Draco正在VibeCoding/可能全网最全长的2万字Openclaw保姆教程.md",
-    "Projects/公众号/优秀文章/Draco正在VibeCoding",
-    "Tavily.md",
-    "Projects/公众号/优秀文章",
-    "Projects/MapAI/简历及细节.md",
-    "Projects/公众号",
-    "Areas/算法/bfs/101. 对称二叉树.md",
-    "ARCHITECTURE.md",
-    "Areas/算法/bfs/1091. 二进制矩阵中的最短路径.md",
-    "Areas/算法/队列/899. 有序队列.md",
-    "Projects/智能装修/3DGS+AI+装修-市场调研报告.md",
-    "Areas/Agentic Engening/skills/feature-development-personal/feature-development-personal.md",
-    "Areas/算法/bfs",
-    "Areas/算法/新建文件夹",
-    "Areas/算法/dfs",
-    "Areas/算法/哈希表",
-    "Areas/算法/栈",
-    "Areas/算法/队列",
-    "未命名 1.canvas",
+    "Areas/Agentic Engening/Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性.md",
+    "Areas/Agentic Engening/Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性1.0.md",
+    "Pasted image 20260329111651.png",
+    "Pasted image 20260329092002.png",
+    "Pasted image 20260329091513.png",
+    "Pasted image 20260328150133.png",
+    "Pasted image 20260328145723.png",
+    "Pasted image 20260328143557.png",
+    "Pasted image 20260328143148.png",
+    "Pasted image 20260328141340.png",
+    "Pasted image 20260328141318.png",
+    "Pasted image 20260328141012.png",
+    "Excalidraw/dev-environment.excalidraw",
+    "Areas/Agentic Engening/Claude Code超详细实战教程3.26(二)：工程化实践.md",
+    "Areas/Agentic Engening/CLAUDE.md-用户根目录下.md",
+    "Excalidraw/openspec-workflow.excalidraw",
+    "Excalidraw/claude-code-architecture.excalidraw",
+    "Excalidraw/EXCALIDRAW_FORMAT.md",
+    "Excalidraw/skills-mcp-hooks.excalidraw",
+    "Excalidraw/dev-environment.excalidraw.md",
+    "Excalidraw/Drawing 2026-03-24 23.09.14.excalidraw.md",
+    "Excalidraw/openspec-workflow.excalidraw.md",
+    "Excalidraw/claude-code-architecture.excalidraw.md",
+    "Resources/公众号/优秀文章/《CLAUDE.md 与内容型知识库项目协作实战手册》/第 2 篇：从零搭建一份内容型知识库项目的 CLAUDE.md 实战编写已付费.md",
+    "Resources/公众号/优秀文章/《CLAUDE.md 与内容型知识库项目协作实战手册》/第 3 篇：规则分层用 docs文档体系实现渐进披露已付费.md",
+    "Resources/公众号/优秀文章/《CLAUDE.md 与内容型知识库项目协作实战手册》/第 1 篇：重新理解 CLAUDE.md——它不是文档，而是项目协作的配置中枢.md",
+    "Resources/公众号/优秀文章/《CLAUDE.md 与内容型知识库项目协作实战手册》/第 6 篇：从文件到系统，CLAUDE.md 与 hooks、subagents 的协作升级已付费.md",
+    "Resources/公众号/优秀文章/《CLAUDE.md 与内容型知识库项目协作实战手册》/第 5 篇：让 Claude 少犯错，验证机制、测试策略与发布检查清单 已付费.md",
+    "Resources/公众号/优秀文章/《CLAUDE.md 与内容型知识库项目协作实战手册》/第 4 篇：内容即数据——frontmatter 规范、数据结构与构建链路的工程化设计 已付费.md",
+    "Resources/公众号/优秀文章/Vibe Coding 高级教程（2026.2）.md",
+    "Resources/公众号/优秀文章/claude code 教程-2.md",
+    "Resources/公众号/优秀文章/claude code 教程-1.md",
+    "Resources/公众号/优秀文章/Anthropic 公司 Claude Code 创作者Boris Cherny最佳实践𝗖𝗟𝗔𝗨𝗗𝗘.𝗺𝗱.md",
+    "Resources/公众号/优秀文章/Harness Engineering 为什么是 Agent 时代的“控制论”？.md",
+    "Areas/Agentic Engening/Claude Code工程化最佳实践Everything Claude Code.md",
+    "Areas/Agentic Engening/Vibe Coding必备！OpenSpec-规范驱动开发.md",
+    "Areas/Agentic Engening/OpenSpec：AI 写代码越写越乱？这套开源工作流，正在把 Vibe Coding 拉回正轨.md",
+    "Areas/Agentic Engening/OpenSpec-教程版.md",
+    "Areas/Agentic Engening/er_diagram.excalidraw",
     "未命名.canvas",
-    "Resources/TypeScript 类型体操通关秘籍/images/jP9PfO3vKBDBTSju_JEFRU1lVOLY5hVaVrnp7JHKShE.webp",
-    "Resources/TypeScript 类型体操通关秘籍/images/KFKJmehaGFpGumlWaqy6y1MBWg3qH1_byfoA7SLNGJw.webp",
-    "Resources/TypeScript 类型体操通关秘籍/images/qG5byHZx2rh-ZQd_jjIbDcNhlWOa34f9vgtDktQyhfo.webp",
-    "Resources/TypeScript 类型体操通关秘籍/images/GuxChLtKZkD-z4Z6Y7-2I0lfAWIp8S3YFR-pwhLqOlk.webp",
-    "Resources/TypeScript 类型体操通关秘籍/images/nZUisSjYBmW8plRvZtY9iIchM1YT2Gd_JL8wdZbaNSw.webp",
-    "Resources/TypeScript 类型体操通关秘籍/images/fUGkmYBoFeB-wxDO8ySyRNdFxQ1Uqg0aXW37CUYJX-U.webp",
-    "Resources/TypeScript 类型体操通关秘籍/images/9_WpoXaPuOvivczSvfJDn8JXu8qTIcooZLiEHUUUZCw.webp",
-    "Resources/TypeScript 类型体操通关秘籍/images/EpzJKq5y6DBlg6j1n4GryzyGYZYiHcqWBtB_6aKLuGA.webp",
-    "Resources/TypeScript 类型体操通关秘籍/images/YCndr6rKOHDtUvEqaFYKDUDg8Fg9MeY0-sodGpHxgMU.webp",
-    "Resources/TypeScript 类型体操通关秘籍/images/DVSJ05SFs7sbrdu4ZIfzmYAjAWmKmxk39EEmlupEo4M.webp"
+    "未命名.base",
+    "Areas/Agentic Engening/你真的懂CLAUDE.md吗.md",
+    "Excalidraw",
+    "Resources/公众号/优秀文章/《CLAUDE.md 与内容型知识库项目协作实战手册》",
+    "Resources/公众号/优秀文章/Draco正在VibeCoding",
+    "Resources/公众号/优秀文章",
+    "未命名 1.canvas"
   ]
 }
