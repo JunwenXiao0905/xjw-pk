@@ -6,7 +6,7 @@
       {
         "id": "380a989eb7e80cd5",
         "type": "tabs",
-        "dimension": 79.33070866141732,
+        "dimension": 59.2911877394636,
         "children": [
           {
             "id": "0f317bcaa14c529c",
@@ -14,20 +14,77 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Areas/Agentic Engening/Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性1.0.md",
+                "file": "Areas/Harness Engineering/发布文章/Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性1.0"
+              "title": "Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性"
+            }
+          },
+          {
+            "id": "87d586e00e6adebb",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Areas/Harness Engineering/个人笔记/CLAUDE.md和记忆机制.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "CLAUDE.md和记忆机制"
+            }
+          },
+          {
+            "id": "fff6420f79882863",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Areas/Harness Engineering/发布文章/告别混乱，让你的Claude Code轻装上阵.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "告别混乱，让你的Claude Code轻装上阵"
+            }
+          },
+          {
+            "id": "8ab415ffbfc133f3",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Areas/Harness Engineering/个人笔记/CLAUDE.md和记忆机制.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "CLAUDE.md和记忆机制"
+            }
+          },
+          {
+            "id": "886e10ae55d381e7",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Areas/就业/公司名录.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "公司名录"
             }
           }
-        ]
+        ],
+        "currentTab": 4
       },
       {
         "id": "f511fb5e1653b43b",
         "type": "tabs",
-        "dimension": 20.66929133858268,
+        "dimension": 40.7088122605364,
         "children": [
           {
             "id": "6d2b29c02cf6c6d2",
@@ -35,13 +92,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Areas/Agentic Engening/Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性1.0.md",
+                "file": "Areas/就业/公司名录.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性1.0 的大纲"
+              "title": "公司名录 的大纲"
             }
           }
         ]
@@ -101,7 +158,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 351.5
+    "width": 532.5
   },
   "right": {
     "id": "9670f9e1bf99fd91",
@@ -187,13 +244,23 @@
               "icon": "lucide-list",
               "title": "PKOS架构设计 的大纲"
             }
+          },
+          {
+            "id": "fc84114055b774c5",
+            "type": "leaf",
+            "state": {
+              "type": "git-view",
+              "state": {},
+              "icon": "git-pull-request",
+              "title": "Source Control"
+            }
           }
-        ]
+        ],
+        "currentTab": 5
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 551.5
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -204,13 +271,49 @@
       "templates:插入模板": false,
       "command-palette:打开命令面板": false,
       "bases:新建数据库": false,
-      "obsidian-excalidraw-plugin:新建绘图文件": false
+      "obsidian-excalidraw-plugin:新建绘图文件": false,
+      "obsidian-git:Open Git source control": false
     }
   },
-  "active": "0f317bcaa14c529c",
+  "active": "886e10ae55d381e7",
   "lastOpenFiles": [
-    "Areas/Agentic Engening/Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性.md",
-    "Areas/Agentic Engening/Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性1.0.md",
+    "Areas/就业/计算机方向.md",
+    "Areas/就业/热门就业、考研方向.md",
+    "Areas/Harness Engineering/发布文章/Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性.md",
+    "Areas/Harness Engineering/个人笔记/自动化调试-chrome mcp tool.md",
+    "Areas/就业/公司名录.md",
+    "Areas/Harness Engineering/个人笔记/网络搜索功能的优化.md",
+    "Areas/就业",
+    "Areas/操作系统/WSL2 安装 Chrome + 代理配置.md",
+    "Areas/Harness Engineering/个人笔记/自动化测试-playwright cli.md",
+    "Areas/Harness Engineering/个人笔记/项目实操踩坑记录.md",
+    "Areas/Harness Engineering/个人笔记/工程化.md",
+    "Areas/Harness Engineering/个人笔记/6-提效总结.md",
+    "Areas/Harness Engineering/个人笔记/1-CLAUDE.md和记忆机制.md",
+    "Areas/Harness Engineering/个人笔记/everything-claude-code/hook.md",
+    "Areas/Harness Engineering/发布文章/TS全栈技术是否会成为未来主流？.md",
+    "Areas/Harness Engineering/rules/rules/tmux.md",
+    "Areas/Harness Engineering/rules/rules/nx_monorepo",
+    "未命名",
+    "Excalidraw/Drawing 2026-04-02 16.52.59.excalidraw.md",
+    "Areas/Harness Engineering/个人笔记/claude-code-best-practice.md",
+    "Areas/Harness Engineering/rules/rules/agent temas",
+    "Areas/Harness Engineering/个人笔记/3-plugins.md",
+    "Areas/Harness Engineering/个人笔记/gstack",
+    "Areas/Harness Engineering/rules/rules/nestjs/security.md",
+    "Areas/Harness Engineering/rules/rules/nestjs/patterns.md",
+    "Areas/Harness Engineering/rules/rules/nestjs/architecture.md",
+    "Areas/Harness Engineering/rules/rules/nestjs/testing.md",
+    "Areas/Harness Engineering/rules/rules/nestjs",
+    "Areas/Harness Engineering/rules/rules/typescript/patterns.md",
+    "Areas/Harness Engineering/rules/rules/typescript/coding-style.md",
+    "Areas/Harness Engineering/rules/rules/typescript/hooks.md",
+    "Areas/Harness Engineering/rules/rules/common/testing.md",
+    "Areas/Harness Engineering/个人笔记/spec-kit",
+    "Areas/Harness Engineering/skills/product-docs-governance",
+    "Areas/Harness Engineering/skills/ui-ux-pro-max/scripts/__pycache__/design_system.cpython-313.pyc",
+    "Areas/Harness Engineering/skills/ui-ux-pro-max/scripts/__pycache__/design_system.cpython-312.pyc",
+    "Resources/简历/27届 AI应用开发_前端简历求锐评_1_那一点风_来自小红书网页版.jpg",
     "Pasted image 20260329111651.png",
     "Pasted image 20260329092002.png",
     "Pasted image 20260329091513.png",
@@ -220,41 +323,7 @@
     "Pasted image 20260328143148.png",
     "Pasted image 20260328141340.png",
     "Pasted image 20260328141318.png",
-    "Pasted image 20260328141012.png",
-    "Excalidraw/dev-environment.excalidraw",
-    "Areas/Agentic Engening/Claude Code超详细实战教程3.26(二)：工程化实践.md",
-    "Areas/Agentic Engening/CLAUDE.md-用户根目录下.md",
-    "Excalidraw/openspec-workflow.excalidraw",
-    "Excalidraw/claude-code-architecture.excalidraw",
-    "Excalidraw/EXCALIDRAW_FORMAT.md",
-    "Excalidraw/skills-mcp-hooks.excalidraw",
-    "Excalidraw/dev-environment.excalidraw.md",
-    "Excalidraw/Drawing 2026-03-24 23.09.14.excalidraw.md",
-    "Excalidraw/openspec-workflow.excalidraw.md",
-    "Excalidraw/claude-code-architecture.excalidraw.md",
-    "Resources/公众号/优秀文章/《CLAUDE.md 与内容型知识库项目协作实战手册》/第 2 篇：从零搭建一份内容型知识库项目的 CLAUDE.md 实战编写已付费.md",
-    "Resources/公众号/优秀文章/《CLAUDE.md 与内容型知识库项目协作实战手册》/第 3 篇：规则分层用 docs文档体系实现渐进披露已付费.md",
-    "Resources/公众号/优秀文章/《CLAUDE.md 与内容型知识库项目协作实战手册》/第 1 篇：重新理解 CLAUDE.md——它不是文档，而是项目协作的配置中枢.md",
-    "Resources/公众号/优秀文章/《CLAUDE.md 与内容型知识库项目协作实战手册》/第 6 篇：从文件到系统，CLAUDE.md 与 hooks、subagents 的协作升级已付费.md",
-    "Resources/公众号/优秀文章/《CLAUDE.md 与内容型知识库项目协作实战手册》/第 5 篇：让 Claude 少犯错，验证机制、测试策略与发布检查清单 已付费.md",
-    "Resources/公众号/优秀文章/《CLAUDE.md 与内容型知识库项目协作实战手册》/第 4 篇：内容即数据——frontmatter 规范、数据结构与构建链路的工程化设计 已付费.md",
-    "Resources/公众号/优秀文章/Vibe Coding 高级教程（2026.2）.md",
-    "Resources/公众号/优秀文章/claude code 教程-2.md",
-    "Resources/公众号/优秀文章/claude code 教程-1.md",
-    "Resources/公众号/优秀文章/Anthropic 公司 Claude Code 创作者Boris Cherny最佳实践𝗖𝗟𝗔𝗨𝗗𝗘.𝗺𝗱.md",
-    "Resources/公众号/优秀文章/Harness Engineering 为什么是 Agent 时代的“控制论”？.md",
-    "Areas/Agentic Engening/Claude Code工程化最佳实践Everything Claude Code.md",
-    "Areas/Agentic Engening/Vibe Coding必备！OpenSpec-规范驱动开发.md",
-    "Areas/Agentic Engening/OpenSpec：AI 写代码越写越乱？这套开源工作流，正在把 Vibe Coding 拉回正轨.md",
-    "Areas/Agentic Engening/OpenSpec-教程版.md",
-    "Areas/Agentic Engening/er_diagram.excalidraw",
     "未命名.canvas",
-    "未命名.base",
-    "Areas/Agentic Engening/你真的懂CLAUDE.md吗.md",
-    "Excalidraw",
-    "Resources/公众号/优秀文章/《CLAUDE.md 与内容型知识库项目协作实战手册》",
-    "Resources/公众号/优秀文章/Draco正在VibeCoding",
-    "Resources/公众号/优秀文章",
     "未命名 1.canvas"
   ]
 }

@@ -1,0 +1,1 @@
+。claude mcp add 命令修改的是 ~/.claude.json，不是 ~/.claude/.mcp.json
