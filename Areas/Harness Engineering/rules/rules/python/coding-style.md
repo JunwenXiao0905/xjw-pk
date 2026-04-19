@@ -12,6 +12,15 @@ paths:
 - Follow **PEP 8** conventions
 - Use **type annotations** on all function signatures
 
+## Project Management
+
+Use **uv** as the unified Python project management tool:
+
+- Manage dependencies and lockfiles with `uv`
+- Manage virtual environments with `uv`
+- Run Python tools and scripts with `uv run`
+- Do not use `pip`, `poetry`, `pipenv`, or `conda` for project management unless explicitly required
+
 ## Immutability
 
 Prefer immutable data structures:
@@ -33,9 +42,9 @@ class Point(NamedTuple):
 
 ## Formatting
 
-- **black** for code formatting
-- **isort** for import sorting
-- **ruff** for linting
+- **black** for code formatting via `uv run black`
+- **isort** for import sorting via `uv run isort`
+- **ruff** for linting via `uv run ruff`
 
 ## Reference
 
