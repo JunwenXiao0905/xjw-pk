@@ -201,3 +201,24 @@ const validated: UserInput = userSchema.parse(input)
 - No `console.log` statements in production code
 - Use proper logging libraries instead
 - See hooks for automatic detection
+
+## Tailwind CSS 组件根节点命名
+
+- 使用 `tailwindcss` 时，重要组件和高复用组件的根节点必须额外带一个语义化类名，不能只依赖工具类
+- 语义化类名使用 kebab-case，并优先采用 `<component-name>-root` 格式
+- 示例：`ChatInput` 组件的根节点应包含 `chatinput-root`
+- 这类类名的主要目标是提升调试效率，方便在 DevTools 中快速定位组件
+
+```tsx
+// WRONG: 根节点只有 Tailwind 工具类，调试时难以快速定位
+export function ChatInput() {
+  return <div className="flex items-center gap-2 rounded-lg border p-3" />
+}
+
+// CORRECT: 根节点包含稳定、语义化的组件类名
+export function ChatInput() {
+  return (
+    <div className="chatinput-root flex items-center gap-2 rounded-lg border p-3" />
+  )
+}
+```
