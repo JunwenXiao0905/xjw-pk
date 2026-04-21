@@ -1,125 +1,20 @@
 {
-  "nodes": [
-    {
-      "id": "webgpu-overview",
-      "type": "text",
-      "text": "# WebGPU 方向观察\n\n底层图形能力、Canvas UI、3D 编辑器和 AI 原生编辑器正在汇合。",
-      "x": 0,
-      "y": 0,
-      "width": 360,
-      "height": 180
-    },
-    {
-      "id": "webgpu-projects-note",
-      "type": "file",
-      "file": "Areas/_赛道观察/WebGPU/开源项目观察.md",
-      "x": -460,
-      "y": -260,
-      "width": 360,
-      "height": 180
-    },
-    {
-      "id": "canvas-ui-note",
-      "type": "file",
-      "file": "Areas/_赛道观察/Canvas UI/HTML in Canvas.md",
-      "x": 460,
-      "y": -260,
-      "width": 360,
-      "height": 180
-    },
-    {
-      "id": "wgpu",
-      "type": "text",
-      "text": "## wgpu\n\nRust / WASM / WebGPU 的底层基础设施代表。",
-      "x": -500,
-      "y": 80,
-      "width": 300,
-      "height": 140
-    },
-    {
-      "id": "pascal-editor",
-      "type": "text",
-      "text": "## pascalorg/editor\n\nWebGPU + React Three Fiber 的 3D 建筑编辑器样本。",
-      "x": -130,
-      "y": 300,
-      "width": 360,
-      "height": 150
-    },
-    {
-      "id": "html-in-canvas",
-      "type": "text",
-      "text": "## HTML in Canvas\n\n脱离传统 DOM，自己接管布局、渲染和交互。",
-      "x": 420,
-      "y": 80,
-      "width": 340,
-      "height": 150
-    },
-    {
-      "id": "ai-native-editor",
-      "type": "text",
-      "text": "## AI 原生编辑器\n\n语义节点、场景树、操作可编排，适合 agent 理解和控制。",
-      "x": 360,
-      "y": 330,
-      "width": 380,
-      "height": 160
-    }
-  ],
-  "edges": [
-    {
-      "id": "edge-overview-projects",
-      "fromNode": "webgpu-overview",
-      "fromSide": "left",
-      "toNode": "webgpu-projects-note",
-      "toSide": "right",
-      "label": "开源样本"
-    },
-    {
-      "id": "edge-overview-canvas-ui",
-      "fromNode": "webgpu-overview",
-      "fromSide": "right",
-      "toNode": "canvas-ui-note",
-      "toSide": "left",
-      "label": "UI 范式"
-    },
-    {
-      "id": "edge-projects-wgpu",
-      "fromNode": "webgpu-projects-note",
-      "fromSide": "bottom",
-      "toNode": "wgpu",
-      "toSide": "top",
-      "label": "底层"
-    },
-    {
-      "id": "edge-projects-pascal",
-      "fromNode": "webgpu-projects-note",
-      "fromSide": "bottom",
-      "toNode": "pascal-editor",
-      "toSide": "top",
-      "label": "应用"
-    },
-    {
-      "id": "edge-canvas-html",
-      "fromNode": "canvas-ui-note",
-      "fromSide": "bottom",
-      "toNode": "html-in-canvas",
-      "toSide": "top",
-      "label": "概念"
-    },
-    {
-      "id": "edge-html-ai-editor",
-      "fromNode": "html-in-canvas",
-      "fromSide": "bottom",
-      "toNode": "ai-native-editor",
-      "toSide": "top",
-      "label": "延伸"
-    },
-    {
-      "id": "edge-pascal-ai-editor",
-      "fromNode": "pascal-editor",
-      "fromSide": "right",
-      "toNode": "ai-native-editor",
-      "toSide": "left",
-      "label": "场景信号"
-    }
-  ]
+	"nodes":[
+		{"id":"webgpu-overview","type":"text","text":"# WebGPU 方向观察\n\n底层图形能力、Canvas UI、3D 编辑器和 AI 原生编辑器正在汇合。","x":0,"y":0,"width":360,"height":180},
+		{"id":"webgpu-projects-note","type":"file","file":"Areas/_赛道观察/WebGPU/开源项目观察.md","x":-460,"y":-260,"width":360,"height":180},
+		{"id":"canvas-ui-note","type":"file","file":"Areas/_赛道观察/Canvas UI/HTML in Canvas.md","x":460,"y":-260,"width":360,"height":180},
+		{"id":"wgpu","type":"text","text":"## wgpu\n\nRust / WASM / WebGPU 的底层基础设施代表。","x":-500,"y":80,"width":300,"height":140},
+		{"id":"pascal-editor","type":"text","text":"## pascalorg/editor\n\nWebGPU + React Three Fiber 的 3D 建筑编辑器样本。","x":-130,"y":300,"width":360,"height":150},
+		{"id":"html-in-canvas","type":"text","text":"## HTML in Canvas\n\n脱离传统 DOM，自己接管布局、渲染和交互。","x":420,"y":80,"width":340,"height":150},
+		{"id":"ai-native-editor","type":"text","text":"## AI 原生编辑器\n\n语义节点、场景树、操作可编排，适合 agent 理解和控制。","x":360,"y":330,"width":380,"height":160}
+	],
+	"edges":[
+		{"id":"edge-overview-projects","fromNode":"webgpu-overview","fromSide":"left","toNode":"webgpu-projects-note","toSide":"right","label":"开源样本"},
+		{"id":"edge-overview-canvas-ui","fromNode":"webgpu-overview","fromSide":"right","toNode":"canvas-ui-note","toSide":"left","label":"UI 范式"},
+		{"id":"edge-projects-wgpu","fromNode":"webgpu-projects-note","fromSide":"bottom","toNode":"wgpu","toSide":"top","label":"底层"},
+		{"id":"edge-projects-pascal","fromNode":"webgpu-projects-note","fromSide":"bottom","toNode":"pascal-editor","toSide":"top","label":"应用"},
+		{"id":"edge-canvas-html","fromNode":"canvas-ui-note","fromSide":"bottom","toNode":"html-in-canvas","toSide":"top","label":"概念"},
+		{"id":"edge-html-ai-editor","fromNode":"html-in-canvas","fromSide":"bottom","toNode":"ai-native-editor","toSide":"top","label":"延伸"},
+		{"id":"edge-pascal-ai-editor","fromNode":"pascal-editor","fromSide":"right","toNode":"ai-native-editor","toSide":"left","label":"场景信号"}
+	]
 }

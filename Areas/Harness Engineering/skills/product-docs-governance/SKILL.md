@@ -407,11 +407,11 @@ libs/features/{feature}/docs/
 
 ```text
 需求 / 文档收敛
-  → feature-development
-实现计划
-  → writing-plans
+  → product-docs-governance
+编写计划
+  → /openspec-propose
 执行计划
-  → executing-plans
+  → /openspec-apply-change
 遇到问题
   → systematic-debugging
 完成前验证

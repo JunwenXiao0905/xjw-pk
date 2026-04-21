@@ -42,44 +42,16 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Areas/Harness Engineering/发布文章/告别混乱，让你的Claude Code轻装上阵.md",
+                "file": "Areas/Harness Engineering/skills/实用skills清单.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "告别混乱，让你的Claude Code轻装上阵"
-            }
-          },
-          {
-            "id": "8ab415ffbfc133f3",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Areas/Harness Engineering/个人笔记/CLAUDE.md和记忆机制.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "CLAUDE.md和记忆机制"
-            }
-          },
-          {
-            "id": "886e10ae55d381e7",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Areas/Harness Engineering/发布文章/Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性"
+              "title": "实用skills清单"
             }
           }
         ],
-        "currentTab": 4
+        "currentTab": 2
       },
       {
         "id": "f511fb5e1653b43b",
@@ -92,13 +64,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Areas/Harness Engineering/发布文章/Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性.md",
+                "file": "Areas/Harness Engineering/skills/实用skills清单.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性 的大纲"
+              "title": "实用skills清单 的大纲"
             }
           }
         ]
@@ -260,7 +232,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 200
+    "width": 378.5
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -275,8 +247,39 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "886e10ae55d381e7",
+  "active": "fff6420f79882863",
   "lastOpenFiles": [
+    "Areas/Harness Engineering/skills/tmux/SKILL.md",
+    "Areas/Harness Engineering/skills/实用skills清单.md",
+    "Areas/Harness Engineering/skills/tmux",
+    "Areas/Harness Engineering/skills/ui-ux-pro-max/SKILL.md",
+    "Areas/Harness Engineering/skills/react-best-practices/SKILL.md",
+    "Areas/Harness Engineering/skills/product-docs-governance/SKILL.md",
+    "Areas/Harness Engineering/skills/feature-development-personal/SKILL.md",
+    "Areas/Harness Engineering/skills/feature-development-personal/feature-development-personal.md",
+    "Areas/Harness Engineering/skills/feature-development-personal/介绍.md",
+    "obsidian最佳实践.md",
+    "Areas/_赛道观察/WebGPU/WebGPU 方向地图.canvas",
+    "Areas/Harness Engineering/个人笔记/AI画图神器-Excalidraw和draw.io和PicDoc.md",
+    "Areas/_赛道观察/WebGPU/开源项目观察.md",
+    "Areas/_赛道观察/Canvas UI/HTML in Canvas.md",
+    "Areas/_赛道观察/WebGPU",
+    "Areas/_赛道观察/Canvas UI",
+    "Areas/_赛道观察",
+    "Areas/Harness Engineering/未命名.canvas",
+    "Excalidraw/Drawing 2026-04-02 16.52.59.excalidraw.md",
+    "Excalidraw/dev-environment.excalidraw",
+    "Excalidraw/EXCALIDRAW_FORMAT.md",
+    "Excalidraw/Drawing 2026-04-02 16.52.59.polished.excalidraw.md",
+    "Excalidraw/Drawing 2026-04-20 15.07.03.excalidraw.md",
+    "Areas/Harness Engineering/rules/rules/typescript/coding-style.md",
+    "Areas/Harness Engineering/发布文章/告别混乱，让你的Claude Code轻装上阵.md",
+    "Areas/Harness Engineering/rules/rules/common/tmux.md",
+    "Areas/Harness Engineering/rules/rules/python/coding-style.md",
+    "Areas/Harness Engineering/rules/rules/python/patterns.md",
+    "Areas/Harness Engineering/个人笔记/项目实操踩坑记录.md",
+    "Areas/Harness Engineering/个人笔记/自动化调试-chrome mcp tool.md",
+    "Areas/Harness Engineering/发布文章/Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性.md",
     "Areas/Harness Engineering/发布文章/images/Pasted image 20260320002041.png",
     "Areas/Harness Engineering/发布文章/images/Pasted image 20260320002717.png",
     "Areas/Harness Engineering/发布文章/images/Pasted image 20260329111651.png",
@@ -288,41 +291,11 @@
     "Areas/Harness Engineering/发布文章/images/Pasted image 20260328141318.png",
     "Areas/Harness Engineering/发布文章/images/Pasted image 20260328141012.png",
     "Areas/Harness Engineering/发布文章/images/Pasted image 20260328140644.png",
-    "Areas/Harness Engineering/发布文章/images/Pasted image 20260327012500.png",
     "knowledge-publish-guide.md",
-    "obsidian最佳实践.md",
     "Excalidraw/skills-mcp-hooks.excalidraw",
     "Excalidraw/openspec-workflow.excalidraw",
-    "Excalidraw/EXCALIDRAW_FORMAT.md",
-    "Excalidraw/Drawing 2026-04-02 16.52.59.excalidraw.md",
-    "Excalidraw/dev-environment.excalidraw",
     "Excalidraw/claude-code-architecture.excalidraw",
-    "Areas/Drawing 2026-04-18 14.59.29.excalidraw.md",
-    "未命名.md",
-    "Areas/就业/公司名录.md",
-    "Areas/就业/计算机方向.md",
-    "Areas/就业/热门就业、考研方向.md",
-    "Areas/Harness Engineering/发布文章/Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性.md",
-    "Areas/Harness Engineering/个人笔记/自动化调试-chrome mcp tool.md",
-    "Areas/Harness Engineering/个人笔记/网络搜索功能的优化.md",
     "Areas/就业",
-    "Areas/操作系统/WSL2 安装 Chrome + 代理配置.md",
-    "Areas/Harness Engineering/个人笔记/自动化测试-playwright cli.md",
-    "Areas/Harness Engineering/个人笔记/项目实操踩坑记录.md",
-    "Areas/Harness Engineering/个人笔记/工程化.md",
-    "Areas/Harness Engineering/个人笔记/6-提效总结.md",
-    "Areas/Harness Engineering/个人笔记/1-CLAUDE.md和记忆机制.md",
-    "Areas/Harness Engineering/个人笔记/everything-claude-code/hook.md",
-    "Areas/Harness Engineering/发布文章/TS全栈技术是否会成为未来主流？.md",
-    "Areas/Harness Engineering/rules/rules/tmux.md",
-    "Areas/Harness Engineering/rules/rules/nx_monorepo",
-    "未命名",
-    "Areas/Harness Engineering/个人笔记/claude-code-best-practice.md",
-    "Areas/Harness Engineering/rules/rules/agent temas",
-    "Areas/Harness Engineering/个人笔记/3-plugins.md",
-    "Areas/Harness Engineering/个人笔记/gstack",
-    "Areas/Harness Engineering/rules/rules/nestjs/security.md",
-    "Areas/Harness Engineering/rules/rules/nestjs/patterns.md",
     "未命名.canvas",
     "未命名 1.canvas"
   ]
