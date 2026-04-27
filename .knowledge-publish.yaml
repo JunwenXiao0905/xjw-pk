@@ -26,6 +26,9 @@ ignoreDirs:
   - Projects
   - archive
   - secrets
+  - Areas/_公司库
+  - Areas/_赛道观察
+  - Areas/_职业路径
 
 # ============================================
 # 隐藏文件模式
