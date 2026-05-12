@@ -36,3 +36,9 @@ GIS：postgis maplibre GDAL
 	
 ```
 
+
+用户目录下的CLAUDE.md放置思想钢印，关闭讨好型人格。
+
+项目目录下的CLAUDE.md放置文档索引，还需要维护
+docs/architecture.md
+docs/anti-patterns.md

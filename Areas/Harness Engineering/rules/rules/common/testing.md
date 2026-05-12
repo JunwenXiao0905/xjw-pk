@@ -17,6 +17,14 @@ MANDATORY workflow:
 5. Refactor (IMPROVE)
 6. Verify coverage (80%+)
 
+## Test Organization
+
+Unit tests must mirror the source directory structure.
+
+Each test file should test only the behavior of its corresponding source file.
+
+Avoid broad test files that cover multiple unrelated modules. Shared behavior should be tested through the module that owns it.
+
 ## Troubleshooting Test Failures
 
 1. Use **tdd-guide** agent

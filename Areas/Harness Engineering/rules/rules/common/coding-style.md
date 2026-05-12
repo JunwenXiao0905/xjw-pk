@@ -6,8 +6,8 @@ ALWAYS create new objects, NEVER mutate existing ones:
 
 ```
 // Pseudocode
-WRONG:  modify(original, field, value) → changes original in-place
-CORRECT: update(original, field, value) → returns new copy with change
+WRONG:  modify(original, field, value) -> changes original in-place
+CORRECT: update(original, field, value) -> returns new copy with change
 ```
 
 Rationale: Immutable data prevents hidden side effects, makes debugging easier, and enables safe concurrency.
@@ -19,6 +19,36 @@ MANY SMALL FILES > FEW LARGE FILES:
 - 200-400 lines typical, 800 max
 - Extract utilities from large modules
 - Organize by feature/domain, not by type
+- Reuse existing utilities from `utils` whenever possible
+- If a generally useful helper does not exist, extract it into `utils` and reuse it consistently
+
+Do not extract one-off helper functions unless they represent a real boundary, hide meaningful complexity, or provide reuse value. Prefer inline implementation for simple logic that is only used once.
+
+## Documentation
+
+Document externally exposed types, interfaces, functions, and classes.
+
+Add functional comments at important logic branches when:
+- The branch encodes business rules
+- The condition is non-obvious
+- The behavior protects an edge case
+- Future maintainers may not infer the reason from the code alone
+
+Do not comment obvious implementation details. Comments should explain intent, contract, or boundary behavior.
+
+## Abstraction
+
+Avoid abstraction layers that do not simplify code or represent real boundaries.
+
+Prefer direct calls to the owning module or service instead of passing broad wrapper objects between layers.
+
+Only introduce an abstraction when it:
+- Reduces meaningful duplication
+- Encapsulates real complexity
+- Defines a stable boundary
+- Matches an existing project pattern
+
+Avoid abstractions created only to move code around.
 
 ## Error Handling
 
@@ -41,18 +71,17 @@ ALWAYS validate at system boundaries:
 
 ## Mock Data Restrictions
 
-  NEVER use mock data unless explicitly requested:
-  - Default to real data sources (APIs, databases, files)
-  - Mock data introduces drift from production behavior
-  - Tests with mocks pass but production may fail
+NEVER use mock data unless explicitly requested:
+- Default to real data sources (APIs, databases, files)
+- Mock data introduces drift from production behavior
+- Tests with mocks pass but production may fail
 
-  If mock data appears necessary due to business or code constraints:
-  - STOP and ASK the user before proceeding
-  - Explain why mock is needed and what alternatives exist
-  - Get explicit approval before implementing any mock
+If mock data appears necessary due to business or code constraints:
+- STOP and ASK the user before proceeding
+- Explain why mock is needed and what alternatives exist
+- Get explicit approval before implementing any mock
 
-  Rationale: Mocks hide real-world edge cases, create maintenance burden, and mask integration failures.
-
+Rationale: Mocks hide real-world edge cases, create maintenance burden, and mask integration failures.
 
 ## Code Quality Checklist
 
@@ -64,3 +93,9 @@ Before marking work complete:
 - [ ] Proper error handling
 - [ ] No hardcoded values (use constants or config)
 - [ ] No mutation (immutable patterns used)
+- [ ] Public types, interfaces, functions, and classes are documented
+- [ ] Important logic branches explain functional intent
+- [ ] Existing utilities are reused where appropriate
+- [ ] New reusable helpers are extracted into `utils`
+- [ ] No unnecessary abstraction layers
+- [ ] No one-off helper extraction without real boundary or reuse value

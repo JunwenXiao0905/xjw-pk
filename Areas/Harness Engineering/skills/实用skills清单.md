@@ -6,6 +6,7 @@
 | name              | 来源                                          | 作用                                                       | 备注                                                     |
 | ----------------- | ------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------ |
 | `obsidian-skills` | <https://github.com/kepano/obsidian-skills> | 让 AI agent 更懂 Obsidian Markdown、Bases、Canvas、CLI 和网页内容抽取 | 只记录为外部实用 skill；具体 Obsidian 使用方法写到根目录 `obsidian最佳实践.md` |
+| frontend-design   | frontend-design@claude-plugins-official     |                                                          |                                                        |
 
 ## `obsidian-skills` 子能力
 

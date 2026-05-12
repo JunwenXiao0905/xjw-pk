@@ -15,12 +15,15 @@ Use types to make public APIs, shared models, and component props explicit, read
 
 ### Public APIs
 
-- Add parameter and return types to exported functions, shared utilities, and public class methods
+- Add parameter types to exported functions, shared utilities, and public class methods
+- Add return types only when TypeScript cannot infer them correctly, when the function is part of a public contract, or when the explicit type prevents accidental contract drift
 - Let TypeScript infer obvious local variable types
 - Extract repeated inline object shapes into named types or interfaces
+- Always use source types from the owning library or module
+- Do not create local duplicate types or substitute types to work around TypeScript errors. Fix the type boundary instead.
 
 ```typescript
-// WRONG: Exported function without explicit types
+// WRONG: Exported function without parameter types
 export function formatUser(user) {
   return `${user.firstName} ${user.lastName}`
 }

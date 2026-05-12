@@ -6,10 +6,24 @@
       {
         "id": "380a989eb7e80cd5",
         "type": "tabs",
-        "dimension": 81.9055944055944,
+        "dimension": 55.41958041958041,
         "children": [
           {
-            "id": "0f317bcaa14c529c",
+            "id": "fff6420f79882863",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Areas/GIS/Cesium/cesium基础.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "cesium基础"
+            }
+          },
+          {
+            "id": "a91f3912afc5beb8",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -21,42 +35,13 @@
               "icon": "lucide-file",
               "title": "Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性"
             }
-          },
-          {
-            "id": "87d586e00e6adebb",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Areas/Harness Engineering/个人笔记/CLAUDE.md和记忆机制.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "CLAUDE.md和记忆机制"
-            }
-          },
-          {
-            "id": "fff6420f79882863",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Areas/Harness Engineering/skills/实用skills清单.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "实用skills清单"
-            }
           }
-        ],
-        "currentTab": 2
+        ]
       },
       {
         "id": "f511fb5e1653b43b",
         "type": "tabs",
-        "dimension": 18.094405594405593,
+        "dimension": 44.58041958041958,
         "children": [
           {
             "id": "6d2b29c02cf6c6d2",
@@ -64,13 +49,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Areas/Harness Engineering/skills/实用skills清单.md",
+                "file": "Areas/GIS/Cesium/cesium基础.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "实用skills清单 的大纲"
+              "title": "cesium基础 的大纲"
             }
           }
         ]
@@ -232,7 +217,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 378.5
+    "width": 435.5
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -247,55 +232,56 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "fff6420f79882863",
+  "active": "6d2b29c02cf6c6d2",
   "lastOpenFiles": [
-    "Areas/Harness Engineering/skills/tmux/SKILL.md",
-    "Areas/Harness Engineering/skills/实用skills清单.md",
-    "Areas/Harness Engineering/skills/tmux",
-    "Areas/Harness Engineering/skills/ui-ux-pro-max/SKILL.md",
-    "Areas/Harness Engineering/skills/react-best-practices/SKILL.md",
-    "Areas/Harness Engineering/skills/product-docs-governance/SKILL.md",
-    "Areas/Harness Engineering/skills/feature-development-personal/SKILL.md",
-    "Areas/Harness Engineering/skills/feature-development-personal/feature-development-personal.md",
-    "Areas/Harness Engineering/skills/feature-development-personal/介绍.md",
-    "obsidian最佳实践.md",
-    "Areas/_赛道观察/WebGPU/WebGPU 方向地图.canvas",
-    "Areas/Harness Engineering/个人笔记/AI画图神器-Excalidraw和draw.io和PicDoc.md",
-    "Areas/_赛道观察/WebGPU/开源项目观察.md",
-    "Areas/_赛道观察/Canvas UI/HTML in Canvas.md",
-    "Areas/_赛道观察/WebGPU",
-    "Areas/_赛道观察/Canvas UI",
-    "Areas/_赛道观察",
-    "Areas/Harness Engineering/未命名.canvas",
-    "Excalidraw/Drawing 2026-04-02 16.52.59.excalidraw.md",
-    "Excalidraw/dev-environment.excalidraw",
-    "Excalidraw/EXCALIDRAW_FORMAT.md",
-    "Excalidraw/Drawing 2026-04-02 16.52.59.polished.excalidraw.md",
-    "Excalidraw/Drawing 2026-04-20 15.07.03.excalidraw.md",
-    "Areas/Harness Engineering/rules/rules/typescript/coding-style.md",
-    "Areas/Harness Engineering/发布文章/告别混乱，让你的Claude Code轻装上阵.md",
-    "Areas/Harness Engineering/rules/rules/common/tmux.md",
-    "Areas/Harness Engineering/rules/rules/python/coding-style.md",
-    "Areas/Harness Engineering/rules/rules/python/patterns.md",
-    "Areas/Harness Engineering/个人笔记/项目实操踩坑记录.md",
-    "Areas/Harness Engineering/个人笔记/自动化调试-chrome mcp tool.md",
+    "Areas/Python/uvicorn.md",
+    "Areas/Python/Python项目管理.md",
+    "Areas/Python/PyCharm.md",
+    "Areas/Python/FastAPI.md",
+    "Areas/Python/1729265071683.png",
+    "Areas/Python/3小时快速入门python.md",
+    "Areas/Python",
+    "Areas/新建文件夹",
+    "Areas/Harness Engineering/个人笔记/学习/Codex APP实用功能清单：上手后最值得用的几个能力.md",
     "Areas/Harness Engineering/发布文章/Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性.md",
+    "Areas/GIS/Cesium/cesium基础.md",
+    "Areas/Harness Engineering/发布文章/别再屯插件了：我给 Claude Code 配了一套最小工程化模板.md",
+    "Areas/Harness Engineering/发布文章/告别混乱，让你的Claude Code轻装上阵.md",
+    "Areas/Harness Engineering/发布文章/给claude code解开限制，多种权限设计.md",
+    "Areas/Harness Engineering/发布文章/你真的懂CLAUDE.md吗.md",
+    "Areas/Harness Engineering/发布文章/Claude Code这些提效工具和设置，你配置了吗.md",
+    "Areas/Harness Engineering/发布文章/前端转全栈，我选择这套技术框架.md",
+    "Areas/Harness Engineering/发布文章/Codex 沦为 Claude Code 插件？两大 AI Coding 工具终于联手.md",
+    "Areas/Harness Engineering/发布文章/CLAUDE.md-用户根目录下.md",
+    "Areas/Harness Engineering/发布文章/OpenSpec-教程版.md",
+    "Areas/Harness Engineering/发布文章/Vibe Coding必备！OpenSpec-规范驱动开发.md",
+    "Areas/Harness Engineering/发布文章/TS全栈技术是否会成为未来主流？.md",
+    "Areas/Harness Engineering/发布文章/VibeCoding-SuperPower赋予的xx能力.md",
+    "Areas/Harness Engineering/发布文章/别再只会装插件了：我给 Claude Code 配了一套最小工程化模板.md",
+    "knowledge-publish-guide.md",
+    "obsidian最佳实践.md",
+    "Areas/Harness Engineering/rules/rules/common/persona.md",
+    "docs/plans/2026-04-23-mobile-excalidraw-structure.md",
+    "docs/plans/2026-04-23-complex-mobile-excalidraw.md",
+    "Areas/Harness Engineering/个人笔记/工程",
+    "Areas/Harness Engineering/个人笔记/学习",
+    "Areas/Harness Engineering/个人笔记/学习/Pasted image 20260508220312.png",
+    "Areas/GIS/Cesium",
+    "Areas/_赛道观察/低空经济",
+    "Areas/_职业路径/历史记录",
+    "Areas/_公司库/国企央企",
+    "Areas/_公司库/华为OD与生态",
+    "Areas/_公司库/互联网与平台",
+    "Areas/_赛道观察/WebGPU/WebGPU 方向地图.canvas",
+    "Areas/Harness Engineering/未命名.canvas",
     "Areas/Harness Engineering/发布文章/images/Pasted image 20260320002041.png",
     "Areas/Harness Engineering/发布文章/images/Pasted image 20260320002717.png",
     "Areas/Harness Engineering/发布文章/images/Pasted image 20260329111651.png",
-    "Areas/Harness Engineering/发布文章/images",
     "Areas/Harness Engineering/发布文章/images/Pasted image 20260328145723.png",
     "Areas/Harness Engineering/发布文章/images/Pasted image 20260328150133.png",
     "Areas/Harness Engineering/发布文章/images/Pasted image 20260329092002.png",
     "Areas/Harness Engineering/发布文章/images/Pasted image 20260328141340.png",
     "Areas/Harness Engineering/发布文章/images/Pasted image 20260328141318.png",
-    "Areas/Harness Engineering/发布文章/images/Pasted image 20260328141012.png",
-    "Areas/Harness Engineering/发布文章/images/Pasted image 20260328140644.png",
-    "knowledge-publish-guide.md",
-    "Excalidraw/skills-mcp-hooks.excalidraw",
-    "Excalidraw/openspec-workflow.excalidraw",
-    "Excalidraw/claude-code-architecture.excalidraw",
-    "Areas/就业",
     "未命名.canvas",
     "未命名 1.canvas"
   ]
