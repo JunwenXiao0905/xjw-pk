@@ -6,7 +6,6 @@
       {
         "id": "380a989eb7e80cd5",
         "type": "tabs",
-        "dimension": 55.41958041958041,
         "children": [
           {
             "id": "fff6420f79882863",
@@ -14,12 +13,26 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Areas/GIS/Cesium/cesium基础.md",
+                "file": "knowledge-publish-guide.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "cesium基础"
+              "title": "knowledge-publish-guide"
+            }
+          },
+          {
+            "id": "8fa171e25e4bb7c6",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "obsidian最佳实践.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "obsidian最佳实践"
             }
           },
           {
@@ -36,29 +49,8 @@
               "title": "Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性"
             }
           }
-        ]
-      },
-      {
-        "id": "f511fb5e1653b43b",
-        "type": "tabs",
-        "dimension": 44.58041958041958,
-        "children": [
-          {
-            "id": "6d2b29c02cf6c6d2",
-            "type": "leaf",
-            "state": {
-              "type": "outline",
-              "state": {
-                "file": "Areas/GIS/Cesium/cesium基础.md",
-                "followCursor": false,
-                "showSearch": false,
-                "searchQuery": ""
-              },
-              "icon": "lucide-list",
-              "title": "cesium基础 的大纲"
-            }
-          }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -232,8 +224,13 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "6d2b29c02cf6c6d2",
+  "active": "8fa171e25e4bb7c6",
   "lastOpenFiles": [
+    "Areas/Harness Engineering/个人笔记/学习/goal：达标命令.md",
+    "Areas/Harness Engineering/发布文章/Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性.md",
+    "Areas/Harness Engineering/个人笔记/学习/回敬 Codex，Claude Code 推出 goal 功能，不干完不睡觉.md",
+    "knowledge-publish-guide.md",
+    "Areas/GIS/Cesium/cesium基础.md",
     "Areas/Python/uvicorn.md",
     "Areas/Python/Python项目管理.md",
     "Areas/Python/PyCharm.md",
@@ -243,8 +240,6 @@
     "Areas/Python",
     "Areas/新建文件夹",
     "Areas/Harness Engineering/个人笔记/学习/Codex APP实用功能清单：上手后最值得用的几个能力.md",
-    "Areas/Harness Engineering/发布文章/Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性.md",
-    "Areas/GIS/Cesium/cesium基础.md",
     "Areas/Harness Engineering/发布文章/别再屯插件了：我给 Claude Code 配了一套最小工程化模板.md",
     "Areas/Harness Engineering/发布文章/告别混乱，让你的Claude Code轻装上阵.md",
     "Areas/Harness Engineering/发布文章/给claude code解开限制，多种权限设计.md",
@@ -258,11 +253,8 @@
     "Areas/Harness Engineering/发布文章/TS全栈技术是否会成为未来主流？.md",
     "Areas/Harness Engineering/发布文章/VibeCoding-SuperPower赋予的xx能力.md",
     "Areas/Harness Engineering/发布文章/别再只会装插件了：我给 Claude Code 配了一套最小工程化模板.md",
-    "knowledge-publish-guide.md",
     "obsidian最佳实践.md",
     "Areas/Harness Engineering/rules/rules/common/persona.md",
-    "docs/plans/2026-04-23-mobile-excalidraw-structure.md",
-    "docs/plans/2026-04-23-complex-mobile-excalidraw.md",
     "Areas/Harness Engineering/个人笔记/工程",
     "Areas/Harness Engineering/个人笔记/学习",
     "Areas/Harness Engineering/个人笔记/学习/Pasted image 20260508220312.png",

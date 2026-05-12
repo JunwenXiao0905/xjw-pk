@@ -1,5 +1,5 @@
 ---
-published: "true"
+published: "false"
 title: obsidian最佳实践
 ---
 
