@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Areas/Harness Engineering/个人笔记/学习/8-worktree.md",
+                "file": "Areas/Harness Engineering/skills/实用skills清单.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "8-worktree"
+              "title": "实用skills清单"
             }
           }
         ],
@@ -181,13 +181,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Areas/Harness Engineering/个人笔记/学习/8-worktree.md",
+                "file": "Areas/Harness Engineering/skills/实用skills清单.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "8-worktree 的大纲"
+              "title": "实用skills清单 的大纲"
             }
           }
         ],
@@ -210,8 +210,13 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "fc84114055b774c5",
+  "active": "a91f3912afc5beb8",
   "lastOpenFiles": [
+    "Areas/Python/uvicorn.md",
+    "Areas/Python/Python项目管理.md",
+    "Areas/Python/Python基础知识.md",
+    "Areas/Python/Python后端-FastAPI.md",
+    "Areas/Harness Engineering/个人笔记/学习/8-worktree.md",
     "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules.md",
     "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/hook.md",
     "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/TRANSLATION_TASKS.md",
@@ -237,15 +242,10 @@
     "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/python/hooks.md",
     "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/python/fastapi.md",
     "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/python/fastapi.md.tmp.24758.1778680645005",
-    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/python/coding-style.md",
     "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/python/coding-style.md.tmp.24758.1778680644865",
-    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/typescript/testing.md",
     "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/typescript/testing.md.tmp.24758.1778680644738",
-    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/typescript/security.md",
     "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/typescript/security.md.tmp.24758.1778680644608",
-    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/typescript/patterns.md",
     "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/typescript/patterns.md.tmp.24758.1778680644468",
-    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/typescript/hooks.md",
     "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/typescript/hooks.md.tmp.24758.1778680644318",
     "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/typescript/coding-style.md.tmp.24758.1778680644166",
     "Areas/Python/1729265071683.png",
