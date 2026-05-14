@@ -19,32 +19,6 @@
 [CesiumJS-0318.pdf](https://www.yuque.com/attachments/yuque/0/2026/pdf/34655355/1768885819108-7a145ead-c749-4cd0-9203-63b8be40dd0e.pdf)
 
 ## 一、heml页面实现cesium加载
-1、下载1.99版本（这样下载是歪货，应该直接找GitHub）
-
-<!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2024/png/34655355/1732625910120-a5061cac-fa64-4ce4-aeca-5209a5737e09.png)
-
-2、拿到token
-
-<!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2024/png/34655355/1732625947498-a5096844-a7b6-4a1b-8350-415027959e01.png)
-
-3、cesium包认识
-
-既是js包，也是一个完整的项目，可以直接启动
-
-<!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2024/png/34655355/1732625951810-71cd6276-cc0f-4eed-98f6-46d8b58ef960.png)
-
-4、html中加载
-
-我猜测是这个包的问题，导致无法识别 js 和css 包。也有可能是token的问题，毕竟当成项目直接打开1.99这个版本，会报错显示 token 不合法
-
-<!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2024/png/34655355/1732625957316-516fdbcf-3152-4940-a0cf-03ebafd0d8d0.png)
-
-<!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2024/png/34655355/1732625961161-9728e11f-8cd2-4950-8b4d-a3a30456803b.png)
 
 
 

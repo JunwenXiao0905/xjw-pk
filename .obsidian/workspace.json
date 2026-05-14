@@ -25,17 +25,14 @@
             "id": "a91f3912afc5beb8",
             "type": "leaf",
             "state": {
-              "type": "canvas",
+              "type": "markdown",
               "state": {
-                "file": "Areas/赛道观察/WebGPU/WebGPU 方向地图.canvas",
-                "viewState": {
-                  "x": 160,
-                  "y": 115,
-                  "zoom": -0.7094098716456451
-                }
+                "file": "Areas/GIS/Cesium/cesium基础.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-layout-dashboard",
-              "title": "WebGPU 方向地图"
+              "icon": "lucide-file",
+              "title": "cesium基础"
             }
           }
         ],
@@ -184,13 +181,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Areas/赛道观察/WebGPU/WebGPU 方向地图.canvas",
+                "file": "Areas/GIS/Cesium/cesium基础.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "WebGPU 方向地图 的大纲"
+              "title": "cesium基础 的大纲"
             }
           }
         ],
@@ -213,8 +210,9 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "a91f3912afc5beb8",
+  "active": "fc84114055b774c5",
   "lastOpenFiles": [
+    "Areas/赛道观察/WebGPU/WebGPU 方向地图.canvas",
     "Areas/赛道观察/WebGPU/开源项目观察.md",
     "Areas/赛道观察/GIS与空间智能/行业线索.md",
     "Areas/赛道观察/GIS+Rust+WebGPU/行业线索.md",
@@ -240,7 +238,6 @@
     "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/common/agents.md",
     "Areas/Harness Engineering/个人笔记/学习/andrej-karpathy-skills/SKILL.zh.md",
     "Areas/Harness Engineering/个人笔记/学习/andrej-karpathy-skills/README.zh.md",
-    "Areas/Harness Engineering/个人笔记/学习/andrej-karpathy-skills/TRANSLATION_TASKS.md",
     "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/python/testing.md.tmp.24758.1778680645549",
     "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/python/security.md.tmp.24758.1778680645405",
     "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/python/patterns.md.tmp.24758.1778680645265",
@@ -253,7 +250,6 @@
     "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/typescript/coding-style.md.tmp.24758.1778680644166",
     "Areas/Python/1729265071683.png",
     "Areas/Harness Engineering/个人笔记/学习/Pasted image 20260508220312.png",
-    "Areas/赛道观察/WebGPU/WebGPU 方向地图.canvas",
     "Areas/Harness Engineering/未命名.canvas",
     "Areas/Harness Engineering/发布文章/images/Pasted image 20260320002041.png",
     "Areas/Harness Engineering/发布文章/images/Pasted image 20260320002717.png",
