@@ -22,31 +22,17 @@
             }
           },
           {
-            "id": "8fa171e25e4bb7c6",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "obsidian最佳实践.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "obsidian最佳实践"
-            }
-          },
-          {
             "id": "a91f3912afc5beb8",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Areas/Harness Engineering/发布文章/Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性.md",
+                "file": "Areas/Harness Engineering/个人笔记/学习/8-worktree.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性"
+              "title": "8-worktree"
             }
           }
         ],
@@ -107,7 +93,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 532.5
+    "width": 552.5
   },
   "right": {
     "id": "9670f9e1bf99fd91",
@@ -180,21 +166,6 @@
             }
           },
           {
-            "id": "08d81994ff529e4c",
-            "type": "leaf",
-            "state": {
-              "type": "outline",
-              "state": {
-                "file": "PKOS架构设计.md",
-                "followCursor": false,
-                "showSearch": false,
-                "searchQuery": ""
-              },
-              "icon": "lucide-list",
-              "title": "PKOS架构设计 的大纲"
-            }
-          },
-          {
             "id": "fc84114055b774c5",
             "type": "leaf",
             "state": {
@@ -203,9 +174,24 @@
               "icon": "git-pull-request",
               "title": "Source Control"
             }
+          },
+          {
+            "id": "d05a68aabf66b58b",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Areas/Harness Engineering/个人笔记/学习/8-worktree.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "8-worktree 的大纲"
+            }
           }
         ],
-        "currentTab": 5
+        "currentTab": 4
       }
     ],
     "direction": "horizontal",
@@ -224,46 +210,46 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "8fa171e25e4bb7c6",
+  "active": "fc84114055b774c5",
   "lastOpenFiles": [
-    "Areas/Harness Engineering/个人笔记/学习/goal：达标命令.md",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules.md",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/hook.md",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/TRANSLATION_TASKS.md",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/common/agents.md",
+    "Areas/Harness Engineering/个人笔记/学习/andrej-karpathy-skills/SKILL.zh.md",
+    "Areas/Harness Engineering/个人笔记/学习/andrej-karpathy-skills/README.zh.md",
+    "Areas/Harness Engineering/个人笔记/学习/andrej-karpathy-skills/TRANSLATION_TASKS.md",
+    "Areas/Harness Engineering/个人笔记/学习/andrej-karpathy-skills/_source/README.zh.md",
+    "Areas/Harness Engineering/个人笔记/学习/andrej-karpathy-skills/_source/skills/karpathy-guidelines/SKILL.md",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/common/coding-style.md",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/_source/rules/common/coding-style.md",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/_source/rules/common/code-review.md",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/common/code-review.md",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/typescript/coding-style.md",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/common/patterns.md",
     "Areas/Harness Engineering/发布文章/Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性.md",
-    "Areas/Harness Engineering/个人笔记/学习/回敬 Codex，Claude Code 推出 goal 功能，不干完不睡觉.md",
-    "knowledge-publish-guide.md",
-    "Areas/GIS/Cesium/cesium基础.md",
-    "Areas/Python/uvicorn.md",
-    "Areas/Python/Python项目管理.md",
-    "Areas/Python/PyCharm.md",
-    "Areas/Python/FastAPI.md",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/python/testing.md",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/python/testing.md.tmp.24758.1778680645549",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/python/security.md",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/python/security.md.tmp.24758.1778680645405",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/python/patterns.md",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/python/patterns.md.tmp.24758.1778680645265",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/python/hooks.md",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/python/fastapi.md",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/python/fastapi.md.tmp.24758.1778680645005",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/python/coding-style.md",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/python/coding-style.md.tmp.24758.1778680644865",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/typescript/testing.md",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/typescript/testing.md.tmp.24758.1778680644738",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/typescript/security.md",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/typescript/security.md.tmp.24758.1778680644608",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/typescript/patterns.md",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/typescript/patterns.md.tmp.24758.1778680644468",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/typescript/hooks.md",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/typescript/hooks.md.tmp.24758.1778680644318",
+    "Areas/Harness Engineering/个人笔记/学习/everything-claude-code/rules/typescript/coding-style.md.tmp.24758.1778680644166",
     "Areas/Python/1729265071683.png",
-    "Areas/Python/3小时快速入门python.md",
-    "Areas/Python",
-    "Areas/新建文件夹",
-    "Areas/Harness Engineering/个人笔记/学习/Codex APP实用功能清单：上手后最值得用的几个能力.md",
-    "Areas/Harness Engineering/发布文章/别再屯插件了：我给 Claude Code 配了一套最小工程化模板.md",
-    "Areas/Harness Engineering/发布文章/告别混乱，让你的Claude Code轻装上阵.md",
-    "Areas/Harness Engineering/发布文章/给claude code解开限制，多种权限设计.md",
-    "Areas/Harness Engineering/发布文章/你真的懂CLAUDE.md吗.md",
-    "Areas/Harness Engineering/发布文章/Claude Code这些提效工具和设置，你配置了吗.md",
-    "Areas/Harness Engineering/发布文章/前端转全栈，我选择这套技术框架.md",
-    "Areas/Harness Engineering/发布文章/Codex 沦为 Claude Code 插件？两大 AI Coding 工具终于联手.md",
-    "Areas/Harness Engineering/发布文章/CLAUDE.md-用户根目录下.md",
-    "Areas/Harness Engineering/发布文章/OpenSpec-教程版.md",
-    "Areas/Harness Engineering/发布文章/Vibe Coding必备！OpenSpec-规范驱动开发.md",
-    "Areas/Harness Engineering/发布文章/TS全栈技术是否会成为未来主流？.md",
-    "Areas/Harness Engineering/发布文章/VibeCoding-SuperPower赋予的xx能力.md",
-    "Areas/Harness Engineering/发布文章/别再只会装插件了：我给 Claude Code 配了一套最小工程化模板.md",
-    "obsidian最佳实践.md",
-    "Areas/Harness Engineering/rules/rules/common/persona.md",
-    "Areas/Harness Engineering/个人笔记/工程",
-    "Areas/Harness Engineering/个人笔记/学习",
     "Areas/Harness Engineering/个人笔记/学习/Pasted image 20260508220312.png",
-    "Areas/GIS/Cesium",
-    "Areas/_赛道观察/低空经济",
-    "Areas/_职业路径/历史记录",
-    "Areas/_公司库/国企央企",
-    "Areas/_公司库/华为OD与生态",
-    "Areas/_公司库/互联网与平台",
     "Areas/_赛道观察/WebGPU/WebGPU 方向地图.canvas",
     "Areas/Harness Engineering/未命名.canvas",
     "Areas/Harness Engineering/发布文章/images/Pasted image 20260320002041.png",
