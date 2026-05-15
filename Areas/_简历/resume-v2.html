@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>中级前端工程师（偏全栈、GIS）- 肖竣文</title>
+  <style>
+    :root {
+      --primary-color: #2c3e50;
+      --thema-color: #255db0;
+      --thema-color-b: #dfb674;
+      --accent-color: #3498db;
+      --text-color: #333;
+      --light-text: #666;
+      --bg-color: #f5f6fa;
+      --card-bg: #ffffff;
+      --border-color: #e1e4e8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--text-color);
+      background-color: var(--bg-color);
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background-color: var(--card-bg);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+      padding: 40px;
+      border-radius: 8px;
+    }
+
+    /* Header Section */
+    header {
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    header.header {
+      border-bottom: none;
+      padding-bottom: 0px;
+      margin-bottom: 0px;
+
+    }
+
+    .title {
+      width: 100%;
+      height: 80px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+
+    }
+
+    .title-text {
+      font-size: 40px;
+      color: #255db0;
+      margin-bottom: 10px;
+      padding: 0 30px 0 30px;
+      border-right: 3px solid var(--thema-color);
+    }
+
+    .title-slogn {
+      font-size: 17px;
+      padding: 0 30px 0 30px;
+      height: 100%;
+      color: var(--thema-color);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .title-svg {
+      margin-left: auto;
+      margin-right: 20px;
+      display: flex;
+      align-items: center;
+    }
+
+    .title-svg svg {
+      width: 40px;
+      height: 40px;
+      fill: var(--thema-color-b);
+    }
+
+    .title-line {
+      display: flex;
+      flex-direction: row;
+      height: 20px;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .title-line .line-a {
+      flex: 2 0 0;
+      height: 20px;
+      background-color: var(--thema-color);
+      clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 100%, 0 100%);
+    }
+
+    .title-line .line-b {
+      flex: 1 0 0;
+      height: 15px;
+      background-color: var(--thema-color-b);
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 15px 100%);
+      margin-left: -10px;
+    }
+
+    .content {
+      padding-top: 20px;
+      margin-left: 30px;
+      border-left: 2px solid var(--thema-color);
+    }
+
+    .section-container {
+      margin-bottom: 13px;
+      margin-right: 30px;
+
+      padding-top: 10px;
+      position: relative;
+      /* 为挂钩三角形提供定位基准 */
+    }
+
+    .section-container-title {
+      width: 150px;
+      height: 30px;
+      font-size: 18px;
+      color: #fff;
+      background-color: var(--thema-color);
+      padding-left: 20px;
+      font-weight: 200;
+      display: flex;
+      align-items: center;
+      position: relative;
+      /* 往左移动，使其覆盖在左边框上 */
+      margin-left: -10px;
+      /* 30px margin + 2px border */
+      z-index: 2;
+      /* 保证在上方 */
+
+      /* 金刚狼爪痕效果 - 平行切痕 */
+      clip-path: polygon(
+          /* 主体左上角 */
+          0 0,
+          /* 第一刀（最右边的主切面） */
+          calc(100% - 30px) 0,
+          100% 100%,
+
+          /* 第二刀（中间的切痕缝隙）- 从底部切入 */
+          calc(100% - 15px) 100%,
+          calc(100% - 45px) 0,
+          calc(100% - 47px) 0,
+          calc(100% - 17px) 100%,
+
+          /* 第三刀（中间的切痕缝隙）- 从底部切入 */
+          calc(100% - 22px) 100%,
+          calc(100% - 52px) 0,
+          calc(100% - 54px) 0,
+          calc(100% - 24px) 100%,
+
+
+          /* 回到左下角 */
+          0 100%);
+    }
+
+    /* 挂钩折角 - 独立元素或父容器伪元素实现，避免被 clip-path 裁剪 */
+    .section-container::before {
+      content: '';
+      position: absolute;
+      top: 40px;
+      /* title height 30px + padding 10px */
+      left: -10px;
+      width: 0;
+      height: 0;
+      border-top: 10px solid #1a427d;
+      /* 深一点的主题色作为阴影 */
+      border-left: 10px solid transparent;
+      z-index: 1;
+    }
+
+    .section-main {
+      padding-left: 22px;
+      padding-top: 4px;
+      border-top: 2px solid var(--thema-color);
+    }
+
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 140px;
+      grid-auto-rows: minmax(25px, 30px);
+      gap: 2px 5px;
+      /* 减小行间距，从5px改为2px */
+      margin-top: 15px;
+    }
+
+    .photo-box {
+      grid-column: 3;
+      grid-row: 1 / 7;
+      background-color: #f0f0f0;
+      border: 1px solid #ddd;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .photo-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .info-item {
+      display: flex;
+      align-items: flex-start;
+      font-size: 15px;
+      color: var(--text-color);
+    }
+
+    .info-item .label {
+      color: var(--light-text);
+      margin-right: 8px;
+      width: 60px;
+      /* 固定宽度 */
+      text-align: justify;
+      text-align-last: justify;
+      /* 强制两端对齐 */
+      display: inline-block;
+    }
+
+    /* 统一添加冒号，避免对齐问题影响冒号位置 */
+    .architecture-grid {
+      display: grid;
+      /* 左侧占2.5份，右侧占1份 -> 右侧变窄 */
+      grid-template-columns: 3.5fr 1fr;
+      gap: 10px;
+      margin-top: 25px;
+      margin-bottom: 30px;
+    }
+
+    .arch-left-col {
+      display: grid;
+      grid-template-rows: repeat(5, auto);
+      gap: 15px 0;
+    }
+
+    .arch-item {
+      position: relative;
+      padding: 18px 15px 15px 15px;
+      /* 玻璃拟态/卡片感 */
+      background: linear-gradient(135deg, #ffffff 0%, #deecfc 100%);
+      border: 1px solid rgba(37, 93, 176, 0.1);
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(37, 93, 176, 0.05);
+      transition: all 0.3s ease;
+      /* 左侧装饰条 */
+      /* border-left: 3px solid var(--thema-color); */
+    }
+
+    .arch-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 93, 176, 0.12);
+    }
+
+    /* 优化后的标签样式 */
+    .arch-label {
+      position: absolute;
+      top: -10px;
+      left: 12px;
+      background: #fff;
+      padding: 0 10px;
+      /* 使用双色渐变边框或更高级的阴影 */
+      border: 1px solid var(--thema-color-b);
+      box-shadow: 0 2px 4px rgba(37, 36, 33, 0.15);
+      color: var(--thema-color-b);
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 12px;
+      /* 圆角胶囊样式 */
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      z-index: 2;
+    }
+
+    .arch-label.gis-title {
+      border: 1px solid var(--thema-color);
+      box-shadow: 0 2px 4px rgba(37, 36, 33, 0.15);
+      color: var(--thema-color);
+    }
+
+    .tech-class {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      gap: 10px;
+    }
+
+    .tech-class-item {
+      padding: 4px 8px;
+    }
+
+    /* 右侧 GIS 大卡片的高级样式 */
+    .arch-right-col {
+      position: relative;
+      padding: 20px;
+      border-radius: 6px;
+      height: 100%;
+      /* 科技感背景 */
+      background: linear-gradient(135deg, rgba(37, 93, 176, 0.03) 0%, rgba(37, 93, 176, 0.08) 100%);
+      border: 1px solid rgba(37, 93, 176, 0.15);
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+
+      /* 添加背景网格装饰 */
+      background-image:
+        linear-gradient(rgba(37, 93, 176, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37, 93, 176, 0.05) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    /* GIS 内部文字排版优化 */
+    .gis-content {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 15px;
+
+    }
+
+    .gis-tag {
+      background: #fff;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 14px;
+      color: var(--thema-color);
+      border: 1px solid rgba(37, 93, 176, 0.2);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+      font-weight: 500;
+    }
+
+    .skill-list {
+      margin-top: 20px;
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .skill-list li {
+      margin-bottom: 8px;
+      position: relative;
+      padding-left: 15px;
+      font-size: 14px;
+      color: var(--text-color);
+    }
+
+    .skill-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--accent-color);
+    }
+
+    /* 优化后的技能列表样式 */
+    .skills-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    .skill-box {
+      background: #fafbfc;
+      border: 1px solid #e1e4e8;
+      border-radius: 6px;
+      padding: 12px 15px;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .skill-box:hover {
+      box-shadow: 0 4px 15px rgba(37, 93, 176, 0.08);
+      border-color: var(--thema-color);
+      background: #fff;
+      transform: translateY(-2px);
+    }
+
+    .skill-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+    }
+
+    .skill-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 14px;
+      background-color: var(--thema-color);
+      margin-right: 8px;
+      border-radius: 2px;
+    }
+
+    .skill-desc {
+      font-size: 13.5px;
+      color: #4a5568;
+      line-height: 1.6;
+      text-align: justify;
+    }
+
+    .skill-tag {
+      font-weight: 600;
+      color: var(--thema-color);
+      margin: 0 2px;
+    }
+
+    /* Generic Section Styles */
+    section {
+      margin-bottom: 30px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      color: var(--primary-color);
+      border-left: 4px solid var(--accent-color);
+      padding-left: 12px;
+      margin-bottom: 20px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Self Evaluation */
+    .evaluation-list {
+      list-style: none;
+    }
+
+    .evaluation-list li {
+      margin-bottom: 8px;
+      position: relative;
+      padding-left: 20px;
+    }
+
+    .evaluation-list li::before {
+      content: "▹";
+      position: absolute;
+      left: 0;
+      color: var(--accent-color);
+    }
+
+    .highlight {
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+
+    .company-block {
+      margin-top: 10px;
+    }
+
+    /* Experience Section */
+    .company-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      background-color: #f8f9fa;
+      padding: 10px 15px;
+      border-radius: 4px;
+      border-left: 4px solid #95a5a6;
+    }
+
+    .company-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+
+    .duration {
+      font-size: 14px;
+      color: var(--light-text);
+      background: #fff;
+      padding: 2px 8px;
+      border-radius: 12px;
+      border: 1px solid #ddd;
+    }
+
+    .project-item {
+      margin-bottom: 25px;
+      padding-left: 15px;
+      border-left: 1px solid var(--border-color);
+      margin-left: 10px;
+    }
+
+    .project-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+    }
+
+    .project-title::before {
+      content: "";
+      display: block;
+      width: 8px;
+      height: 8px;
+      background-color: var(--accent-color);
+      border-radius: 50%;
+      margin-left: -20px;
+      margin-right: 12px;
+      border: 2px solid #fff;
+    }
+
+    .tech-stack {
+      font-size: 13px;
+      color: var(--accent-color);
+      background-color: rgba(52, 152, 219, 0.1);
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    .project-desc {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 8px;
+      font-style: italic;
+    }
+
+    .responsibilities {
+      list-style: none;
+      font-size: 14px;
+    }
+
+    .responsibilities li {
+      margin-bottom: 4px;
+      position: relative;
+      padding-left: 15px;
+    }
+
+    .responsibilities li::before {
+      content: "-";
+      position: absolute;
+      left: 0;
+      color: #999;
+    }
+
+    /* Footer/Other */
+    .other-info {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    @media print {
+      body {
+        background-color: white;
+        padding: 0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .container {
+        box-shadow: none;
+        padding: 0;
+        width: 100%;
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="title">
+        <div class="title-text">个人简历</div>
+        <div class="title-slogn">
+          <div>好运深藏于你的努力之中</div>
+          <div>Great effort creates its own luck</div>
+        </div>
+        <div class="title-svg">
+          <svg class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M874.944 12.576l-0.032 147.84 139.776 0.768-91.904 134.848A461.984 461.984 0 0 1 976 512c0 256.256-207.744 464-464 464S48 768.256 48 512 255.744 48 512 48c89.056 0 172.224 25.088 242.88 68.576l120.064-104zM329.024 416H90.688a433.408 433.408 0 0 0-10.688 96c0 238.592 193.408 432 432 432S944 750.592 944 512c0-32.96-3.712-65.12-10.688-96H695.36l-18.88 107.744a39.616 39.616 0 0 1-45.792 32.192h-0.128a39.808 39.808 0 0 1-32.224-46.08L614.72 416h-205.12l16.448 93.856a39.808 39.808 0 0 1-28.288 45.12l-3.968 0.96a39.616 39.616 0 0 1-45.92-32.192L329.024 416z m304.736 210.144a40.224 40.224 0 0 1 40 40 39.488 39.488 0 0 1-39.68 39.68 275.776 275.776 0 0 0-196.928 80.96 39.84 39.84 0 0 1-56.352-0.192 39.84 39.84 0 0 1-0.224-56.352 354.848 354.848 0 0 1 253.184-104.096zM512 80C329.92 80 174.176 192.64 110.592 352h802.816C849.824 192.64 694.048 80 512 80z">
+            </path>
+          </svg>
+        </div>
+      </div>
+    </header>
+    <div class="title-line">
+      <div class="line-a"></div>
+      <div class="line-b"></div>
+    </div>
+
+    <div class="content">
+      <!-- Header -->
+
+      <div class="section-container">
+        <div class="section-container-title">基础信息</div>
+        <div class="section-main">
+          <div class="info-grid">
+            <!-- 照片列 (第3列, 跨5行) -->
+            <div class="photo-box">
+              <img src="../assets/images/证件照.jpg" alt="证件照"
+                style="width:100%; height:100%; object-fit:cover; max-width:100%;">
+            </div>
+
+            <!-- 第一列 / 第二列 自动填充 -->
+            <div class="info-item"><span class="label">姓名</span>： 肖竣文</div>
+            <div class="info-item"><span class="label">求职岗位</span>： 中级前端工程师（全栈、GIS）</div>
+
+
+            <div class="info-item"><span class="label">学历</span>： 本科 </div>
+            <div class="info-item"><span class="label">电话</span>： 17345317582</div>
+
+            <div class="info-item"><span class="label">学校</span>： 西南科技大学</div>
+            <div class="info-item"><span class="label">邮箱</span>： 3249554887@qq.com</div>
+
+            <div class="info-item"><span class="label">专业</span>： 地理信息科学</div>
+            <div class="info-item"><span class="label">个人网站</span>： <a
+                href="https://www.x-dimension.top/">www.x-dimension.top</a>
+            </div>
+            <!-- <div class="info-item"><span class="label">个人助手</span>： <a
+                href="http://47.85.38.240:17218/5ea284fd?token=c2a1651b66297dfd7225504995acec16">openclaw.x-dimension.top</a>
+            </div> -->
+            <div class="info-item"><span class="label">在校荣誉</span>：
+              <div>
+                <div>国家级奖项*2</div>
+                <div>十佳社团会长</div>
+              </div>
+            </div>
+            <div class="info-item"><span class="label">公众号</span>： <a
+                href="https://www.yuque.com/xiaojunwen-4eycx/cvpc70/gh5o9ixc5dfmza0r?singleDoc# 《工具与哲学》">《Agentic
+                Engineering》</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="section-container">
+        <div class="section-container-title">专业技能</div>
+        <div class="section-main">
+
+          <div class="skills-container">
+            <!-- AI开发流程 -->
+            <div class="skill-box">
+              <div class="skill-title">AI 辅助开发</div>
+              <div class="skill-desc">
+                熟练使用 <span class="skill-tag">Codex / Claude Code</span> 等工具，通过 <span class="skill-tag">Skills /
+                  MCP</span> 和 <span class="skill-tag">AGENT.md</span> 规范，实现从需求分析到代码生成的闭环开发。
+              </div>
+            </div>
+
+            <!-- 后端与数据库 -->
+            <div class="skill-box">
+              <div class="skill-title">后端与数据库</div>
+              <div class="skill-desc">
+                熟练使用 <span class="skill-tag">NestJS / Node.js</span> 构建高性能服务端；掌握 <span class="skill-tag">PostgreSQL /
+                  Prisma</span> ORM 及 RESTful API 设计，具备全栈独立交付能力。
+              </div>
+            </div>
+
+
+            <!-- 前端核心 -->
+            <div class="skill-box">
+              <div class="skill-title">前端核心技术</div>
+              <div class="skill-desc">
+                熟练掌握 <span class="skill-tag">TypeScript /
+                  ES6+</span>；深入理解React核心原理与设计；了解Chrome浏览器工作原理，具备性能优化能力。
+              </div>
+            </div>
+
+            <!-- GIS与三维 -->
+            <div class="skill-box">
+              <div class="skill-title">GIS 与 三维可视化</div>
+              <div class="skill-desc">
+                熟悉 <span class="skill-tag">CesiumJS </span> 及 WebGL 底层原理，掌握 <span class="skill-tag">MapLibre /
+                  Deck.gl</span>；掌握 <span class="skill-tag">GeoServer / PostGIS</span> 及 OGC 标准，具备复杂空间分析能力。
+              </div>
+            </div>
+
+            <!-- 补充一个综合能力或框架生态 -->
+            <div class="skill-box">
+              <div class="skill-title">框架与生态</div>
+              <div class="skill-desc">
+                熟悉 <span class="skill-tag">React、Taro</span> 框架；掌握Vue3；掌握组件设计与状态管理最佳实践。
+              </div>
+            </div>
+            <!-- 工程化 -->
+            <div class="skill-box">
+              <div class="skill-title">工程化与部署</div>
+              <div class="skill-desc">
+                熟练掌握 <span class="skill-tag">Nx Monorepo</span> 大型仓库管理；熟悉 <span class="skill-tag">Vite / Docker /
+                  CI/CD</span> 流程；规范 Git 工作流与代码审查，保障项目质量与迭代效率。
+              </div>
+            </div>
+
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Experience -->
+      <div class="section-container">
+        <div class="section-container-title">工作经历</div>
+        <div class="section-main">
+          <div class="company-block">
+            <div class="company-header">
+              <span class="company-name">成都天巡微小卫星科技有限责任公司</span>
+              <span class="duration">2024年11月 — 至今</span>
+            </div>
+
+            <!-- Role Summary & Progression -->
+            <div class="project-item">
+              <div class="project-title">前端 & GIS技术负责人</div>
+              <div class="project-desc">
+                从 WebGIS 核心功能开发逐步扩展到系统架构设计与 AI 应用探索。参与并推动多个三维可视化平台从需求分析到系统上线的完整交付，
+                在复杂地理数据处理、前端性能优化及工程化实践方面积累了丰富经验。
+              </div>
+              <ul class="responsibilities">
+                <li><strong>WebGIS 核心研发与性能攻坚：</strong> 参与视觉导航验证平台开发，基于 React + Cesium 构建高性能三维可视化底座。通过 <span
+                    class="highlight">LOD层级优化、瓦片缓存策略</span>，实现 <span class="highlight">TB级</span> 数据秒级加载，支撑 <span
+                    class="highlight">10万+</span> 动态轨迹点实时渲染，解决海量数据下的前端性能瓶颈。</li>
+                <li><strong>多端架构选型与独立交付：</strong>
+                  负责飞行保障平台（Vue+Cesium）及烟草服务小程序（Taro+OpenLayers）的前端架构设计与核心功能开发，
+                  完成技术选型、模块划分与基础组件封装，推动项目按计划交付并稳定上线。</li>
+                <li><strong>AI工程化体系建设：</strong> 在团队内部尝试引入 AI辅助开发流程，基于 <strong>OpenSpec</strong> （Proposal → Spec →
+                  Tasks）规范需求拆解，
+                  结合 Claude Code 与 Codex 提升代码生成与迭代效率，探索 AI 在工程开发流程中的落地实践。</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <!-- Experience -->
+      <div class="section-container">
+        <div class="section-container-title">项目经历</div>
+        <div class="section-main">
+          <div class="company-block">
+
+
+
+            <!-- Project 1 -->
+            <div class="project-item">
+              <div class="project-title">【自研】Map AI 智能地图分析平台 </div>
+              <div class="tech-stack">技术栈：Nx + React + NestJS + Python + Cesium + PostGIS + Redis + MinIO</div>
+              <div class="project-desc">
+
+              </div>
+              <ul class="responsibilities">
+                <li><strong>项目背景 (S)：</strong> 针对传统 GIS 平台“数据链路割裂、交互渲染耦合、AI 驱动能力弱”的痛点，公司交付项目的基建要求，内部制图需求，构建面向 GIS
+                  数据管理、可视化与 AI 辅助分析的一体化平台。
+                </li>
+                <li><strong>技术决策 (T)：</strong> 作为技术负责人，主导全栈技术选型与架构设计，目标是打通“数据接入 → 地图内核 → AI 指令驱动”的完整闭环，并建立可扩展的 Monorepo
+                  工程体系。</li>
+                <li><strong>架构落地 (A)：</strong>
+                  <br>1. <strong>工程体系：</strong> 基于 Nx Monorepo 搭建“一仓多端”架构，统一管理 Web 工作台、NestJS 网关与 Python
+                  Agent，实现前后端代码共享与类型安全；
+                  <br>2. <strong>地图内核：</strong> 设计 map-core 核心库，将渲染、交互、状态管理彻底解耦，通过 Store + LayerRenderer +
+                  InteractionManager 分层架构，降低 AI 控图的复杂度；
+                  <br>3. <strong>双轨渲染：</strong> 针对海量数据场景，设计“Entity/Primitive 双轨渲染架构”，支持高保真与高性能模式动态切换，解决性能瓶颈；
+                  <br>4. <strong>AI 协同：</strong> 建立基于 Socket.IO 的全双工通信链路，定义 AI Action 协议，实现 AI 对地图图层、视角、样式的实时驱动；
+                  <br>5. <strong>数据治理：</strong> 攻克 Shapefile/GeoJSON 复杂解析难题，构建基于 GDAL 优先、shpjs 降级的混合解析方案，确保数据接入的高可用性。
+                </li>
+                <li><strong>项目成果 (R)：</strong> 成功从 0 到 1 搭建具备持续演进能力的 AI+GIS 平台底座，沉淀 3 个核心应用与 3 个特性库。不仅实现了 GIS
+                  数据的自动化上图与管理，更打通了 AI 驱动地图操作的“最后一公里”，为后续智能分析与自动制图奠定了坚实的架构基础。</li>
+              </ul>
+            </div>
+
+            <!-- Project 2 -->
+            <div class="project-item">
+              <div class="project-title">【交付】基于三维地图的智能化飞行保障平台</div>
+              <div class="tech-stack">技术栈：Vue + Cesium + GeoServer + Pinia + WebSocket</div>
+              <div class="project-desc">
+
+              </div>
+              <ul class="responsibilities">
+                <li><strong>项目背景 (S)：</strong> 机场飞行保障平台融合大屏可视化、智能体、知识库、告警、三维演练等核心业务，需要统一体验并保持性能。</li>
+                <li><strong>核心任务 (T)：</strong> 负责前端落地，必须让首页 3DTiles、历史影像、AI
+                  聊天、知识库、告警与模型演练等多分支在限定时间内就绪，同时打通流式渲染、图表展示、粒子/模型运动、文档预览与高频告警提示。</li>
+                <li><strong>关键行动 (A)：</strong> 实施“分级加载”策略（低精度底图+关键图表优先，高精度模型异步加载），配合视口懒加载，将首屏内容可见时间控制在 0.5~0.8 秒；针对 AI
+                  聊天，采用流式回写+Pinia 状态管理，实现
+                  Markdown/图表/知识库的实时渲染；优化知识库列表为虚拟滚动，解决长列表卡顿；在三维演练中，统一编排模型/粒子/相机轨迹，并通过多图层叠加与卷帘技术实现历史影像对比与入侵告警联动。</li>
+                <li><strong>项目成果 (R)：</strong> 首页首屏加载压缩至 ~2 秒内，AI
+                  聊天与图表即时渲染、知识库滑动顺畅，模型/粒子演练与告警联动提升指挥响应，整体平台实现“3D＋AI＋知识＋告警”一体化指挥体验并持续保有可扩展性。</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <!-- 个人助手 -->
+      <div class="section-container">
+        <div class="section-container-title">个人项目</div>
+        <div class="section-main">
+          <div class="company-block">
+
+
+            <!-- Project 1 -->
+            <div class="project-item">
+              <div class="project-title">Personal Knowledge OS </div>
+              <div class="tech-stack">技术栈：React + NestJS + PostgreSQL (pgvector) + LangChain + AST</div>
+              <div class="project-desc">
+                <strong>项目定位：</strong> AI 原生的个人知识基础设施，旨在解决知识碎片化与 AI 长期记忆缺失的问题，实现 Markdown 知识库的语义化检索与智能交互。
+              </div>
+              <ul class="responsibilities">
+                <li><strong>知识索引管道 (Knowledge Indexer)：</strong> 基于 NestJS 构建高性能解析服务，利用 AST 技术深度解析 Markdown 文档结构，自动处理
+                  WikiLinks 双向链接关系，并生成段落级向量索引 (Embeddings)。</li>
+                <li><strong>Git 驱动同步 (GitOps)：</strong> 引入 GitHub Webhooks 机制，实现知识库的“提交即发布”与“提交即索引”，确保 AI
+                  知识库与本地笔记的实时一致性。</li>
+                <li><strong>AI 长期记忆构建：</strong> 基于 PostgreSQL (pgvector) 构建向量数据库，为OpenClaw
+                  提供语义检索能力，使其能够理解并推理个人知识库中的上下文关联。</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Other Info -->
+      <div class="section-container">
+        <div class="section-container-title">其他成就</div>
+        <div class="section-main">
+          <div class="other-info">
+            <strong>公众号文章撰写：</strong> <a
+              href="https://mp.weixin.qq.com/s/9HmoSYPOrpBarFPR2HaWww?scene=1">《基于Dify建立员工日志评分算法与工作流》<a />、<a
+                href="https://mp.weixin.qq.com/s/AAwpwsA5tC8hqt33drf1Ag?scene=1&click_id=8">《超详细GeoServer安装及地图服务发布与调用教程！》<a />、<a
+                  href="https://mp.weixin.qq.com/s/jrz3rRAnv-99_0VHVjARnQ?scene=1&click_id=5">《QGIS MCP使用》<a />、<a
+                    href="https://mp.weixin.qq.com/s/bxsyWFmOnLMRzcAC_uPA9A?scene=1&click_id=7">《QGIS +
+                    Deepness》<a />等，浏览量总计过千。
+          </div>
+        </div>
+      </div>
+    </div>
+</body>
+
+</html>

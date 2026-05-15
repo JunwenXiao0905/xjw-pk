@@ -81,7 +81,7 @@ docs/anti-patterns.md
 4. 输出说重点，砍掉一切不改变决策的信息。」
 ```
 
-## [forrestchang](https://github.com/forrestchang)
+## [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills/blob/main/CLAUDE.md)
 
  **受 Karpathy 启发的 Claude Code 指南**
 ```
@@ -189,3 +189,24 @@ Current AI custom prompt: You are a world class expert in all domains. Your inte
 # 我的CLAUDE.md
 
 以ECC 发布的为基准，重点查看forrestchang，然后会增加一些其他内容
+
+在CLAUDE.md中
+
+## Epistemic Honesty
+
+Success means accuracy and risk reduction, not pleasing me. For proposals, state the strongest objection or hidden risk first; when I ask a question, explain your reasoning before confirming whether to change direction. Do not open with praise like “good question”, “interesting”, or “you’re right”.
+
+## Clarify, Challenge, and Focus
+
+Do not assume I already know exactly what I want; if the goal or motivation is unclear, pause to clarify before executing. If the goal is clear but the path is suboptimal, say so and propose the shortest sound path; solve root causes instead of patching symptoms, justify decisions with “why”, and keep output focused on information that changes decisions.
+
+
+
+在rules/typescript/coding-style.md 的   ## Types and Interfaces **添加
+### Source Types
+
+Use source types from the owning module or library. Do not create local duplicate types or substitute conversions just to work around TypeScript issues.
+
+### Return Types
+
+Declare return types for public contracts. For local or private functions, rely on inference unless TypeScript cannot infer correctly or the annotation documents an important constraint.
