@@ -21,7 +21,6 @@ float()
 str()
 
 
-
 # 交互模式
 
 
@@ -269,6 +268,38 @@ app.post('/review/webhook', (req, res) => {
 # Python类型
 
 
+## TypedDict：给字典声明固定结构
++ `TypedDict` 用来描述“字段固定的字典”。
++ 它本质上还是 `dict`，但会告诉类型检查器：这个字典应有哪些键、每个键的值是什么类型。
++ 适合表示配置、请求体、状态对象，例如 LangGraph 里的 `state`。
+
+```python
+from typing import TypedDict
+
+
+class ArticleState(TypedDict):
+    topic: str
+    outline: list[str]
+    article: str
+```
+
++ 上面这段不是在定义普通面向对象类，而是在用 `class` 语法声明一种“字典结构类型”。
++ 可以把它理解成 TypeScript 里的对象类型或 `interface`：
+
+```ts
+type ArticleState = {
+  topic: string
+  outline: string[]
+  article: string
+}
+```
+
++ `TypedDict` 和普通 `dict` / `Dict` 的区别：
+    - `dict[str, object]` 只说明“键是字符串，值是某种对象”，不知道有哪些固定字段。
+    - `TypedDict` 会明确指出 `topic`、`outline`、`article` 这些字段及其类型。
++ 因此，如果字典结构是固定的，用 `TypedDict` 比 `dict` 更适合；如果只是任意键值映射，用 `dict[...]` 即可。
+
+
 # Python模块
  每个 .py 文件自动就是模块，不需要 export。文件里定义的所有名字，导入后直接可用。
 
@@ -369,7 +400,40 @@ from ..schemas import NoteCreate     # 上一级
 
 
 # 类
-## 1.类的继承写法
+
+
+## 1.定义类与创建对象
+
++ `class` 用来定义类；类可以理解成“对象的模板”。
++ Python 没有 `new` 关键字，创建对象时直接写 `类名(...)`。
+
+```python
+class User:
+    def __init__(self, name: str):
+        self.name = name
+
+
+user = User("Tom")
+```
+
++ 上面 `User` 是类，`user` 是实例。
++ `User("Tom")` 就是在创建对象，不需要写 `new User("Tom")`。
++ 类本身也可以当作一个值传来传去，所以函数可以接收“类”而不是“实例”。
+
+```python
+class ArticleState(TypedDict):
+    topic: str
+    outline: list[str]
+    article: str
+    
+builder = StateGraph(ArticleState)
+```
+
++ 这里 `StateGraph(...)` 是在创建 `StateGraph` 实例。
++ 传进去的 `ArticleState` 不是实例，而是类型本身；作用是告诉 `StateGraph`：这张图的 state 结构长什么样。
++ `class ArticleState(TypedDict): ...` 这类写法看起来像普通类，但这里更接近“类型声明”，不是常规业务类。
+
+## 2.类的继承写法
 ```python
   class 子类(父类):
       def __init__(self, ...):
@@ -379,7 +443,7 @@ from ..schemas import NoteCreate     # 上一级
 + 类似 JS 的 class Sub extends Base { constructor() { super() } }
 + super() 调用父类方法，不写就是完全覆盖父类
 
-##  2. Python 错误基类：Exception
+##  3. Python 错误基类：Exception
 + Python 所有异常的祖先类，类似 JS 的 Error
 + 自定义异常必须继承 Exception，否则 Python 不认
 + 常见内置异常：ValueError、TypeError、KeyError、RuntimeError
@@ -564,6 +628,4 @@ note = NoteCreate(title="hello")
       age: int = Field(..., gt=0, lt=150)       # gt = greater than
       email: str = Field(..., pattern=r".+@.+") # 正则验证
 ```
-
-
 
