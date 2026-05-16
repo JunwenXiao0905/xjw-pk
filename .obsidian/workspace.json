@@ -25,15 +25,14 @@
             "id": "a91f3912afc5beb8",
             "type": "leaf",
             "state": {
-              "type": "split-diff-view",
+              "type": "markdown",
               "state": {
-                "aFile": "err.txt",
-                "bFile": "err.txt",
-                "aRef": "HEAD",
-                "bRef": ""
+                "file": "Areas/Git/SSH Key 配置与连接远程仓库.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "diff",
-              "title": "Diff: err.txt  (Index)"
+              "icon": "lucide-file",
+              "title": "SSH Key 配置与连接远程仓库"
             }
           }
         ],
@@ -182,12 +181,13 @@
             "state": {
               "type": "outline",
               "state": {
+                "file": "Areas/Git/SSH Key 配置与连接远程仓库.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "大纲"
+              "title": "SSH Key 配置与连接远程仓库 的大纲"
             }
           }
         ],
@@ -212,6 +212,15 @@
   },
   "active": "a91f3912afc5beb8",
   "lastOpenFiles": [
+    "Areas/Harness Engineering/rules/typescript/testing.md",
+    "Areas/Harness Engineering/rules/typescript/security.md",
+    "Areas/Harness Engineering/rules/typescript/patterns.md",
+    "Areas/Harness Engineering/rules/typescript/hooks.md",
+    "Areas/Harness Engineering/rules/typescript/coding-style.md",
+    "Areas/Harness Engineering/rules/typescript",
+    "Areas/Git/Git.md",
+    "Areas/Git/SSH Key 配置与连接远程仓库.md",
+    "Areas/Git",
     "Areas/Python/LangGraph 学习笔记.md",
     "如何谈判薪资.md",
     "Areas/赛道观察/行业方向观察/低空经济/行业线索.md",
@@ -236,19 +245,10 @@
     "Areas/赛道观察/前沿技术观察/GIS+Rust+WebGPU",
     "Areas/赛道观察/前沿技术观察/GIS+AI",
     "Areas/赛道观察/前沿技术观察/Canvas UI",
-    "Areas/赛道观察/前沿技术观察",
     "Areas/_职业路径/考研/考研方向.md",
-    "Areas/_简历/resume-v4.html",
     "Areas/Harness Engineering/rules/python/testing.md",
     "Areas/Harness Engineering/rules/python/security.md",
     "Areas/Harness Engineering/rules/python/patterns.md",
-    "Areas/Harness Engineering/rules/python/hooks.md",
-    "Areas/Harness Engineering/rules/python/fastapi.md",
-    "Areas/Harness Engineering/rules/python/coding-style.md",
-    "Areas/Harness Engineering/rules/common/testing.md",
-    "Areas/Harness Engineering/rules/common/security.md",
-    "Areas/Harness Engineering/rules/common/performance.md",
-    "Areas/Harness Engineering/rules/common/patterns.md",
     "Areas/赛道观察/WebGPU/WebGPU 方向地图.canvas",
     "Areas/Python/1729265071683.png",
     "Areas/Harness Engineering/个人笔记/学习/Pasted image 20260508220312.png",
