@@ -1,277 +1,318 @@
-视频地址：[3小时超快速入门Python | 动画教学【2025新版】【自学Python教程】【零基础Python】【计算机二级Python】【Python期末速成】_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1Jgf6YvE8e?spm_id_from=333.788.videopod.episodes&vd_source=e9c45fdc03639b59ab05f66211ecc1cb)
+# Python 基础知识
 
+## 目录
 
+- [第1章 运行与入口](#第1章-运行与入口)
+  - [1.1 交互模式与脚本执行](#11-交互模式与脚本执行)
+  - [1.2 `python -m`](#12-python--m)
+  - [1.3 `__name__` 与 `__main__`](#13-__name__-与-__main__)
+  - [1.4 `main()` 入口模式](#14-main-入口模式)
+- [第2章 参数与调用](#第2章-参数与调用)
+  - [2.1 位置参数与关键字参数](#21-位置参数与关键字参数)
+  - [2.2 默认参数](#22-默认参数)
+  - [2.3 `*args` 与 `**kwargs`](#23-args-与-kwargs)
+  - [2.4 参数展开](#24-参数展开)
+- [第3章 容器与解包](#第3章-容器与解包)
+  - [3.1 `list`、`tuple`、`dict`](#31-listtupledict)
+  - [3.2 列表拼接与构造](#32-列表拼接与构造)
+  - [3.3 列表解包](#33-列表解包)
+  - [3.4 元组解包](#34-元组解包)
+- [第4章 类型标注](#第4章-类型标注)
+  - [4.1 参数与返回值注解](#41-参数与返回值注解)
+  - [4.2 `list[str]`、`dict[str, int]`](#42-liststrdictstr-int)
+  - [4.3 `str | None`](#43-str--none)
+  - [4.4 `TypedDict`](#44-typeddict)
+- [第5章 模块与导入](#第5章-模块与导入)
+  - [5.1 模块](#51-模块)
+  - [5.2 包与 `__init__.py`](#52-包与-__init__py)
+  - [5.3 绝对导入与相对导入](#53-绝对导入与相对导入)
+  - [5.4 `sys.path`](#54-syspath)
+- [第6章 类与对象](#第6章-类与对象)
+  - [6.1 `class`](#61-class)
+  - [6.2 实例、属性、方法](#62-实例属性方法)
+  - [6.3 继承](#63-继承)
+  - [6.4 类、实例与类型](#64-类实例与类型)
+- [第7章 异常](#第7章-异常)
+  - [7.1 `Exception`](#71-exception)
+  - [7.2 `raise`](#72-raise)
+  - [7.3 自定义异常](#73-自定义异常)
+- [第8章 装饰器](#第8章-装饰器)
+  - [8.1 `@decorator`](#81-decorator)
+  - [8.2 带参数装饰器](#82-带参数装饰器)
+  - [8.3 `@wraps`](#83-wraps)
+  - [8.4 Flask 路由装饰器](#84-flask-路由装饰器)
+  - [8.5 常见内置装饰器](#85-常见内置装饰器)
+- [第9章 Pydantic](#第9章-pydantic)
+  - [9.1 `BaseModel`](#91-basemodel)
+  - [9.2 `Field`](#92-field)
+  - [9.3 `model_dump()`](#93-model_dump)
+- [第10章 工程实践](#第10章-工程实践)
+  - [10.1 CLI 交互循环](#101-cli-交互循环)
+  - [10.2 `.env` 与 `.env.local`](#102-env-与-envlocal)
+  - [10.3 `load_dotenv()`](#103-load_dotenv)
 
-# 数据类型
-##   元类（metaclass）
-  "创建类的类"。普通类创建对象，元类创建类。Pydantic 用元类（或 __init_subclass__）在类定义时自动读取类型注解，注入 __init__ 方法。
+## 第1章 运行与入口
+
+### 1.1 交互模式与脚本执行
+
+Python 常见有两种运行方式：交互模式和脚本执行。
+
+交互模式就是先启动 Python 解释器，再一行一行输入代码，解释器立刻执行并返回结果。它更像一个临时实验台，适合验证表达式、测试语法和做小段试验。
+
+```bash
+python
+```
+
+进入后通常会看到类似提示符：
 
 ```python
-  class NoteCreate(BaseModel):
-      title: str
-  # ↑ 这行执行时，元类扫描 title: str，自动生成 __init__ 方法
-  # 你不用自己写构造函
+>>> 1 + 2
+3
+>>> name = "Tom"
+>>> name
+'Tom'
 ```
 
-## 数据类型转换方法
-int()
+退出交互模式可以用 `Ctrl + D`，也可以输入：
 
-float()
-
-str()
-
-
-# 交互模式
-
-
-1.文件/命令行模式
-
-## 2.交互模式
-打开python控制台，或者在命令行输入python即可
-
-<!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2025/png/34655355/1757946317535-b7742204-6390-40b2-9b92-3653da8baf07.png)<!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2025/png/34655355/1757946390498-aa4e3d3b-7b42-45f8-9b49-bb5ef5588c2b.png)
-
-
-
-退出交互模式
-
-ctrl + d 或者 输入 quit()
-
-
-
-# Python 文件结构
-+ 模块本质：每个`.py`就是一个模块，导入或运行皆可。
-+ 名称标识：`__name__`为模块名；脚本直接运行时为`'__main__'`。
-+ 入口保护：`if __name__ == '__main__':`只在脚本运行时执行，导入不执行；用于`main()`、CLI、示例/快速测试。
-+ 入口模式：
-    - 定义`def main(): ...`，在入口保护中调用`main()`。
-    - 避免在模块顶层做重操作（网络/数据库/I/O），延迟到`main()`或函数里。
-+ 导入原则：
-    - 顶层脚本用绝对导入：`from biz.llm.factory import LLMFactory`。
-    - 包内模块间可用相对导入：`from .client.openai import OpenAIClient`、`from ..utils import dir_util`。
-+ 名称导出：模块中可用`__all__`限制`from module import *`的导入集合；更推荐显式导入，避免星号污染。
-+ 类型与依赖：复杂依赖的类型提示可用`if typing.TYPE_CHECKING:`防止运行时导入重依赖。
-+ 运行方式：保持包语义用`python -m package.module`，例如`python -m biz.llm.client.openai`。
-
-# 包管理知识
-+ 包定义：目录作为包；传统包需要`__init__.py`，导入包时会执行其中代码。
-+ `__init__.py`职责：
-    - 轻量初始化（版本、常量）：`__version__ = '1.0.0'`。
-    - 重导出统一入口：`from .factory import LLMFactory`；配合`__all__ = ['LLMFactory']`定义公共API。
-    - 避免重操作（网络/扫描），降低导入开销。
-+ 相对导入语义：
-    - `.`当前包、`..`父包；按包层级解析，不是文件路径。
-    - 不能越过顶层包，否则`ImportError: beyond top-level package`。
-    - 顶层脚本不在任何包内，不能使用`from .xxx import ...`。
-+ 包边界与命名空间：
-    - 顶层包由导入名首段与`sys.path`上的目录共同决定（如`biz`）。
-    - 模块的`__package__`标识所属包（如`biz.llm.client`）；包搜索路径见`__spec__.submodule_search_locations`。
-+ 隐式包（PEP 420）：
-    - 无`__init__.py`也可成为包；适合跨分发/插件化，将同名包目录在多个路径合并。
-    - 顶层包不能写初始化代码；你的项目已是传统包，更直观、易维护。
-+ 发布打包：
-    - 传统包用`setuptools.find_packages()`；命名空间包用`find_namespace_packages()`或在`pyproject.toml`选择相应finder。
-+ 最佳实践：
-    - 包内用相对导入，跨包用绝对导入。
-    - 明确公共API并重导出，星号导入谨慎使用。
-    - `__init__.py`保持轻量；入口逻辑放到`if __name__ == '__main__'`下或独立CLI。
-
-# 装饰器
-+ 装饰器是一个“可调用对象”，接受一个函数或类，返回一个被“包装/替换”后的新对象。
-+ `@` 是语法糖：把“定义时的包裹逻辑”从手写改为一行声明。
-+ 典型用途：日志/统计、权限校验、缓存、重试、输入校验、注册（Flask 路由）、将函数转为类方法等。
-
-**基本语法**
-
-+ 无参装饰器：`@decorator` 等价于 `func = decorator(func)`。
-+ 带参装饰器：`@decorator(a, b)` 等价于 `func = decorator(a, b)(func)`（外层先接参数，返回真正的装饰器）。
-+ 叠加装饰器顺序（从上到下应用）：  
-`@dec1`  
-`@dec2`  
-`def f(...): ...`  
-等价于 `f = dec1(dec2(f))`（离函数最近的 `dec2` 先包裹，再被 `dec1` 包裹）。
-
-**执行时机**
-
-+ 装饰发生在“函数定义完成后、模块导入时”，不是在函数调用时。
-+ 因此任何注册行为（如 Flask 的路由登记）会在导入模块时立即生效。
-
-**Flask 中的 **`route`
-
-+ 你的代码 `api_app = Flask(__name__)` 创建了一个 Flask 应用实例。
-+ `@api_app.route('/review/webhook', methods=['POST'])` 是“带参装饰器”，用来注册视图函数到该实例。
-+ 简化理解（接近 Flask 源码的伪码）：
-
-```plain
-def route(self, rule, **options):
-    def decorator(f):
-        endpoint = options.get('endpoint', f.__name__)
-        self.add_url_rule(rule, endpoint=endpoint, view_func=f, **options)
-        return f  # 通常原样返回，注册完成
-    return decorator
+```python
+quit()
 ```
 
-+ 叠加顺序在 Flask 非常重要：  
-    - 推荐把 `@api_app.route(...)` 放在“最上面”，以确保 Flask 注册的是“已经被其他装饰器包装后的最终函数”。  
-    - 例如：
+脚本执行则是把代码写进 `.py` 文件，再让 Python 一次性执行整个文件：
 
-```plain
-@api_app.route('/review/webhook', methods=['POST'])
-@require_json
-def handle_webhook():
+```bash
+python app.py
+```
+
+交互模式偏试验，脚本执行偏正式运行。
+
+### 1.2 `python -m`
+
+`python -m` 的意思不是“运行某个文件路径”，而是“把某个模块当作程序入口来运行”。
+
+最常见写法是：
+
+```bash
+python -m package.module
+```
+
+例如：
+
+```bash
+python -m http.server
+```
+
+这表示运行标准库里的 `http.server` 模块。
+
+它和 `python path/to/file.py` 的区别在于：`-m` 会按模块导入规则来定位代码，因此更适合包内模块，也更适合需要保留包语义的场景。遇到相对导入时，`python -m ...` 通常比直接运行深层脚本更稳。
+
+### 1.3 `__name__` 与 `__main__`
+
+每个 Python 模块都有一个内置变量 `__name__`。
+
+如果一个文件是被别的模块导入的，那么 `__name__` 一般是它自己的模块名。  
+如果这个文件是当前程序的直接入口，那么 `__name__` 会变成 `"__main__"`。
+
+这就是下面这类判断存在的原因：
+
+```python
+if __name__ == "__main__":
     ...
 ```
 
-等价于 `handle_webhook = api_app.route(...)(require_json(handle_webhook))`，路由注册的是 `require_json(handle_webhook)`（正确）。
+它的含义是：只有当这个文件是“直接运行”时，下面的代码才执行；如果只是被导入，就不执行。
 
-    - 如果你写成：
+### 1.4 `main()` 入口模式
 
-```plain
-@require_json
-@api_app.route('/review/webhook', methods=['POST'])
-def handle_webhook():
-    ...
+常见写法是先定义一个 `main()`，再在入口判断里调用它：
+
+```python
+def main() -> None:
+    print("run")
+
+
+if __name__ == "__main__":
+    main()
 ```
 
-等价于 `handle_webhook = require_json(api_app.route(...)(handle_webhook))`，路由在装饰前已注册原函数，`require_json` 后续不会影响已注册的视图（常见坑）。
+这样做的好处是把“定义”和“执行入口”分开。函数、类、常量可以正常放在模块里，真正要执行的逻辑集中在 `main()`，文件被导入时也不会顺手把主流程跑起来。
 
-**自己写一个装饰器（与 Flask 结合）**
+不要把数据库连接、网络请求、文件写入这类重逻辑直接放在模块顶层；这类逻辑更适合放进 `main()` 或其他显式调用的函数里。
 
-+ 无参版（保持函数元数据以免影响 Flask 端点名）：  
+## 第2章 参数与调用
 
-```plain
-from functools import wraps
-from flask import request, jsonify
+### 2.1 位置参数与关键字参数
 
-def require_json(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        if not request.is_json:
-            return jsonify({'error': 'Invalid data format'}), 400
-        return f(*args, **kwargs)
-    return wrapper
+调用函数时，参数可以按位置传，也可以按名字传。
 
-@api_app.route('/review/webhook', methods=['POST'])
-@require_json
-def handle_webhook():
-    # 这里可以安全地读取 JSON
-    data = request.get_json()
-    ...
+```python
+def create_user(name: str, age: int) -> dict:
+    return {"name": name, "age": age}
+
+
+create_user("Alice", 18)
+create_user(name="Alice", age=18)
+create_user(age=18, name="Alice")
 ```
 
-+ 带参版（装饰器工厂）：  
+第一种写法是位置参数。Python 看到第一个值就传给 `name`，第二个值传给 `age`。
 
-```plain
-from functools import wraps
+第二种和第三种是关键字参数。这里不是按顺序，而是按参数名绑定，所以顺序可以交换。
 
-def require_header(name):
-    def decorator(f):
-        @wraps(f)
-        def wrapper(*args, **kwargs):
-            from flask import request, jsonify
-            if not request.headers.get(name):
-                return jsonify({'error': f'Missing header: {name}'}), 400
-            return f(*args, **kwargs)
-        return wrapper
-    return decorator
+`HumanMessage(content=user_input)` 也属于同一类写法。它表示把变量 `user_input` 的值传给参数 `content`。这里的 `content` 是参数名，不是变量名。
 
-@api_app.route('/review/webhook', methods=['POST'])
-@require_header('X-GitHub-Event')  # 示例：要求存在某个头
-def handle_webhook():
-    ...
+容易混淆的一点是：
+
+```python
+HumanMessage(content)
 ```
 
-**保留函数元数据**
+这不是“省略写法”，而是把变量 `content` 当作第一个位置参数传入。
 
-+ 使用 `functools.wraps` 装饰包装函数，保留原函数的 `__name__`、文档、注解等：
-    - 对 Flask 很重要，因为默认端点名取自函数名；不使用 `@wraps` 时函数名可能变成 `wrapper`，影响 `url_for` 等。
+### 2.2 默认参数
 
-**常见陷阱**
+参数可以带默认值。调用时如果不传，Python 就使用默认值。
 
-+ 忘记 `@wraps` 导致端点名/调试信息变更。
-+ 包装函数没有写 `*args, **kwargs`，使签名不兼容，导致视图或被装饰函数无法接收参数。
-+ 带参装饰器忘记加括号：`@retry` 与 `@retry()` 语义不同（前者是无参装饰器，后者才是带参）。
-+ Flask 路由的叠加顺序写反，导致注册的不是最终包装后的函数。
-+ 在导入时执行重度逻辑（装饰器里做耗时任务），会拖慢应用启动。
-
-**内置常见装饰器**
-
-+ `@staticmethod`、`@classmethod`、`@property`：面向对象方法语义转换。
-+ `@dataclass`：为类自动生成初始化/比较等方法。
-+ `@lru_cache`：缓存函数返回值。
-+ `@pytest.mark.*`、`@click.command` 等：第三方框架常见的“声明式”注册用法，与 Flask 路由设计相似。
-
-总结：`@api_app.route('/review/webhook', methods=['POST'])` 是一个带参装饰器工厂，它在模块导入时把下面的函数注册为处理 `POST /review/webhook` 的视图；叠加其他装饰器时，让路由装饰器放在最上面，使用 `@wraps` 保持函数元数据，这样 Flask 注册的就是你期望的“最终、已包装”的视图函数。**结论**
-
-+ 可以理解为“回调函数”。在 Flask 中它更常称为“视图函数/路由处理器”，本质都是把一个函数注册给框架，框架在匹配到请求时回调执行。
-
-**等价类比（Express.js）**
-
-+ Python（你的代码）：
-    - `@api_app.route('/review/webhook', methods=['POST'])`
-    - `def handle_webhook(): ...`
-+ JavaScript（Express）：
-
-```plain
-const express = require('express');
-const app = express();
-app.use(express.json()); // 解析 JSON 请求体
-
-app.post('/review/webhook', (req, res) => {
-  const data = req.body;
-  if (!data) return res.status(400).json({ error: 'Invalid JSON' });
-
-  const webhookSource = req.get('X-GitHub-Event');
-  if (webhookSource) {
-    // GitHub webhook
-    return res.json({ source: 'github', event: webhookSource, ok: true });
-  }
-  // GitLab webhook
-  return res.json({ source: 'gitlab', ok: true });
-});
+```python
+def greet(name: str, prefix: str = "Hi") -> str:
+    return f"{prefix}, {name}"
 ```
 
-+ 语义对齐：
-    - Flask 的路由装饰器把 `handle_webhook` 注册到 `POST /review/webhook`，收到请求时由框架调用。
-    - Express 的 `app.post('/review/webhook', handler)` 把 `handler` 作为回调，收到请求时由框架调用。
+这里的 `prefix` 默认是 `"Hi"`，所以这两个调用都合法：
 
-**关键差异**
+```python
+greet("Tom")
+greet("Tom", "Hello")
+```
 
-+ 注册方式
-    - Flask：用装饰器语法 `@api_app.route(...)`（定义时注册，模块导入即生效）。
-    - Express：把函数直接作为参数传给 `app.post(...)`（运行时注册）。
-+ 请求与响应的传递
-    - Flask：不传参接收 `request`，它是上下文代理；通过返回值生成响应（`return jsonify(...)`）。
-    - Express：回调参数显式传入 `req`、`res`；通过调用 `res.json()`、`res.send()` 来发送响应。
-+ 同步/异步
-    - Flask（WSGI）默认同步；也支持 `async def`（需兼容的服务器/模式）。
-    - Express/Node 回调天然面向异步；也能返回 Promise/使用 `async/await`。
-+ 中间件/装饰器用法
-    - Flask：装饰器叠加、`@before_request`/`@after_request` 钩子、`@errorhandler`。
-    - Express：`app.use(...)` 中间件链、`next(err)` 错误处理、路由级中间件。
-+ JSON 解析
-    - Flask：`request.is_json` + `request.get_json()`；需 `Content-Type: application/json`。
-    - Express：需先 `app.use(express.json())` 才有 `req.body`。
+需要注意的是：默认参数不是“每次调用时临时声明”，而是在函数定义阶段就已经确定。可变对象默认值会有额外陷阱，这部分后续单独整理。
 
-**术语建议**
+### 2.3 `*args` 与 `**kwargs`
 
-+ 在 Python/Flask 社区更常用“视图函数”“路由处理器”“endpoint”，但把它理解为“由框架在请求到来时触发的回调函数”完全没问题，便于与前端/Node 经验建立直觉映射。
+这两个写法都和“接收不定数量参数”有关。
 
-如果你愿意，我可以把这段对照示例和说明整理成一页 Markdown 小笔记，放进 `doc/`，并补充一张“请求流程图（Flask 与 Express 对照）”帮你记忆。
+```python
+def demo(*args, **kwargs):
+    return args, kwargs
+```
+
+其中：
+
+- `*args` 把多余的位置参数收集成一个元组。
+- `**kwargs` 把多余的关键字参数收集成一个字典。
+
+例如：
+
+```python
+demo(1, 2, name="Tom")
+```
+
+大致会得到：
+
+```python
+((1, 2), {"name": "Tom"})
+```
+
+### 2.4 参数展开
+
+定义函数时的 `*args`、`**kwargs` 是“收集参数”；调用函数时的 `*`、`**` 则是“展开参数”。
+
+```python
+def add(a, b):
+    return a + b
 
 
+nums = [1, 2]
+add(*nums)
+```
 
+这里的 `*nums` 会把 `[1, 2]` 展开成两个位置参数，等价于：
 
+```python
+add(1, 2)
+```
 
-# Python类型
+同理，`**` 可以把字典展开成关键字参数。
 
+## 第3章 容器与解包
 
-## TypedDict：给字典声明固定结构
-+ `TypedDict` 用来描述“字段固定的字典”。
-+ 它本质上还是 `dict`，但会告诉类型检查器：这个字典应有哪些键、每个键的值是什么类型。
-+ 适合表示配置、请求体、状态对象，例如 LangGraph 里的 `state`。
+### 3.1 `list`、`tuple`、`dict`
+
+这三个是最常见的容器类型。
+
+- `list`：有序、可变。
+- `tuple`：有序、不可变。
+- `dict`：键值映射。
+
+### 3.2 列表拼接与构造
+
+常见方式有 `append`、`extend`、`+`，以及基于旧列表构造新列表。
+
+```python
+items = [1, 2]
+items.append(3)
+items = items + [4]
+```
+
+如果需要保留旧列表不变，更适合构造新列表，而不是原地修改。
+
+### 3.3 列表解包
+
+`*items` 会把可迭代对象中的元素逐个展开。
+
+```python
+items = [1, 2]
+result = [*items, 3]
+```
+
+结果是：
+
+```python
+[1, 2, 3]
+```
+
+`[*messages, HumanMessage(content=user_input)]` 表示先展开旧消息列表，再追加新消息。这一写法常用于基于旧列表构造新列表，避免原地修改。
+
+### 3.4 元组解包
+
+```python
+a, b = (1, 2)
+```
+
+它的作用是同时取多个值，并按顺序赋给多个变量。
+
+## 第4章 类型标注
+
+### 4.1 参数与返回值注解
+
+```python
+def add(a: int, b: int) -> int:
+    return a + b
+```
+
+这里的 `a: int`、`b: int` 是参数注解，`-> int` 是返回值注解。
+
+### 4.2 `list[str]`、`dict[str, int]`
+
+```python
+names: list[str] = ["a", "b"]
+ages: dict[str, int] = {"Tom": 18}
+```
+
+这类写法用于标注容器里元素的类型。
+
+### 4.3 `str | None`
+
+`str | None` 表示值可能是 `str`，也可能是 `None`。
+
+```python
+nickname: str | None = None
+```
+
+### 4.4 `TypedDict`
+
+`TypedDict` 用来描述“键集合固定的字典结构”。
 
 ```python
 from typing import TypedDict
@@ -283,129 +324,145 @@ class ArticleState(TypedDict):
     article: str
 ```
 
-+ 上面这段不是在定义普通面向对象类，而是在用 `class` 语法声明一种“字典结构类型”。
-+ 可以把它理解成 TypeScript 里的对象类型或 `interface`：
+这段代码表达的是：
 
-```ts
-type ArticleState = {
-  topic: string
-  outline: string[]
-  article: string
+- 这个值本质上是 `dict`
+- 这个 `dict` 应该有 `topic`、`outline`、`article` 这几个键
+- 每个键对应的值类型已经写死
+
+例如：
+
+```python
+state: ArticleState = {
+    "topic": "LangGraph",
+    "outline": ["定义", "结构", "执行流程"],
+    "article": "",
 }
 ```
 
-+ `TypedDict` 和普通 `dict` / `Dict` 的区别：
-    - `dict[str, object]` 只说明“键是字符串，值是某种对象”，不知道有哪些固定字段。
-    - `TypedDict` 会明确指出 `topic`、`outline`、`article` 这些字段及其类型。
-+ 因此，如果字典结构是固定的，用 `TypedDict` 比 `dict` 更适合；如果只是任意键值映射，用 `dict[...]` 即可。
+这里 `state` 仍然是普通字典，读取方式也是：
+
+```python
+state["topic"]
+state["outline"]
+```
+
+不是：
+
+```python
+state.topic
+```
+
+`TypedDict` 虽然用了 `class` 语法，但这里不是在定义常规业务类，也不是为了后面写 `ArticleState(...)` 这种实例化代码。这里借 `class` 语法列出的是“固定键名 + 每个键的值类型”。
+
+它解决的是 `dict[str, str]` 解决不了的问题。  
+`dict[str, str]` 只能说明“键是字符串，值是字符串”，不能说明必须有哪些键；`TypedDict` 可以把具体键名写出来。
+
+它主要用于类型标注，重点是把字典结构写清楚，方便编辑器提示和类型检查。运行时使用时，通常还是普通 `dict`。
+
+它和 Pydantic 都能描述数据结构，但侧重点不同：
+
+- `TypedDict`：描述字典结构
+- `BaseModel`：定义运行时数据模型
+
+在 LangGraph 里，state 经常在节点之间按字典传递，并且节点通常返回局部更新字典：
+
+```python
+def decide_route(state: RouterState) -> dict:
+    return {"route": "writer"}
+```
+
+这种数据形态天然适合用 `TypedDict` 描述。
+
+### 4.5 `Literal`
+
+`Literal` 用来限制值只能是几个固定字面量之一。
+
+```python
+from typing import Literal
 
 
-# Python模块
- 每个 .py 文件自动就是模块，不需要 export。文件里定义的所有名字，导入后直接可用。
+def pick_next_node(state: RouterState) -> Literal["writer", "chatbot", "fallback"]:
+    return state["route"]
+```
+
+这里返回值不是普通 `str`，而是限定为这三个固定字符串之一。
+
+它和联合类型有点像，但粒度更细：
+
+```python
+str | None
+```
+
+表示“二选一的类型”；
+
+```python
+Literal["writer", "chatbot", "fallback"]
+```
+
+表示“只能是这几个固定值之一”。
+
+它常用于路由、分支选择、枚举式返回值。和 `TypedDict` 一样，它主要是类型标注，不是运行时对象模型。
+
+## 第5章 模块与导入
+
+### 5.1 模块
+
+每个 `.py` 文件天然就是一个模块。
 
 ```python
 # notes.py
 def get_note():
     pass
-
-def delete_note():
-    pass
 ```
 
-```typescript
-  // JS: 需要 export
-  export function getNote() {}
-  export function deleteNote() {}
-```
-
-  导入方式
+导入方式：
 
 ```python
-
-  # 导入整个模块
-  import app.routers.notes
-  app.routers.notes.get_note()          # 必须带完整路径
-
-  # 导入具体名字（最常用）
-  from app.routers.notes import get_note, delete_note
-  get_note()                            # 直接用
-
-  # 导入模块并起别名
-  from app.routers import notes as notes_router
-  notes_router.get_note()
-```
-
- 等价 JS：
-
-```typescript
-// import 整个模块
-import * as notes from './notes'
-notes.getNote()
-
-// 具名导入
-import { getNote, deleteNote } from './notes'
-getNote()
-
-// 别名导入
-import * as notesRouter from './notes'
-```
-
- __init__.py 控制导出
-
-  __init__.py 的作用类似 index.ts —— 统一暴露、控制导出范围：
-
-```python
-# routers/__init__.py
-from .notes import router as notes_router   # 把子模块的名字收集到这里
-
-__all__ = ["notes_router"]                  # 控制 from routers import * 的范围
-```
-
- 等价 JS：
-
-```typescript
-// routers/index.ts
-export { router as notesRouter } from './notes'
-```
-
-  相对 vs 绝对导入
-
-```python
-# 绝对导入（推荐，从 src/ 根开始）
+import app.routers.notes
 from app.routers.notes import get_note
-
-# 相对导入（同级目录用 .）
-from .notes import get_note          # 同目录
-from ..schemas import NoteCreate     # 上一级
+from app.routers import notes as notes_router
 ```
 
-核心区别
+### 5.2 包与 `__init__.py`
+
+包是目录层面的组织方式，`__init__.py` 常用于：
+
+- 把目录标识成传统包；
+- 放轻量初始化；
+- 提供统一导出入口。
 
 ```python
-  ┌──────────┬────────────────────────────────────────┬──────────────────────────────────┐
-  │          │               JavaScript               │              Python              │
-  ├──────────┼────────────────────────────────────────┼──────────────────────────────────┤
-  │ 标记模块 │ export                                 │ 任何 .py 文件                    │
-  ├──────────┼────────────────────────────────────────┼──────────────────────────────────┤
-  │ 导入     │ import { x } from './file'             │ from file import x               │
-  ├──────────┼────────────────────────────────────────┼──────────────────────────────────┤
-  │ 别名     │ import { x as y }                      │ from file import x as y          │
-  ├──────────┼────────────────────────────────────────┼──────────────────────────────────┤
-  │ 统一入口 │ index.ts                               │ __init__.py                      │
-  ├──────────┼────────────────────────────────────────┼──────────────────────────────────┤
-  │ 路径解析 │ ./ 当前、../ 上级、无前缀=node_modules │ . 当前、.. 上级、无前缀=sys.path │
-  └──────────┴────────────────────────────────────────┴──────────────────────────────────┘
+from .notes import router as notes_router
+
+__all__ = ["notes_router"]
 ```
 
+不要把重逻辑塞进 `__init__.py`。
 
+### 5.3 绝对导入与相对导入
 
-# 类
+```python
+from app.routers.notes import get_note
+from .notes import get_note
+from ..schemas import NoteCreate
+```
 
+跨包时优先绝对导入。包内相邻模块可用相对导入。
 
-## 1.定义类与创建对象
+顶层脚本不在包内时，不能使用 `from .xxx import ...`；超过顶层包会报 `ImportError: beyond top-level package`。
 
-+ `class` 用来定义类；类可以理解成“对象的模板”。
-+ Python 没有 `new` 关键字，创建对象时直接写 `类名(...)`。
+### 5.4 `sys.path`
+
+Python 导入模块时，会按 `sys.path` 里的目录顺序查找。
+
+理解 `sys.path` 的意义，主要是为了排查“为什么这个导入能找到”或“为什么找不到”。
+
+## 第6章 类与对象
+
+### 6.1 `class`
+
+`class` 用来定义类。Python 创建对象时不需要 `new`。
 
 ```python
 class User:
@@ -416,216 +473,324 @@ class User:
 user = User("Tom")
 ```
 
-+ 上面 `User` 是类，`user` 是实例。
-+ `User("Tom")` 就是在创建对象，不需要写 `new User("Tom")`。
-+ 类本身也可以当作一个值传来传去，所以函数可以接收“类”而不是“实例”。
+### 6.2 实例、属性、方法
+
+- 类：模板。
+- 实例：按类创建出来的对象。
+- 属性：对象上的数据。
+- 方法：对象上的行为。
+
+### 6.3 继承
 
 ```python
-class ArticleState(TypedDict):
-    topic: str
-    outline: list[str]
-    article: str
-    
+class Child(Base):
+    def __init__(self, name):
+        super().__init__(name)
+```
+
+`super()` 用来调用父类方法。
+
+### 6.4 类、实例与类型
+
+类既是构造器，也是类型定义。
+
+```python
 builder = StateGraph(ArticleState)
 ```
 
-+ 这里 `StateGraph(...)` 是在创建 `StateGraph` 实例。
-+ 传进去的 `ArticleState` 不是实例，而是类型本身；作用是告诉 `StateGraph`：这张图的 state 结构长什么样。
-+ `class ArticleState(TypedDict): ...` 这类写法看起来像普通类，但这里更接近“类型声明”，不是常规业务类。
+这里传入的 `ArticleState` 是类型本身，不是实例。`HumanMessage` 也是同类情况：既是类，也定义了一种对象类型。
 
-## 2.类的继承写法
-```python
-  class 子类(父类):
-      def __init__(self, ...):
-          super().__init__(...)      # 调用父类的 __init__
-```
+## 第7章 异常
 
-+ 类似 JS 的 class Sub extends Base { constructor() { super() } }
-+ super() 调用父类方法，不写就是完全覆盖父类
+### 7.1 `Exception`
 
-##  3. Python 错误基类：Exception
-+ Python 所有异常的祖先类，类似 JS 的 Error
-+ 自定义异常必须继承 Exception，否则 Python 不认
-+ 常见内置异常：ValueError、TypeError、KeyError、RuntimeError
+`Exception` 是大多数 Python 异常的基类。
 
+常见异常包括：
 
+- `ValueError`
+- `TypeError`
+- `KeyError`
+- `RuntimeError`
 
-# raise关键字
-+ Python 的 throw，抛出异常，当前函数立即停止
-+ 语法：raise 异常实例
+### 7.2 `raise`
+
+`raise` 用于抛出异常。
 
 ```python
-raise Exception("出错了")
-raise NotFoundException("Note")
+raise Exception("error")
 ```
 
+### 7.3 自定义异常
 
+自定义异常应继承 `Exception`。
 
+## 第8章 装饰器
 
+### 8.1 `@decorator`
 
-# 内置库
-## Pydantic
-数据验证库。通过继承 BaseModel + 类型注解，在类实例化时自动验证数据类型和约束。
+`@decorator` 等价于：
+
+```python
+func = decorator(func)
+```
+
+装饰器常用于日志、权限校验、缓存和注册。
+
+### 8.2 带参数装饰器
+
+`@decorator(a, b)` 等价于：
+
+```python
+func = decorator(a, b)(func)
+```
+
+### 8.3 `@wraps`
+
+`@wraps` 用来保留原函数的 `__name__`、文档、注解等元数据。
+
+```python
+from functools import wraps
+```
+
+不使用 `@wraps` 时，被包装函数名可能变成 `wrapper`。
+
+### 8.4 Flask 路由装饰器
+
+`@api_app.route(...)` 是带参数装饰器。路由注册发生在模块导入时。
+
+```python
+@api_app.route('/review/webhook', methods=['POST'])
+@require_json
+def handle_webhook():
+    ...
+```
+
+路由装饰器通常放在最上面，这样 Flask 注册到的是包装后的最终函数。
+
+### 8.5 常见内置装饰器
+
+- `@staticmethod`
+- `@classmethod`
+- `@property`
+- `@dataclass`
+- `@lru_cache`
+
+## 第9章 Pydantic
+
+### 9.1 `BaseModel`
+
+`BaseModel` 是 Pydantic 提供的父类。定义数据模型时，通常让自己的类继承它。
 
 ```python
 from pydantic import BaseModel, Field
 
- class NoteCreate(BaseModel):
-      title: str = Field(..., min_length=1)
 
-  note = NoteCreate(title="hello")    # ✅ 通过
-  note = NoteCreate(title=123)        # ❌ ValidationError
-
-
+class NoteCreate(BaseModel):
+    title: str = Field(..., min_length=1)
+    content: str = ""
 ```
 
-### BaseModel
-####  BaseModel 的本质
-  BaseModel 是一个普通的 Python 类。它的特殊之处在于：
+这里的 `NoteCreate` 仍然是一个普通 Python 类。区别不在“它不像类”，而在于它继承的父类是 `BaseModel`。
+
+先看普通类的情况：
 
 ```python
-  class BaseModel:
-      def __init_subclass__(cls):
-          # 子类定义时自动调用
-          # 读取 __annotations__
-          # 注入 __init__
-          # 注入 model_dump
-          # 注入 model_dump_json
-          ...
+class NoteCreate:
+    def __init__(self, title: str, content: str = ""):
+        self.title = title
+        self.content = content
 ```
 
-
-
-  为什么不需要自己写 __init__, 因为 Pydantic 在 BaseModel 里预置了这些方法，它们在你定义子类时自动扫描注解并注入。
-
-你写：
-
-```python
-from pydantic import BaseModel, Field
-
- class NoteCreate(BaseModel):
-      title: str = Field(..., min_length=1)
-```
-
-
-
-  实际发生的等价代码：
-
-```python
-  class NoteCreate:
-      title: str
-      content: str
-
-      def __init__(self, title: str, content: str = ""):
-          self.title = title
-          self.content = content
-
-      def model_dump(self):
-          return {"title": self.title, "content": self.content}
-
-      def model_dump_json(self):
-          return '{"title": "' + self.title + '", "content": "' + self.content + '"}'
-```
-
-
-
-  核心逻辑
-
-  Pydantic: 1. 读取 __annotations__ → {"title": str, "name": str}
-
-            2. 生成 __init__(self, title, name)
-
-            3. 在 __init__ 里加验证逻辑
-
-            4. 注入 model_dump, model_dump_json 等方法
-
-
-
-  你用:  a = A(title="hi", name="world")  ← 直接实例化，不需要自己写构造函数
-
-
-
-  一句话：BaseModel
-
-  是"会读注解的父类"。你定义子类时，它帮你把注解变成构造函数和工具方法。你只管声明，它帮你实现。
-
-#### xxx.model_dump() 
- BaseModel 提供的方法。把 Pydantic 类实例转成普通的 Python 字典（dict）。
+这个类之所以能实例化，是因为它自己写了 `__init__`：
 
 ```python
 note = NoteCreate(title="hello")
-  # note 是一个类实例
-
-  note.model_dump()
-  # 返回: {"title": "hello", "content": "", "done": false}
-  # 返回是一个普通的 dict，可以像操作普通字典一样操作它
 ```
 
+如果一个子类自己没有定义 `__init__`，Python 会沿继承链继续找 `__init__`。也就是说，先看子类自己有没有；没有的话，再去父类里找。
 
-
-  关键参数：exclude_unset=True
+纯 Python 里，这件事可以写成：
 
 ```python
-  note = NotePartialUpdate(title="新标题")   # content 没传
+class A:
+    def __init__(self, **data):
+        print(data)
 
-  note.model_dump()
-  # {"title": "新标题", "content": None, "done": None}
-  # 没传的字段也被包含进来（值是 None）
 
-  note.model_dump(exclude_unset=True)
-  # {"title": "新标题"}
-  # 只包含你实际传了的字段
+class B(A):
+    pass
+
+
+b = B(name="tom", age=18)
 ```
 
+这里 `B` 自己没写 `__init__`，但 `B(...)` 仍然成立，因为实例化时实际调用的是继承来的 `A.__init__`。
 
-
-  用在 PATCH 上：
+`BaseModel` 的第一层机制也是这个逻辑。  
+`NoteCreate` 自己通常不写 `__init__`，所以当你调用：
 
 ```python
-  # 部分更新：只改你传的字段
-  for key, value in note.model_dump(exclude_unset=True).items():
-      existing[key] = value
-  # 没传的字段不会被覆盖成 None
+note = NoteCreate(title="hello")
 ```
 
-### Field
- Pydantic 的字段约束工具。给类型注解加额外的验证规则和元数据。
+Python 会去调用继承来的 `BaseModel.__init__`。
+
+可以先把它近似理解成：
 
 ```python
- title: str = Field(..., min_length=1, max_length=100)
-  #         ^^^^^ 告诉 Pydantic：这个字段有规则
-
+class BaseModel:
+    def __init__(self, **data):
+        ...
 ```
 
-  ...（Ellipsis） — Python 的省略号对象，在这里表示必填。
+这里最关键的是 `**data`。  
+它表示：实例化时传进来的关键字参数，会先被收集成一个字典。
+
+所以：
 
 ```python
-  ┌─────────────────────────┬────────────────┐
-  │          写法           │      含义      │
-  ├─────────────────────────┼────────────────┤
-  │ Field(..., ...)         │ 必填           │
-  ├─────────────────────────┼────────────────┤
-  │ Field(default="x", ...) │ 有默认值，可选 │
-  └─────────────────────────┴────────────────┘
+note = NoteCreate(title="hello")
 ```
 
- 
-
-不用Fidld，就只能做类型检查，不能加规则：
+可以近似理解成：
 
 ```python
-  class A(BaseModel):
-      title: str           # 只检查必须是 str
+data = {"title": "hello"}
+BaseModel.__init__(note, **data)
 ```
 
-  
+也就是说，子类的参数不是先被子类接住再转发，而是因为子类没有自己的 `__init__`，Python 直接把这些关键字参数传给了继承来的父类 `__init__`。
 
-加上 Field 才能限制长度、范围、正则、描述等：
+接下来要问的是：`BaseModel.__init__` 为什么能处理这些数据？
+
+原因在于 `BaseModel.__init__` 不是普通的赋值版构造函数。  
+普通构造函数可能只是：
 
 ```python
-  class A(BaseModel):
-      title: str = Field(..., min_length=1, max_length=100, description="笔记标题")
-      age: int = Field(..., gt=0, lt=150)       # gt = greater than
-      email: str = Field(..., pattern=r".+@.+") # 正则验证
+def __init__(self, title, content=""):
+    self.title = title
+    self.content = content
 ```
 
+但 `BaseModel.__init__` 内部会先根据当前这个子类的字段定义做校验，再决定能不能创建实例。
+
+所以当你写：
+
+```python
+class NoteCreate(BaseModel):
+    title: str = Field(..., min_length=1)
+    content: str = ""
+```
+
+再执行：
+
+```python
+note = NoteCreate(title="hello")
+```
+
+大致发生的是：
+
+1. Python 创建一个 `NoteCreate` 实例
+2. Python 发现 `NoteCreate` 自己没有 `__init__`
+3. Python 调用继承来的 `BaseModel.__init__(self, **data)`
+4. 这里的 `self` 仍然是 `NoteCreate` 实例
+5. 这里的 `data` 大致是 `{"title": "hello"}`
+6. `BaseModel.__init__` 按 `NoteCreate` 这个类声明过的字段规则处理这些数据
+7. 数据合法，实例创建成功
+8. 数据不合法，抛出校验错误
+
+例如：
+
+```python
+note = NoteCreate(title="hello")
+```
+
+这是合法实例化。
+
+```python
+note = NoteCreate(title=123)
+```
+
+这时 `title` 应该是字符串，但传入了整数，Pydantic 会在实例化阶段报校验错误。
+
+所以这一节最核心的理解应该是：
+
+- `BaseModel` 是父类
+- `NoteCreate` 是你定义的子类
+- 子类通常没有自己写 `__init__`
+- 实例化时会直接调用继承来的 `BaseModel.__init__`
+- 传入参数会以 `**data` 的形式进入父类 `__init__`
+- `BaseModel.__init__` 不只是赋值，还会按子类字段规则做校验
+
+### 9.2 `Field`
+
+`Field` 用来给字段补充验证规则和元数据。
+
+```python
+title: str = Field(..., min_length=1, max_length=100)
+age: int = Field(..., gt=0, lt=150)
+email: str = Field(..., pattern=r".+@.+")
+```
+
+这里的 `...` 表示必填。只写 `title: str` 时，只有类型信息；写了 `Field(...)` 之后，这个字段还带有长度、范围、正则等附加规则。
+
+可以把 `Field(...)` 理解成“这个字段除了类型之外，还有额外约束”。
+
+### 9.3 `model_dump()`
+
+`model_dump()` 用来把 Pydantic 模型实例转成普通字典。
+
+```python
+note = NoteCreate(title="hello")
+data = note.model_dump()
+```
+
+`model_dump()` 不是子类自己声明的方法，而是继承自 `BaseModel` 的实例方法。  
+当调用 `note.model_dump()` 时，Python 会沿继承链找到 `BaseModel.model_dump`，再把当前实例 `note` 作为 `self` 传入执行。
+
+这时 `data` 就是一个普通 `dict`，适合继续交给数据库、日志、JSON 序列化逻辑或其他普通 Python 代码处理。
+
+```python
+note.model_dump(exclude_unset=True)
+```
+
+`exclude_unset=True` 只返回实际传入的字段，适合 PATCH / 局部更新场景。
+
+```python
+for key, value in note.model_dump(exclude_unset=True).items():
+    existing[key] = value
+```
+
+## 第10章 工程实践
+
+### 10.1 CLI 交互循环
+
+`while True + input()` 是常见终端交互模式。
+
+```python
+while True:
+    user_input = input("You: ").strip()
+    if user_input.lower() in {"exit", "quit"}:
+        break
+    if not user_input:
+        continue
+```
+
+这种写法常见于聊天式 CLI、调试工具和小型交互脚本。
+
+### 10.2 `.env` 与 `.env.local`
+
+是否自动读取 `.env.local`，取决于代码如何调用 dotenv。
+
+`load_dotenv()` 默认主要读取 `.env`。如果项目使用 `.env.local`，通常需要显式指定。
+
+### 10.3 `load_dotenv()`
+
+```python
+from dotenv import load_dotenv
+
+load_dotenv()
+```
+
+它的作用是把环境变量从文件加载到当前进程环境中。

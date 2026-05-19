@@ -1,0 +1,3 @@
+display_name: Knowledge Note Writer
+short_description: Insert concise knowledge points into the right section.
+default_prompt: Use this skill to add a knowledge point into an existing note, place it in the correct section, and write it in concise lookup-oriented prose.

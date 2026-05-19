@@ -1,0 +1,124 @@
+# 代码审查标准
+
+## 目的
+
+代码审查确保代码合并前的质量、安全性和可维护性。此规则定义何时以及如何进行代码审查。
+
+## 审查时机
+
+**强制审查触发条件：**
+
+- 编写或修改代码后
+- 向共享分支提交前
+- 修改安全敏感代码时（认证、支付、用户数据）
+- 进行架构变更时
+- 合并 Pull Request 前
+
+**审查前准备：**
+
+请求审查前，确保：
+
+- 所有自动化检查（CI/CD）通过
+- 合并冲突已解决
+- 分支与目标分支保持同步
+
+## 审查清单
+
+标记代码完成前：
+
+- [ ] 代码可读且命名良好
+- [ ] 函数职责单一（<50 行）
+- [ ] 文件内聚性强（<800 行）
+- [ ] 无深层嵌套（>4 层）
+- [ ] 错误被显式处理
+- [ ] 无硬编码密钥或凭证
+- [ ] 无 console.log 或调试语句
+- [ ] 新功能有对应测试
+- [ ] 测试覆盖率达到 80% 最低要求
+
+## 安全审查触发条件
+
+**遇到以下情况立即停止并使用 security-reviewer agent：**
+
+- 认证或授权代码
+- 用户输入处理
+- 数据库查询
+- 文件系统操作
+- 外部 API 调用
+- 加密操作
+- 支付或金融代码
+
+## 审查严重级别
+
+| 级别 | 含义 | 操作 |
+|-------|---------|--------|
+| CRITICAL | 安全漏洞或数据丢失风险 | **阻止** - 合并前必须修复 |
+| HIGH | Bug 或重大质量问题 | **警告** - 合并前应修复 |
+| MEDIUM | 可维护性问题 | **提示** - 建议修复 |
+| LOW | 样式或轻微建议 | **备注** - 可选 |
+
+## Agent 使用
+
+使用以下 agent 进行代码审查：
+
+| Agent | 用途 |
+|-------|---------|
+| **code-reviewer** | 通用代码质量、模式、最佳实践 |
+| **security-reviewer** | 安全漏洞、OWASP Top 10 |
+| **typescript-reviewer** | TypeScript/JavaScript 特定问题 |
+| **python-reviewer** | Python 特定问题 |
+| **go-reviewer** | Go 特定问题 |
+| **rust-reviewer** | Rust 特定问题 |
+
+## 审查流程
+
+```
+1. 运行 git diff 了解变更内容
+2. 首先检查安全清单
+3. 审查代码质量清单
+4. 运行相关测试
+5. 验证覆盖率 >= 80%
+6. 使用合适的 agent 进行详细审查
+```
+
+## 常见问题检查
+
+### 安全
+
+- 硬编码凭证（API keys、密码、tokens）
+- SQL 注入（查询中的字符串拼接）
+- XSS 漏洞（未转义的用户输入）
+- 路径穿越（未清理的文件路径）
+- CSRF 保护缺失
+- 认证绕过
+
+### 代码质量
+
+- 大函数（>50 行）- 拆分为更小的函数
+- 大文件（>800 行）- 提取模块
+- 深层嵌套（>4 层）- 使用提前返回
+- 缺失错误处理 - 显式处理
+- 可变模式 - 优先使用不可变操作
+- 缺失测试 - 添加测试覆盖
+
+### 性能
+
+- N+1 查询 - 使用 JOIN 或批量处理
+- 缺失分页 - 添加 LIMIT
+- 无边界查询 - 添加约束
+- 缺失缓存 - 缓存昂贵操作
+
+## 批准条件
+
+- **批准**：无 CRITICAL 或 HIGH 问题
+- **警告**：仅有 HIGH 问题（谨慎合并）
+- **阻止**：发现 CRITICAL 问题
+
+## 与其他规则的关联
+
+此规则与以下规则配合：
+
+- [testing.md](Areas/Harness%20Engineering/Claude%20Code/个人笔记/学习/everything-claude-code/rules/common/testing.md) - 测试覆盖率要求
+- [security.md](Areas/Harness%20Engineering/Claude%20Code/个人笔记/学习/everything-claude-code/rules/common/security.md) - 安全清单
+- [git-workflow.md](Areas/Harness%20Engineering/Claude%20Code/个人笔记/学习/everything-claude-code/rules/common/git-workflow.md) - 提交标准
+- [agents.md](Areas/Harness%20Engineering/Claude%20Code/个人笔记/学习/everything-claude-code/rules/common/agents.md) - Agent 委派
