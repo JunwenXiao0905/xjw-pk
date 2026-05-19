@@ -20,13 +20,13 @@
 
 # 1. 组件关系
 
-| 组件 | 位置 | 一句话 |
-| --- | --- | --- |
-| `PostgreSQL` | 数据库本体 | 存数据、执行 SQL、管理事务。 |
-| `PostGIS` | `PostgreSQL` 扩展 | 给 PostgreSQL 增加空间字段、空间索引、空间函数。 |
-| `psycopg` | Python 驱动 | 负责 Python 和 PostgreSQL 之间的连接与通信。 |
-| `SQLAlchemy` | Python 数据访问层 | 管 `Engine`、`Session`，并提供 `Core` / `ORM`。 |
-| `GeoAlchemy2` | `SQLAlchemy` 空间扩展 | 让 Python/SQLAlchemy 更方便地使用 PostGIS 能力。 |
+| 组件            | 位置                | 一句话                                      |
+| ------------- | ----------------- | ---------------------------------------- |
+| `PostgreSQL`  | 数据库本体             | 存数据、执行 SQL、管理事务。                         |
+| `PostGIS`     | `PostgreSQL` 扩展   | 给 PostgreSQL 增加空间字段、空间索引、空间函数。           |
+| `psycopg`     | Python 驱动         | 负责 Python 和 PostgreSQL 之间的连接与通信。         |
+| `SQLAlchemy`  | Python 数据访问层      | 管 `Engine`、`Session`，并提供 `Core` / `ORM`。 |
+| `GeoAlchemy2` | `SQLAlchemy` 空间扩展 | 让 Python/SQLAlchemy 更方便地使用 PostGIS 能力。   |
 
 # 2. 数据访问链路
 
