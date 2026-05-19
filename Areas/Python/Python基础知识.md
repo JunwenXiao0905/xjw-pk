@@ -12,6 +12,7 @@
   - [2.2 默认参数](#22-默认参数)
   - [2.3 `*args` 与 `**kwargs`](#23-args-与-kwargs)
   - [2.4 参数展开](#24-参数展开)
+  - [2.5 函数签名](#25-函数签名)
 - [第3章 容器与解包](#第3章-容器与解包)
   - [3.1 `list`、`tuple`、`dict`](#31-listtupledict)
   - [3.2 列表拼接与构造](#32-列表拼接与构造)
@@ -22,6 +23,8 @@
   - [4.2 `list[str]`、`dict[str, int]`](#42-liststrdictstr-int)
   - [4.3 `str | None`](#43-str--none)
   - [4.4 `TypedDict`](#44-typeddict)
+  - [4.5 `Annotated`](#45-annotated)
+  - [4.6 `Literal`](#46-literal)
 - [第5章 模块与导入](#第5章-模块与导入)
   - [5.1 模块](#51-模块)
   - [5.2 包与 `__init__.py`](#52-包与-__init__py)
@@ -30,8 +33,9 @@
 - [第6章 类与对象](#第6章-类与对象)
   - [6.1 `class`](#61-class)
   - [6.2 实例、属性、方法](#62-实例属性方法)
-  - [6.3 继承](#63-继承)
-  - [6.4 类、实例与类型](#64-类实例与类型)
+  - [6.3 对象属性、字典键与 `getattr()`](#63-对象属性字典键与-getattr)
+  - [6.4 继承](#64-继承)
+  - [6.5 类、实例与类型](#65-类实例与类型)
 - [第7章 异常](#第7章-异常)
   - [7.1 `Exception`](#71-exception)
   - [7.2 `raise`](#72-raise)
@@ -235,6 +239,58 @@ add(1, 2)
 
 同理，`**` 可以把字典展开成关键字参数。
 
+### 2.5 函数签名
+
+函数签名是“这个函数如何被调用”的那组信息。
+
+最常见的组成包括：
+
+- 参数顺序
+- 哪些参数必填
+- 哪些参数有默认值
+- 参数种类，如位置参数、关键字参数、`*args`、`**kwargs`
+- 返回值注解
+
+例如：
+
+```python
+def create_user(name: str, age: int = 18, *, active: bool = True) -> dict:
+    return {"name": name, "age": age, "active": active}
+```
+
+这个签名里能读出：
+
+- `name` 是必填参数
+- `age` 有默认值 `18`
+- `active` 只能用关键字传参
+- 返回值注解是 `dict`
+
+要区分“签名”和“函数体”：
+
+- `def create_user(name: str, age: int = 18, *, active: bool = True) -> dict:` 是签名
+- `return {"name": name, "age": age, "active": active}` 是函数体
+
+Python 标准库可以直接读取函数签名：
+
+```python
+import inspect
+
+
+def add(a: int, b: int = 0) -> int:
+    return a + b
+
+
+inspect.signature(add)
+```
+
+结果近似：
+
+```python
+(a: int, b: int = 0) -> int
+```
+
+函数签名经常会被框架读取，而不只是给人看。FastAPI 会先分析路由函数签名，再判断参数来自路径、查询参数、请求体还是依赖注入。
+
 ## 第3章 容器与解包
 
 ### 3.1 `list`、`tuple`、`dict`
@@ -374,7 +430,58 @@ def decide_route(state: RouterState) -> dict:
 
 这种数据形态天然适合用 `TypedDict` 描述。
 
-### 4.5 `Literal`
+### 4.5 `Annotated`
+
+`Annotated[T, meta1, meta2]` 表示“真实类型仍然是 `T`，但额外附带一段可被外部读取的元信息”。
+
+```python
+from typing import Annotated
+
+
+name: Annotated[str, "用户名"]
+```
+
+这里的关键点是：
+
+- `str` 仍然是这个值的真实类型
+- 运行时值仍然是普通 `str`，不会变成某种 `Annotated` 实例
+- Python 本身通常不会自动处理后面的元信息
+
+`Annotated` 的主要用途不是改变运行时行为，而是把“类型”和“附加声明”写在同一个类型标注里，供框架、类型检查器扩展或反射代码读取。
+
+FastAPI 里的典型写法：
+
+```python
+from typing import Annotated
+
+from fastapi import Depends, Query
+
+
+q: Annotated[str | None, Query(min_length=3)] = None
+user: Annotated[User, Depends(get_current_user)]
+```
+
+这里拆开看：
+
+- `str | None`、`User`：真实类型
+- `Query(...)`、`Depends(...)`：给 FastAPI 读取的元信息
+
+`Annotated` 解决的是“类型”和“框架声明”混写在默认值位置不清楚的问题。它不是运行时包装器，也不会自动做校验；真正读取这些元信息并据此执行逻辑的，是 FastAPI 这类框架。
+
+如果在普通 Python 里需要保留并读取 `Annotated` 的元信息，通常要显式开启 `include_extras=True`：
+
+```python
+from typing import Annotated, get_type_hints
+
+
+def read_me(user: Annotated[str, "token"]) -> None:
+    pass
+
+
+get_type_hints(read_me, include_extras=True)
+```
+
+### 4.6 `Literal`
 
 `Literal` 用来限制值只能是几个固定字面量之一。
 
@@ -480,7 +587,93 @@ user = User("Tom")
 - 属性：对象上的数据。
 - 方法：对象上的行为。
 
-### 6.3 继承
+### 6.3 对象属性、字典键与 `getattr()`
+
+对象属性和字典键不是一回事。
+
+对象属性：
+
+```python
+user.name
+```
+
+字典键：
+
+```python
+data["name"]
+```
+
+两者都像“按名字找值”，但语法和数据结构不同：
+
+- `user.name`：从对象上取属性
+- `data["name"]`：从字典里取键对应的值
+
+例如：
+
+```python
+class User:
+    def __init__(self, name: str):
+        self.name = name
+
+
+user = User("Tom")
+data = {"name": "Tom"}
+```
+
+这里：
+
+```python
+user.name
+```
+
+和：
+
+```python
+data["name"]
+```
+
+结果可能一样，但来源不同。
+
+`getattr(obj, "attr", default)` 用来按属性名读取对象属性。
+
+```python
+getattr(user, "name", None)
+```
+
+含义是：
+
+- 如果 `user` 有 `name` 属性，就返回它
+- 如果没有，就返回 `None`
+
+它处理的是对象属性，不是字典键。
+
+字典的对应写法是：
+
+```python
+data.get("name", None)
+```
+
+两者相似处在于都可以提供默认值；区别在于：
+
+- `getattr(...)` 读对象属性
+- `dict.get(...)` 读字典键
+
+如果直接写：
+
+```python
+user.age
+```
+
+而对象上没有这个属性，会报 `AttributeError`。  
+如果写：
+
+```python
+getattr(user, "age", None)
+```
+
+就不会在这一行直接报错，而是返回 `None`。
+
+### 6.4 继承
 
 ```python
 class Child(Base):
@@ -490,7 +683,7 @@ class Child(Base):
 
 `super()` 用来调用父类方法。
 
-### 6.4 类、实例与类型
+### 6.5 类、实例与类型
 
 类既是构造器，也是类型定义。
 

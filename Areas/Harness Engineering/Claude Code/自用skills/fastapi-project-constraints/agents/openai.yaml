@@ -1,0 +1,4 @@
+interface:
+  display_name: "FastAPI Project Constraints"
+  short_description: "Apply FastAPI project structure and engineering conventions."
+  default_prompt: "Use this skill to follow FastAPI project conventions for structure, dependencies, database sessions, schemas, and tests."

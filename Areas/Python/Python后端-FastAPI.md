@@ -475,6 +475,92 @@ app.dependency_overrides[get_note_repository] = lambda: test_repository
 
 这句的意思是：在测试环境里，不再使用正式的 `get_note_repository`，而是改成返回测试用仓储对象。这样就可以在不改业务代码的前提下替换依赖实现。
 
+### 4.3.1 `Depends(...)` 返回什么
+
+`Depends(get_token)` 在定义阶段返回的不是 `get_token()` 的执行结果，而是一个 `fastapi.params.Depends` 实例。
+
+它记录的是依赖描述信息，例如：
+
+- 当前依赖函数是 `get_token`
+- 是否启用依赖缓存
+
+路由函数参数里最终拿到的真实值，是 FastAPI 在请求处理阶段执行 `get_token()` 之后得到的返回值。
+
+### 4.3.2 `analyze_param()` 与 `get_dependant()`
+
+FastAPI 在构建路由处理器时，会先读取函数签名，再把参数声明转换成内部依赖图。
+
+关键函数：
+
+- `analyze_param()`：解析参数注解，识别 `Annotated[...]` 里的 `Depends(...)`、`Query(...)`、`Body(...)` 等元信息
+- `get_dependant()`：把当前路由函数及其依赖整理成 `Dependant` 对象树
+
+可以把 `Dependant` 理解成一张结构化调用说明：
+
+- 当前要调用哪个函数
+- 每个参数来自哪里
+- 哪些参数还要先通过其他依赖函数生成
+
+例如：
+
+```python
+token: Annotated[str, Depends(get_token)]
+```
+
+在这一步被读取成的大致信息是：
+
+- 参数名是 `token`
+- 参数真实类型是 `str`
+- 参数值不来自请求体或查询参数，而是来自依赖函数 `get_token`
+
+### 4.3.3 `solve_dependencies()` 与 `run_endpoint_function()`
+
+请求真正进入后，FastAPI 才开始把依赖描述转换成真实参数值。
+
+关键执行顺序：
+
+1. `solve_dependencies()` 递归解决子依赖
+2. 收集路径参数、查询参数、请求体、请求对象等输入
+3. 调用依赖函数
+4. 把依赖函数返回值按参数名放进 `values` 字典
+5. `run_endpoint_function()` 再用 `dependant.call(**values)` 调用路由函数
+
+近似伪代码：
+
+```python
+values = {}
+
+token_value = get_token()
+values["token"] = token_value
+
+read_me(**values)
+```
+
+所以真正传进路由函数的不是 `Depends(get_token)`，而是 `get_token()` 的返回值。
+
+如果 `get_token()` 返回字符串，那么参数拿到的是字符串；如果它返回 `User()` 实例，那么参数拿到的就是 `User` 实例。
+
+### 4.3.4 源码定位
+
+和依赖注入直接相关的源码入口主要在两个文件：
+
+- `fastapi/dependencies/utils.py`
+  - `analyze_param()`
+  - `get_dependant()`
+  - `solve_dependencies()`
+- `fastapi/routing.py`
+  - `run_endpoint_function()`
+
+查源码时可以先抓这条链路：
+
+```text
+路由函数签名
+-> analyze_param()
+-> get_dependant()
+-> solve_dependencies()
+-> run_endpoint_function()
+```
+
 ## 4.4 异常处理机制
 
 ### 4.4.1 伪代码
