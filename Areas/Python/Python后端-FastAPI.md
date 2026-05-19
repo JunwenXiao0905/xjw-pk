@@ -1,96 +1,587 @@
+# 目录
 
+- [[#1. 工程结构总览|1. 工程结构总览]]
+  - [[#1.1 目录结构图|1.1 目录结构图]]
+  - [[#1.2 各目录职责|1.2 各目录职责]]
+  - [[#1.3 main.py 的位置|1.3 `main.py` 的位置]]
+- [[#2. 请求处理链路|2. 请求处理链路]]
+  - [[#2.1 请求流转|2.1 请求流转]]
+  - [[#2.2 各层在链路中的职责|2.2 各层在链路中的职责]]
+  - [[#2.3 边界约束|2.3 边界约束]]
+- [[#3. 常用接口写法|3. 常用接口写法]]
+  - [[#3.1 路由与路径操作|3.1 路由与路径操作]]
+  - [[#3.2 路径参数、查询参数、请求体|3.2 路径参数、查询参数、请求体]]
+  - [[#3.3 Pydantic 模型|3.3 Pydantic 模型]]
+  - [[#3.4 响应模型与状态码|3.4 响应模型与状态码]]
+  - [[#3.5 Depends|3.5 `Depends`]]
+  - [[#3.6 middleware 与 exception_handler|3.6 `middleware` 与 `exception_handler`]]
+- [[#4. 核心机制|4. 核心机制]]
+  - [[#4.1 参数注入|4.1 参数注入]]
+  - [[#4.2 请求体解析机制 (Pydantic & Dataclass)|4.2 请求体解析机制 (Pydantic & Dataclass)]]
+  - [[#4.3 依赖注入机制|4.3 依赖注入机制]]
+  - [[#4.4 异常处理机制|4.4 异常处理机制]]
+  - [[#4.5 中间件调用链|4.5 中间件调用链]]
+  - [[#4.6 应用生命周期|4.6 应用生命周期]]
+- [[#5. 工程实践|5. 工程实践]]
+  - [[#5.1 分层边界|5.1 分层边界]]
+  - [[#5.2 测试组织|5.2 测试组织]]
+  - [[#5.3 常见反模式|5.3 常见反模式]]
 
-# 3. 请求体解析机制 (Pydantic & Dataclass)
-FastAPI 会根据路由函数的参数类型注解，自动解析请求体 JSON 并实例化模型。这一过程发生在你的函数代码执行之前。
+# 1. 工程结构总览
 
+## 1.1 目录结构图
 
-
-  FastAPI 只能自动实例化带有结构化字段元数据的类：
-
-```python
-  ┌────────────────────┬─────────────────────────────────────────┬───────────────────────────┐
-  │        类型        │                  示例                   │           能力            │
-  ├────────────────────┼─────────────────────────────────────────┼───────────────────────────┤
-  │ Pydantic BaseModel │ class NoteCreate(BaseModel): title: str │ ✅ 解析 + 验证 + 错误信息 │
-  ├────────────────────┼─────────────────────────────────────────┼───────────────────────────┤
-  │ dataclass          │ @dataclass class NoteCreate: title: str │ ✅ 解析（不做强类型验证） │
-  ├────────────────────┼─────────────────────────────────────────┼───────────────────────────┤
-  │ 普通 class         │ class NoteCreate: def __init__...       │ ❌ 不支持                 │
-  └────────────────────┴─────────────────────────────────────────┴───────────────────────────┘
+```text
+src/app/
+  main.py
+  core/
+    config.py
+    security.py
+  modules/
+    notes/
+      router.py
+      schema.py
+      service.py
+      repository.py
+    users/
+      router.py
+      schema.py
+      service.py
+      repository.py
+  middleware/
+    exceptions.py
+  dependencies.py
+tests/
 ```
 
+## 1.2 各目录职责
 
+- `main.py`：应用入口，负责创建 `FastAPI` 实例，注册路由、中间件、异常处理、生命周期事件
+- `modules/`：按业务域组织代码时的顶层目录，一个业务一个子目录
+- `router.py`：接口层，只处理 HTTP 入参、出参、状态码、响应模型
+- `schema.py`：Pydantic 模型，定义请求体、响应体、校验规则
+- `service.py`：业务逻辑层，承载规则判断和流程编排
+- `repository.py`：数据访问层，封装数据库或存储读写
+- `core/`：公共基础能力，比如配置、安全、日志
+- `middleware/`：横切逻辑，比如请求日志、异常包装、鉴权前置处理
+- `dependencies.py`：依赖装配中心，统一管理 `Depends(...)`
+- `tests/`：接口测试、依赖覆盖、行为验证
+
+## 1.3 `main.py` 的位置
+
+`main.py` 不是业务代码层，它是应用装配层。
+
+它主要负责三件事：
+
+- 创建 `app = FastAPI(...)`
+- `include_router(...)`
+- 注册 `middleware`、`exception_handler`、`lifespan`
+
+不要把具体业务逻辑写进 `main.py`。
+
+
+# 2. 请求处理链路
+
+## 2.1 请求流转
+
+```text
+HTTP 请求
+-> main.py 注册的 app
+-> middleware
+-> router
+-> Depends 注入依赖
+-> service
+-> repository
+-> 返回 response
+```
+
+## 2.2 各层在链路中的职责
+
+- `router`：接收请求，提取参数，调用 service
+- `service`：处理业务规则
+- `repository`：执行数据读写
+- `exception_handler`：把异常转成统一 HTTP 响应
+- `middleware`：包裹整个请求过程，处理日志、耗时、跨域等通用问题
+
+## 2.3 边界约束
+
+- `router` 不写业务细节
+- `service` 不处理 HTTP 细节
+- `repository` 不关心响应格式
+- `schema` 只描述接口契约
+
+# 3. 常用接口写法
+
+## 3.1 路由与路径操作
+
+常用入口：
+
+- `@app.get(...)`
+- `@app.post(...)`
+- `@app.put(...)`
+- `@app.patch(...)`
+- `@app.delete(...)`
+- `APIRouter(...)`
+
+大多数实际项目不会把所有路由写在 `app` 上，而是拆到多个 `router` 中，再由 `main.py` 统一注册。
+
+## 3.2 路径参数、查询参数、请求体
+
+FastAPI 通过函数签名来判断参数来源：
+
+- 路径里声明过的参数 -> 路径参数
+- 普通基础类型参数 -> 查询参数
+- `BaseModel` 参数 -> 请求体
+
+## 3.3 Pydantic 模型
+
+在按业务域组织的项目里，Pydantic 模型通常放在 `modules/<业务>/schema.py`。
+
+一组接口模型通常分几类：
+
+- `XXCreate`：创建请求体
+- `XXUpdate`：全量更新请求体
+- `XXPartialUpdate`：部分更新请求体
+- `XXResponse`：响应体
+
+作用：
+
+- 定义字段结构
+- 做类型校验
+- 自动生成文档
+
+例如 `notes` 模块里可以写成：
+
+```python
+# src/app/modules/notes/schema.py
+class NoteCreate(BaseModel):
+    ...
+
+
+class NoteUpdate(BaseModel):
+    ...
+
+
+class NotePartialUpdate(BaseModel):
+    ...
+
+
+class NoteResponse(BaseModel):
+    ...
+```
+
+## 3.4 响应模型与状态码
+
+常见用法：
+
+- `response_model=...`
+- `status_code=201`
+- 显式返回 `JSONResponse` 或其他 `Response`
+
+`response_model` 的作用不只是文档，更重要的是约束响应结构。
+
+## 3.5 `Depends`
+
+`Depends(...)` 是 FastAPI 里的依赖注入入口。
+
+最常见的使用场景不是“传业务参数”，而是“注入运行时对象”。
+
+常见用途：
+
+- 注入 service
+- 注入 repository
+- 注入数据库 session
+- 注入当前用户
+- 注入配置对象
+
+典型写法：
+
+```python
+# src/app/dependencies.py
+from fastapi import Depends
+
+from app.modules.notes.repository import NoteRepository
+from app.modules.notes.service import NoteService
+
+note_repository = NoteRepository()
+
+
+def get_note_repository() -> NoteRepository:
+    return note_repository
+
+
+def get_note_service(
+    repository: NoteRepository = Depends(get_note_repository),
+) -> NoteService:
+    return NoteService(repository)
+```
+
+```python
+# src/app/modules/notes/router.py
+from typing import Annotated
+
+from fastapi import APIRouter, Depends
+
+from app.dependencies import get_note_service
+from app.modules.notes.schema import NoteCreate, NoteResponse
+from app.modules.notes.service import NoteService
+
+router = APIRouter(prefix="/notes", tags=["notes"])
+
+
+@router.post("/", response_model=NoteResponse)
+async def create_note(
+    note: NoteCreate,
+    service: Annotated[NoteService, Depends(get_note_service)],
+):
+    return service.create_note(note)
+```
+
+这里的 `service` 不是来自客户端请求，而是由 FastAPI 在执行路由函数前自动提供。
+
+可以把 `Depends(...)` 理解成一句声明：
+
+> 这个参数不要从请求里取，而是通过某个依赖函数生成。
+
+开发时可以把依赖分成几类：
+
+- 业务依赖：`service`、`repository`
+- 基础设施依赖：数据库 session、缓存客户端、配置对象
+- 认证授权依赖：当前用户、权限校验、租户信息
+- 请求上下文依赖：trace id、语言环境、请求级状态
+
+一个实用原则：
+
+- 业务数据参数走路径、查询、请求体
+- 运行时对象参数走 `Depends(...)`
+
+所以像 `note_id`、`skip`、`note` 这种属于请求数据，不该用 `Depends`；而 `service`、`db`、`current_user` 这类对象，适合走 `Depends`。
+
+在大型一点的项目里，`Depends` 通常不会直接写复杂逻辑，而是配合 `dependencies.py` 使用，把依赖装配集中管理。
+
+这一节先把它当“接口层怎么写”来看；它在底层是怎么解析和执行的，放到 `4.3 依赖注入机制` 再展开。
+
+## 3.6 `middleware` 与 `exception_handler`
+
+常用接口：
+
+- `@app.middleware("http")`
+- `@app.exception_handler(...)`
+
+前者处理横切逻辑，后者处理异常到响应的映射。
+
+# 4. 核心机制
+
+## 4.1 参数注入
+
+FastAPI 在调用路由函数之前，会先分析函数签名，再为每个参数判定来源并完成注入。路由函数看起来像普通 Python 函数，但真正执行前已经过了一轮参数解析、类型转换和依赖装配。
+
+```python
+@router.get("/notes/{note_id}")
+async def get_note(
+    note_id: int,
+    skip: int = 0,
+    service: Annotated[NoteService, Depends(get_note_service)],
+):
+    ...
+```
+
+上面这个函数里，三个参数的来源并不一样：
+
+- `note_id`：路径参数，来自 `/notes/{note_id}`
+- `skip`：查询参数，来自 `?skip=...`
+- `service`：依赖注入参数，来自 `Depends(get_note_service)`
+
+如果是这样的写法：
+
+```python
+@router.post("/notes")
+async def create_note(note: NoteCreate):
+    ...
+```
+
+那么 `note` 会被识别为请求体参数，FastAPI 会从 JSON 请求体中解析数据，再实例化成 `NoteCreate`。
+
+可以先把参数来源记成这几类：
+
+- 路径参数：在路由路径中声明过的参数
+- 查询参数：普通基础类型参数，且不在路径中出现
+- 请求体参数：`BaseModel`、`dataclass` 等结构化对象
+- 依赖参数：通过 `Depends(...)` 声明的参数
+- 其他协议参数：`Request`、`Response`、`Header`、`Cookie`、`File`、`Form` 等特殊类型或声明
+
+一个请求进入后，大致流程是：
+
+```text
+匹配路由
+-> 读取路由函数签名
+-> 判断每个参数的来源
+-> 从 URL / query / body / 依赖系统中取值
+-> 做类型转换和校验
+-> 组装成函数调用参数
+-> 执行路由函数
+```
+
+这里最关键的一点是：FastAPI 不是按参数名字硬编码取值，而是综合以下信息做判断：
+
+- 路由路径模板
+- 参数类型注解
+- 参数默认值
+- `Query(...)`、`Path(...)`、`Body(...)`、`Depends(...)` 这类声明
+
+所以参数注入其实是一个总机制，后面的请求体解析和依赖注入，只是它的两个重要子场景。
+
+## 4.2 请求体解析机制 (Pydantic & Dataclass)
+
+FastAPI 会根据路由函数的参数类型注解，自动解析请求体 JSON 并实例化模型。这一过程发生在你的函数代码执行之前。
+
+FastAPI 只能自动实例化带有结构化字段元数据的类：
+
+```python
+┌────────────────────┬─────────────────────────────────────────┬───────────────────────────┐
+│        类型        │                  示例                   │           能力            │
+├────────────────────┼─────────────────────────────────────────┼───────────────────────────┤
+│ Pydantic BaseModel │ class NoteCreate(BaseModel): title: str │ ✅ 解析 + 验证 + 错误信息 │
+├────────────────────┼─────────────────────────────────────────┼───────────────────────────┤
+│ dataclass          │ @dataclass class NoteCreate: title: str │ ✅ 解析（不做强类型验证） │
+├────────────────────┼─────────────────────────────────────────┼───────────────────────────┤
+│ 普通 class         │ class NoteCreate: def __init__...       │ ❌ 不支持                 │
+└────────────────────┴─────────────────────────────────────────┴───────────────────────────┘
+```
 
 为什么普通类不支持？
 
-  普通类的 **init** 里可以写任意逻辑（查库、计算、调用 API），FastAPI 无法预知如何把 JSON  
-  映射到它上面。Pydantic 和 dataclass 则通过 **annotations** 暴露了字段和类型信息，FastAPI  
-  能读取并自动实例化。
+普通类的 `__init__` 里可以写任意逻辑，比如查库、计算、调用 API。FastAPI 无法预知如何把 JSON 映射到它上面。Pydantic 和 dataclass 则通过类型注解暴露了字段信息，FastAPI 才能读取并自动实例化。
 
+执行流：
 
+```text
+浏览器 POST /notes，Body: {"title": "hello"}
+       ↓
+FastAPI 读取签名: def create(note: NoteCreate)
+       ↓
+FastAPI 解析 JSON -> dict
+       ↓
+实例化: NoteCreate(title="hello")  <- 验证在这里发生
+       ↓
+验证通过 -> 调用你的函数: create(note=NoteCreate实例)
+验证失败 -> 直接返回 422，你的函数不执行
+```
 
-  执行流
+关键点：
 
-  浏览器 POST /notes，Body: {"title": "hello"}  
-         ↓  
-  FastAPI 读取签名: def create(note: NoteCreate)  
-         ↓  
-  FastAPI 解析 JSON → dict  
-         ↓  
-  实例化: NoteCreate(title="hello")  ← 验证在这里发生  
-         ↓  
-  验证通过 → 调用你的函数: create(note=NoteCreate实例)  
-  验证失败 → 直接返回 422，你的函数不执行
+- 实例化由 FastAPI 在幕后完成，不是 Python 原生语法
+- Python 类型注解本身只起标注作用，真正消费这些信息的是 FastAPI
+- 函数内拿到的参数已经是实例化后的对象，可直接调用 `.model_dump()` 等方法
 
-  关键点
+## 4.3 依赖注入机制
 
-+ 实例化由 FastAPI 在幕后完成，不是 Python 原生语法。Python 的类型注解本身只起标注作用。
-+ 一个路由函数只能有一个 Pydantic/Dataclass 参数（一个请求体）。
-+ 函数内拿到的参数已经是实例化后的对象，可直接调用 .model_dump() 等方法。
+依赖注入的核心是：对象不要在函数内部手动创建，而是交给外部装配。
 
-#   4. FastAPI 异常处理
-## 4.1 伪代码
+如果没有依赖注入，路由函数里很容易出现这种代码：
+
 ```python
-  # FastAPI 内部实现（伪代码）
+@router.post("/notes")
+async def create_note(note: NoteCreate):
+    repository = NoteRepository()
+    service = NoteService(repository)
+    return service.create_note(note)
+```
+
+这样会有几个问题：
+
+- 路由层承担了对象装配责任
+- 具体实现写死，后续不好替换
+- 测试时不容易注入测试替身
+
+FastAPI 的做法是：由 `Depends(...)` 声明“这个参数应该怎么获得”，路由层只声明自己需要什么。
+
+典型写法：
+
+```python
+def get_note_repository() -> NoteRepository:
+    return note_repository
+
+def get_note_service(
+    repository: NoteRepository = Depends(get_note_repository),
+) -> NoteService:
+    return NoteService(repository)
+```
+
+这里有两层依赖关系：
+
+- `get_note_repository()` 提供 `NoteRepository`
+- `get_note_service(...)` 依赖 `get_note_repository()`，再提供 `NoteService`
+
+路由层只声明自己需要什么：
+
+```python
+async def create_note(
+    note: NoteCreate,
+    service: NoteService = Depends(get_note_service),
+):
+    ...
+```
+
+或者用 `Annotated` 写成更明确的形式：
+
+```python
+NoteServiceDep = Annotated[NoteService, Depends(get_note_service)]
+
+async def create_note(
+    note: NoteCreate,
+    service: NoteServiceDep,
+):
+    ...
+```
+
+这两种写法对 FastAPI 来说含义基本一致。区别只是：
+
+- `service: NoteService = Depends(...)`：把依赖声明写在默认值位置
+- `Annotated[NoteService, Depends(...)]`：把类型和来源拆开写
+
+`Annotated` 在这里不是普通备注，而是给 FastAPI 附加了一段会被读取的元信息：
+
+- 这个参数的类型是 `NoteService`
+- 这个参数的值由 `Depends(get_note_service)` 提供
+
+依赖解析的大致过程是：
+
+```text
+请求进入
+-> FastAPI 读取路由函数签名
+-> 发现 service 参数声明了 Depends(get_note_service)
+-> 调用 get_note_service(...)
+-> 发现它自身又依赖 get_note_repository()
+-> 先执行 get_note_repository()
+-> 再用返回值构造 NoteService
+-> 将 NoteService 注入到路由函数
+-> 执行路由函数
+```
+
+所以 `Depends(...)` 不只是“省略手动传参”，而是在声明一条依赖链。
+
+好处：
+
+- 解耦
+- 可替换
+- 好测试
+
+测试里的依赖覆盖就是这个机制的直接应用：
+
+```python
+app.dependency_overrides[get_note_repository] = lambda: test_repository
+```
+
+这句的意思是：在测试环境里，不再使用正式的 `get_note_repository`，而是改成返回测试用仓储对象。这样就可以在不改业务代码的前提下替换依赖实现。
+
+## 4.4 异常处理机制
+
+### 4.4.1 伪代码
+
+```python
 class FastAPI:
-      handlers = {}
+    handlers = {}
 
-      def exception_handler(self, exc_type):
-          def decorator(func):
-              self.handlers[exc_type] = func   # 注册 handler
-              return func
-          return decorator
+    def exception_handler(self, exc_type):
+        def decorator(func):
+            self.handlers[exc_type] = func
+            return func
+        return decorator
 
-      # 处理请求时：
-      def handle_request(self, request):
-          try:
-              response = route_handler(request)
-          except Exception as exc:
-              # 按异常类型找 handler
-              handler = self.handlers.get(type(exc))
-              if handler:
-                  return handler(request, exc)
-              # 没匹配到，返回 500
-              return JSONResponse(status_code=500, content={"detail": str(exc)})
+    def handle_request(self, request):
+        try:
+            response = route_handler(request)
+        except Exception as exc:
+            handler = self.handlers.get(type(exc))
+            if handler:
+                return handler(request, exc)
+            return JSONResponse(status_code=500, content={"detail": str(exc)})
 ```
 
+### 4.4.2 完整流程
 
-
-##   4.2. 完整流程
 ```python
-  @app.exception_handler(NotFoundException)     ← 注册：NotFoundException → handler
-  async def not_found_handler(request, exc):
-      return JSONResponse(status_code=404, ...)
+@app.exception_handler(NotFoundException)
+async def not_found_handler(request, exc):
+    return JSONResponse(status_code=404, ...)
 
-  notes.py:
-      raise NotFoundException("Note")           ← 抛出异常
+raise NotFoundException("Note")
 ```
 
-  FastAPI:
+FastAPI 内部处理过程：
 
-      捕获异常 → type(exc) 是 NotFoundException
+```text
+捕获异常
+-> type(exc) 是 NotFoundException
+-> 找到对应 handler
+-> 调用 not_found_handler(request, exc)
+-> 返回 JSONResponse
+```
 
-      → 找到 handler → 调用 not_found_handler(request, exc)
+### 4.4.3 实际意义
 
-      → 返回 JSONResponse
+- 业务代码里抛异常
+- HTTP 层统一接住
+- 响应结构保持一致
 
+## 4.5 中间件调用链
+
+中间件本质上是对整个请求处理过程做一层包装：
+
+```python
+@app.middleware("http")
+async def log_requests(request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    return response
+```
+
+调用链可以理解为：
+
+```text
+请求进入
+-> middleware 前置逻辑
+-> route handler
+-> middleware 后置逻辑
+-> 返回响应
+```
+
+## 4.6 应用生命周期
+
+应用除了处理请求，还会有启动和关闭两个阶段。
+
+常见用途：
+
+- 启动时建立数据库连接池
+- 启动时加载配置或模型
+- 关闭时释放资源
+
+FastAPI 中通常通过 `lifespan` 来统一管理这类逻辑。
+
+# 5. 工程实践
+
+## 5.1 分层边界
+
+- `router` 负责 HTTP
+- `service` 负责业务
+- `repository` 负责数据访问
+- `dependencies` 负责装配
+
+## 5.2 测试组织
+
+测试至少分两类：
+
+- 接口测试：直接请求 API，验证行为和响应
+- 业务测试：直接调用 service，验证规则逻辑
+
+依赖注入的一个核心价值是可以在测试里覆盖依赖。
+
+## 5.3 常见反模式
+
+- 把业务逻辑全堆在路由函数里
+- 把数据库操作直接写在 router 中
+- 不区分请求模型和响应模型
+- 把依赖创建逻辑散落在各处
+- 只有手工调接口，没有自动化测试
