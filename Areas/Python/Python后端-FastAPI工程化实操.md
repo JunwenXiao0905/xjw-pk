@@ -4,6 +4,8 @@
   - [[#1.1 目录结构图|1.1 目录结构图]]
   - [[#1.2 各目录职责|1.2 各目录职责]]
   - [[#1.3 main.py 的位置|1.3 `main.py` 的位置]]
+  - [[#1.4 FastAPI 与 Uvicorn|1.4 FastAPI 与 Uvicorn]]
+  - [[#1.5 BaseSettings 与 .env|1.5 BaseSettings 与 .env]]
 - [[#2. 请求处理链路|2. 请求处理链路]]
   - [[#2.1 请求流转|2.1 请求流转]]
   - [[#2.2 各层在链路中的职责|2.2 各层在链路中的职责]]
@@ -78,6 +80,91 @@ tests/
 - 注册 `middleware`、`exception_handler`、`lifespan`
 
 不要把具体业务逻辑写进 `main.py`。
+
+## 1.4 FastAPI 与 Uvicorn
+
+FastAPI 本身只是一个 Python 库，它不负责监听端口。真正接收 HTTP 请求的是 ASGI 服务器，开发时最常见的是 `uvicorn`。
+
+```text
+浏览器 -> uvicorn -> FastAPI app
+```
+
+`uvicorn` 的职责：
+
+- 监听端口，接收 TCP / HTTP 请求
+- 把 HTTP 请求转换成 ASGI 调用
+- 调用 `main.py` 里的 `app`
+- 把 FastAPI 返回结果转换成 HTTP 响应
+
+常见启动命令：
+
+```bash
+uv run uvicorn src.app.main:app --reload
+```
+
+各部分含义：
+
+- `uv run`：在项目环境中运行命令
+- `uvicorn`：启动 ASGI 服务器
+- `src.app.main:app`：加载 `src/app/main.py` 中的 `app` 对象
+- `--reload`：文件变化后自动重启，适合开发环境
+
+## 1.5 BaseSettings 与 `.env`
+
+FastAPI 项目里的运行配置通常不会直接写死在代码里，而是通过 `pydantic-settings` 从 `.env` 或系统环境变量读取。
+
+典型写法：
+
+```python
+# src/app/core/config.py
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    app_name: str = Field(default="Todo API")
+    database_url: str = Field(description="数据库连接地址")
+
+    model_config = SettingsConfigDict(
+        env_prefix="FASTAPI_",
+        env_file=".env",
+        extra="ignore",
+    )
+```
+
+这里的关键点：
+
+- `Settings` 继承 `BaseSettings`
+- 字段定义的是配置项结构，不是手写赋值逻辑
+- `SettingsConfigDict(...)` 指定配置来源和读取规则
+
+例如：
+
+```env
+FASTAPI_DATABASE_URL=postgresql+psycopg://fastapi_user:xxx@localhost:5433/fastapi_study
+```
+
+当执行：
+
+```python
+settings = Settings()
+```
+
+时，`pydantic-settings` 会自动做映射：
+
+```text
+FASTAPI_DATABASE_URL -> database_url
+```
+
+也就是说，代码里通常不会出现：
+
+```python
+database_url = os.getenv("FASTAPI_DATABASE_URL")
+```
+
+这种手写赋值，而是由 `BaseSettings` 在实例化时自动完成“读取 -> 映射 -> 类型转换 -> 校验”。
+
+`env_file` 用来指定 `.env` 文件位置；`env_prefix` 用来约束只读取 `FASTAPI_` 开头的变量。数据库连接这类配置通常应设为必填项，没提供就应在启动时直接报错，而不是偷偷回退到其他数据库。
 
 
 # 2. 请求处理链路
