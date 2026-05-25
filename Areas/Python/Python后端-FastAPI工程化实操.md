@@ -2,24 +2,26 @@
 
 - [[#1. 工程结构总览|1. 工程结构总览]]
   - [[#1.1 目录结构图|1.1 目录结构图]]
-  - [[#1.2 各目录职责|1.2 各目录职责]]
-  - [[#1.3 main.py 的位置|1.3 `main.py` 的位置]]
-  - [[#1.4 FastAPI 与 Uvicorn|1.4 FastAPI 与 Uvicorn]]
-  - [[#1.5 BaseSettings 与 .env|1.5 BaseSettings 与 .env]]
-- [[#2. 请求处理链路|2. 请求处理链路]]
-  - [[#2.1 请求流转|2.1 请求流转]]
-  - [[#2.2 各层在链路中的职责|2.2 各层在链路中的职责]]
-  - [[#2.3 边界约束|2.3 边界约束]]
+  - [[#1.2 FastAPI 模块分布|1.2 FastAPI 模块分布]]
+  - [[#1.3 后端依赖图|1.3 后端依赖图]]
+- [[#2. 工程目录内容|2. 工程目录内容]]
+  - [[#2.1 main.py|2.1 main.py]]
+  - [[#2.2 middleware|2.2 middleware]]
+  - [[#2.3 coreconfig.py|2.3 core/config.py]]
+  - [[#2.4 coredb.py|2.4 core/db.py]]
+  - [[#2.5 dependencies.py|2.5 dependencies.py]]
+  - [[#2.6 modulesrouter.py-schemaservice.py-repository.py-model.py|2.6 modules/*/router.py schema.py service.py repository.py model.py]]
+  - [[#2.7 tests|2.7 tests]]
 - [[#3. 常用接口写法|3. 常用接口写法]]
   - [[#3.1 路由与路径操作|3.1 路由与路径操作]]
-  - [[#3.2 路径参数、查询参数、请求体|3.2 路径参数、查询参数、请求体]]
-  - [[#3.3 Pydantic 模型|3.3 Pydantic 模型]]
+  - [[#3.2 路径参数查询参数请求体|3.2 路径参数、查询参数、请求体]]
+  - [[#3.3 pydantic-模型|3.3 Pydantic 模型]]
   - [[#3.4 响应模型与状态码|3.4 响应模型与状态码]]
-  - [[#3.5 Depends|3.5 `Depends`]]
-  - [[#3.6 middleware 与 exception_handler|3.6 `middleware` 与 `exception_handler`]]
-- [[#4. 核心机制|4. 核心机制]]
+  - [[#3.5 depends|3.5 `Depends`]]
+  - [[#3.6 middleware-与-exception_handler|3.6 `middleware` 与 `exception_handler`]]
+- [[#4. 原理拆解|4. 原理拆解]]
   - [[#4.1 参数注入|4.1 参数注入]]
-  - [[#4.2 请求体解析机制 (Pydantic & Dataclass)|4.2 请求体解析机制 (Pydantic & Dataclass)]]
+  - [[#4.2 请求体解析机制-pydantic--dataclass|4.2 请求体解析机制 (Pydantic & Dataclass)]]
   - [[#4.3 依赖注入机制|4.3 依赖注入机制]]
   - [[#4.4 异常处理机制|4.4 异常处理机制]]
   - [[#4.5 中间件调用链|4.5 中间件调用链]]
@@ -35,66 +37,147 @@
 
 ```text
 src/app/
-  main.py
-  core/
-    config.py
-    security.py
-  modules/
-    notes/
-      router.py
-      schema.py
-      service.py
-      repository.py
-    users/
-      router.py
-      schema.py
-      service.py
-      repository.py
-  middleware/
-    exceptions.py
-  dependencies.py
-tests/
+├── main.py                 # 应用入口：创建 app，注册 router / middleware / lifespan
+
+├── core/
+│   ├── config.py             # 配置对象：读取 .env / 环境变量
+│   └── db.py                 # 数据库基础设施：engine、sessionmaker、ping
+
+├── dependencies.py           # 依赖装配：get_settings、get_db、get_note_service
+
+├── middleware/
+│   └── exceptions.py         # 自定义异常类型
+
+├── modules/
+│   ├── notes/
+│   │   ├── model.py          # SQLAlchemy 模型：Note 表
+│   │   ├── schema.py         # Pydantic 模型：请求体 / 响应体
+│   │   ├── repository.py     # 数据访问层：直接操作 Session
+│   │   ├── service.py        # 业务逻辑层：组织 CRUD 规则
+│   │   └── router.py         # HTTP 层：定义 /notes 接口
+│   └── system/
+│       ├── schema.py         # 健康检查响应模型
+│       └── router.py         # /system/health 接口
+
+└── tests/
+    ├── conftest.py           # 测试环境初始化、依赖覆盖、测试数据库
+    ├── test_notes_api.py     # notes 模块接口测试
+    └── test_system_api.py    # system 模块接口测试
 ```
 
-## 1.2 各目录职责
+这个结构的核心是按业务域组织模块，再把共性的基础设施上提到 `core/`、`dependencies.py` 和 `middleware/`。
 
-- `main.py`：应用入口，负责创建 `FastAPI` 实例，注册路由、中间件、异常处理、生命周期事件
-- `modules/`：按业务域组织代码时的顶层目录，一个业务一个子目录
-- `router.py`：接口层，只处理 HTTP 入参、出参、状态码、响应模型
-- `schema.py`：Pydantic 模型，定义请求体、响应体、校验规则
-- `service.py`：业务逻辑层，承载规则判断和流程编排
-- `repository.py`：数据访问层，封装数据库或存储读写
-- `core/`：公共基础能力，比如配置、安全、日志
-- `middleware/`：横切逻辑，比如请求日志、异常包装、鉴权前置处理
-- `dependencies.py`：依赖装配中心，统一管理 `Depends(...)`
-- `tests/`：接口测试、依赖覆盖、行为验证
+## 1.2 FastAPI 模块分布
 
-## 1.3 `main.py` 的位置
-
-`main.py` 不是业务代码层，它是应用装配层。
-
-它主要负责三件事：
-
-- 创建 `app = FastAPI(...)`
-- `include_router(...)`
-- 注册 `middleware`、`exception_handler`、`lifespan`
-
-不要把具体业务逻辑写进 `main.py`。
-
-## 1.4 FastAPI 与 Uvicorn
-
-FastAPI 本身只是一个 Python 库，它不负责监听端口。真正接收 HTTP 请求的是 ASGI 服务器，开发时最常见的是 `uvicorn`。
+FastAPI 工程里常见的模块分布可以画成：
 
 ```text
-浏览器 -> uvicorn -> FastAPI app
+应用对象
+├── fastapi.FastAPI                 # 应用入口对象：路由、中间件、异常、生命周期
+└── fastapi.APIRouter               # 路由模块对象：拆分业务接口
+
+参数声明
+├── fastapi.Query                   # 查询参数声明
+├── fastapi.Path                    # 路径参数声明
+└── fastapi.Body                    # 请求体声明
+
+依赖注入
+└── fastapi.Depends     # 依赖入口：service、repository、db、settings、current_user
+
+请求响应
+├── fastapi.Request                 # 原始请求对象
+├── fastapi.Response                # 原始响应对象
+└── fastapi.responses.*             # 具体响应类型：JSONResponse 等
+
+异常处理
+├── fastapi.HTTPException           # 标准 HTTP 异常
+└── @app.exception_handler(...)     # 自定义异常到响应的映射入口
+
+中间件
+└── @app.middleware("http")         # 请求链路包装器：日志、耗时、CORS、trace id
+
+服务器
+└── uvicorn                         # ASGI 服务器：监听端口并调用 FastAPI app
 ```
 
-`uvicorn` 的职责：
+这些模块的关系可以压成一句：
 
-- 监听端口，接收 TCP / HTTP 请求
-- 把 HTTP 请求转换成 ASGI 调用
-- 调用 `main.py` 里的 `app`
-- 把 FastAPI 返回结果转换成 HTTP 响应
+```text
+uvicorn -> FastAPI app -> router -> depends -> service -> repository
+```
+
+## 1.3 后端依赖图
+
+先看当前这个项目已经落地的依赖主线：
+
+```text
+接口层
+├── fastapi                        # Web 框架
+└── uvicorn                        # ASGI 服务器
+
+数据模型与配置层
+├── pydantic                       # 请求体 / 响应体 / 数据模型
+└── pydantic-settings              # .env / 环境变量配置对象
+
+数据库层
+├── sqlalchemy                     # ORM / Session / SQL 抽象
+└── psycopg                        # PostgreSQL 驱动
+
+测试层
+├── pytest                         # 测试框架
+├── httpx                          # 测试客户端
+└── anyio / pytest-asyncio         # 异步测试支持
+```
+
+这一组已经足够覆盖一个典型后端的最小工程闭环：
+
+- 接口定义
+- 配置管理
+- 数据库连接
+- 依赖注入
+- 接口测试
+
+如果扩展到一个更完整的大型后端，常见依赖图还会继续长成：
+
+```text
+数据库层
+├── asyncpg / pymysql 等其他数据库驱动
+└── alembic                        # 数据库迁移
+
+认证授权层
+├── pyjwt / python-jose            # JWT 编解码
+├── passlib / pwdlib / bcrypt      # 密码哈希
+└── OAuth2 相关依赖               # 登录、鉴权、权限控制
+
+缓存与消息层
+├── redis                          # 缓存
+├── celery / rq                    # 后台任务
+└── kafka / rabbitmq 客户端        # 消息队列
+
+运维与启动层
+├── gunicorn（可选）               # 多 worker 部署
+└── docker / compose / k8s 配套    # 容器化与编排
+```
+
+# 2. 工程目录内容
+
+## 2.1 `main.py`
+
+`main.py` 是应用装配层，不是业务实现层。
+
+它主要负责：
+
+- 创建 `FastAPI(...)`
+- 注册 `router`
+- 注册 `middleware`
+- 注册 `exception_handler`
+- 注册 `lifespan`
+
+它和 `uvicorn` 的关系是：
+
+```text
+浏览器 -> uvicorn -> FastAPI app(main.py)
+```
 
 常见启动命令：
 
@@ -109,9 +192,34 @@ uv run uvicorn src.app.main:app --reload
 - `src.app.main:app`：加载 `src/app/main.py` 中的 `app` 对象
 - `--reload`：文件变化后自动重启，适合开发环境
 
-## 1.5 BaseSettings 与 `.env`
+不要把具体 CRUD、数据校验规则、数据库操作写进 `main.py`。
 
-FastAPI 项目里的运行配置通常不会直接写死在代码里，而是通过 `pydantic-settings` 从 `.env` 或系统环境变量读取。
+## 2.2 `middleware`
+
+`middleware` 放横切逻辑。
+
+当前项目里主要包括：
+
+- 自定义异常类型
+- 统一请求日志中间件
+
+后续也可以扩展：
+
+- trace id
+- 认证前置处理
+- 统一审计日志
+
+## 2.3 `core/config.py`
+
+`core/config.py` 负责定义配置对象结构，并从 `.env` / 环境变量中读取配置。
+
+它解决的是：
+
+- 配置项有哪些
+- 配置值从哪里来
+- 配置值怎么做类型转换与校验
+
+这个文件的核心对象通常是 `Settings(BaseSettings)`。
 
 典型写法：
 
@@ -166,36 +274,65 @@ database_url = os.getenv("FASTAPI_DATABASE_URL")
 
 `env_file` 用来指定 `.env` 文件位置；`env_prefix` 用来约束只读取 `FASTAPI_` 开头的变量。数据库连接这类配置通常应设为必填项，没提供就应在启动时直接报错，而不是偷偷回退到其他数据库。
 
+## 2.4 `core/db.py`
 
-# 2. 请求处理链路
+`core/db.py` 负责数据库基础设施，而不是业务数据访问。
 
-## 2.1 请求流转
+典型内容包括：
 
-```text
-HTTP 请求
--> main.py 注册的 app
--> middleware
--> router
--> Depends 注入依赖
--> service
--> repository
--> 返回 response
-```
+- 创建 `engine`
+- 创建 `sessionmaker`
+- 提供数据库连通性检查函数
 
-## 2.2 各层在链路中的职责
+也就是说，它只负责“数据库怎么连、会话怎么造”，不负责“笔记怎么查”。
 
-- `router`：接收请求，提取参数，调用 service
-- `service`：处理业务规则
-- `repository`：执行数据读写
-- `exception_handler`：把异常转成统一 HTTP 响应
-- `middleware`：包裹整个请求过程，处理日志、耗时、跨域等通用问题
+## 2.5 `dependencies.py`
 
-## 2.3 边界约束
+`dependencies.py` 是依赖装配中心。
 
-- `router` 不写业务细节
-- `service` 不处理 HTTP 细节
-- `repository` 不关心响应格式
-- `schema` 只描述接口契约
+典型依赖包括：
+
+- `get_settings()`
+- `get_db()`
+- `get_note_repository()`
+- `get_note_service()`
+
+这个文件的重点不是写业务，而是定义对象之间的装配关系。
+
+## 2.6 `modules/*/router.py schema.py service.py repository.py model.py`
+
+按业务域组织的模块里，常见文件分工是：
+
+- `router.py`
+  - HTTP 层
+  - 负责路径、参数、响应模型、状态码
+
+- `schema.py`
+  - Pydantic 模型
+  - 负责请求体、响应体、字段校验
+
+- `service.py`
+  - 业务逻辑层
+  - 负责规则、流程编排、异常抛出
+
+- `repository.py`
+  - 数据访问层
+  - 负责直接操作 `Session`
+
+- `model.py`
+  - SQLAlchemy 模型
+  - 负责表结构与 ORM 映射
+
+## 2.7 `tests`
+
+`tests` 负责验证接口行为，而不是只做“代码能跑”的演示。
+
+当前项目测试层已经覆盖：
+
+- notes CRUD 行为
+- system health 行为
+- 数据库依赖覆盖
+- lifespan 启动流程
 
 # 3. 常用接口写法
 
@@ -287,14 +424,16 @@ class NoteResponse(BaseModel):
 # src/app/dependencies.py
 from fastapi import Depends
 
+from sqlalchemy.orm import Session
+
+from app.dependencies import get_db
 from app.modules.notes.repository import NoteRepository
 from app.modules.notes.service import NoteService
 
-note_repository = NoteRepository()
-
-
-def get_note_repository() -> NoteRepository:
-    return note_repository
+def get_note_repository(
+    db: Session = Depends(get_db),
+) -> NoteRepository:
+    return NoteRepository(db)
 
 
 def get_note_service(
@@ -470,7 +609,7 @@ FastAPI 解析 JSON -> dict
 ```python
 @router.post("/notes")
 async def create_note(note: NoteCreate):
-    repository = NoteRepository()
+    repository = NoteRepository(db)
     service = NoteService(repository)
     return service.create_note(note)
 ```
@@ -486,8 +625,11 @@ FastAPI 的做法是：由 `Depends(...)` 声明“这个参数应该怎么获�
 典型写法：
 
 ```python
+from sqlalchemy.orm import Session
+
+
 def get_note_repository() -> NoteRepository:
-    return note_repository
+    return NoteRepository(db)
 
 def get_note_service(
     repository: NoteRepository = Depends(get_note_repository),
@@ -557,10 +699,10 @@ async def create_note(
 测试里的依赖覆盖就是这个机制的直接应用：
 
 ```python
-app.dependency_overrides[get_note_repository] = lambda: test_repository
+app.dependency_overrides[get_db] = lambda: db_session
 ```
 
-这句的意思是：在测试环境里，不再使用正式的 `get_note_repository`，而是改成返回测试用仓储对象。这样就可以在不改业务代码的前提下替换依赖实现。
+这句的意思是：在测试环境里，不再使用正式的数据库会话依赖，而是改成返回测试会话。这样上层的 repository / service / router 不用改，底层数据源就已经被替换掉了。
 
 ### 4.3.1 `Depends(...)` 返回什么
 
