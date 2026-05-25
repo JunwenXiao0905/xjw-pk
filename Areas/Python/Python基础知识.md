@@ -13,11 +13,19 @@
   - [2.3 `*args` 与 `**kwargs`](#23-args-与-kwargs)
   - [2.4 参数展开](#24-参数展开)
   - [2.5 函数签名](#25-函数签名)
+  - [2.6 条件表达式](#26-条件表达式)
+  - [2.7 `or` 兜底](#27-or-兜底)
+  - [2.8 `and` 短路](#28-and-短路)
+  - [2.9 `if not x`](#29-if-not-x)
 - [第3章 容器与解包](#第3章-容器与解包)
   - [3.1 `list`、`tuple`、`dict`](#31-listtupledict)
   - [3.2 列表拼接与构造](#32-列表拼接与构造)
   - [3.3 列表解包](#33-列表解包)
   - [3.4 元组解包](#34-元组解包)
+  - [3.5 `dict` 的读取、写入、更新](#35-dict-的读取写入更新)
+  - [3.6 `dict.get()`](#36-dictget)
+  - [3.7 `dict.keys()`、`dict.values()`、`dict.items()`](#37-dictkeysdictvaluesdictitems)
+  - [3.8 遍历 `dict`](#38-遍历-dict)
 - [第4章 类型标注](#第4章-类型标注)
   - [4.1 参数与返回值注解](#41-参数与返回值注解)
   - [4.2 `list[str]`、`dict[str, int]`](#42-liststrdictstr-int)
@@ -291,6 +299,134 @@ inspect.signature(add)
 
 函数签名经常会被框架读取，而不只是给人看。FastAPI 会先分析路由函数签名，再判断参数来自路径、查询参数、请求体还是依赖注入。
 
+### 2.6 条件表达式
+
+Python 的条件表达式写法是：
+
+```python
+A if condition else B
+```
+
+例如：
+
+```python
+return "approve_tools" if tools_condition(state) == "tools" else "__end__"
+```
+
+含义是：
+
+- 条件成立，返回 `"approve_tools"`
+- 否则，返回 `"__end__"`
+
+等价于普通 `if/else`：
+
+```python
+if tools_condition(state) == "tools":
+    return "approve_tools"
+else:
+    return "__end__"
+```
+
+对应的 JavaScript 写法是：
+
+```javascript
+return tools_condition(state) === "tools" ? "approve_tools" : "__end__";
+```
+
+### 2.7 `or` 兜底
+
+`x or y` 常用于“如果左边没有合适值，就退回右边”。
+
+```python
+decision = state["human_decision"] or {}
+```
+
+这句的含义是：
+
+- 如果 `state["human_decision"]` 有值，就用它
+- 如果它是空值，就退回到 `{}`
+
+这里的空值包括：
+
+- `None`
+- `False`
+- `0`
+- `""`
+- `[]`
+- `{}`
+
+对应的 JavaScript 写法是：
+
+```javascript
+const decision = state.human_decision || {};
+```
+
+如果是在字典里取值，还要区分两个问题：
+
+1. 键可能不存在
+2. 键存在，但值可能是空值
+
+只解决“键不存在”时，更直接的写法通常是：
+
+```python
+decision = state.get("human_decision", {})
+```
+
+这句表示：
+
+- 如果键不存在，返回默认值 `{}`
+- 如果键存在，返回它原本的值
+
+如果还想把 `None`、空字符串、空列表、空字典这类空值一起兜底，才会写成：
+
+```python
+decision = state.get("human_decision") or {}
+```
+
+可以先按这个规则区分：
+
+- `dict.get(key, default)`：优先解决“键缺失”
+- `x or fallback`：优先解决“值为空”
+
+### 2.8 `and` 短路
+
+`x and y` 表示：
+
+- 如果 `x` 是空值，直接返回 `x`
+- 如果 `x` 有值，继续返回 `y`
+
+它常用于“左边成立时再算右边”。
+
+JavaScript 中最接近的写法是：
+
+```javascript
+x && y
+```
+
+### 2.9 `if not x`
+
+`if not x:` 表示“如果 `x` 是空值，就进入分支”。
+
+例如：
+
+```python
+if not tool_calls:
+    return Command(goto="chatbot")
+```
+
+这句的含义是：
+
+- 如果 `tool_calls` 是空列表、`None`、空字符串等空值
+- 就进入这个分支
+
+对应的 JavaScript 写法是：
+
+```javascript
+if (!tool_calls) {
+  return gotoChatbot();
+}
+```
+
 ## 第3章 容器与解包
 
 ### 3.1 `list`、`tuple`、`dict`
@@ -337,6 +473,143 @@ a, b = (1, 2)
 ```
 
 它的作用是同时取多个值，并按顺序赋给多个变量。
+
+### 3.5 `dict` 的读取、写入、更新
+
+字典是键值映射结构。
+
+```python
+data = {"name": "Tom"}
+```
+
+读取：
+
+```python
+data["name"]
+```
+
+写入新键：
+
+```python
+data["age"] = 18
+```
+
+更新已有键：
+
+```python
+data["name"] = "Alice"
+```
+
+这里新增的是字典键，不是对象属性。
+
+### 3.6 `dict.get()`
+
+`dict.get(key, default)` 用来按键读取字典值，并且可以提供默认值。
+
+```python
+data.get("name", None)
+```
+
+含义是：
+
+- 如果字典里有 `"name"` 这个键，就返回对应值
+- 如果没有，就返回默认值 `None`
+
+例如：
+
+```python
+data = {"name": "Tom"}
+
+data.get("name", None)
+data.get("age", None)
+```
+
+和直接写：
+
+```python
+data["age"]
+```
+
+不同，后者在键不存在时会报 `KeyError`。
+
+### 3.7 `dict.keys()`、`dict.values()`、`dict.items()`
+
+假设：
+
+```python
+data = {"name": "Tom", "age": 18}
+```
+
+```python
+data.keys()
+```
+
+返回 `dict_keys` 视图对象，表示当前字典的所有键。
+
+```python
+data.values()
+```
+
+返回 `dict_values` 视图对象，表示当前字典的所有值。
+
+```python
+data.items()
+```
+
+返回 `dict_items` 视图对象，表示当前字典的所有 `(key, value)` 对。
+
+它们默认不是列表，而是可遍历的视图对象。因此常见写法是：
+
+```python
+list(data.keys())
+list(data.values())
+list(data.items())
+```
+
+对应结果分别近似为：
+
+```python
+["name", "age"]
+["Tom", 18]
+[("name", "Tom"), ("age", 18)]
+```
+
+这些视图对象的意义是：
+
+- 能直接遍历
+- 会反映字典的当前状态
+- 需要真正列表时再手动 `list(...)`
+
+### 3.8 遍历 `dict`
+
+字典默认遍历的是键：
+
+```python
+for key in data:
+    print(key)
+```
+
+也可以显式写成：
+
+```python
+for key in data.keys():
+    print(key)
+```
+
+如果想同时拿到键和值，最常见写法是：
+
+```python
+for key, value in data.items():
+    print(key, value)
+```
+
+对应的 JavaScript 写法是：
+
+```javascript
+for (const [key, value] of Object.entries(data)) {
+  console.log(key, value);
+}
+```
 
 ## 第4章 类型标注
 
@@ -645,18 +918,7 @@ getattr(user, "name", None)
 - 如果 `user` 有 `name` 属性，就返回它
 - 如果没有，就返回 `None`
 
-它处理的是对象属性，不是字典键。
-
-字典的对应写法是：
-
-```python
-data.get("name", None)
-```
-
-两者相似处在于都可以提供默认值；区别在于：
-
-- `getattr(...)` 读对象属性
-- `dict.get(...)` 读字典键
+它处理的是对象属性，不是字典键。字典的 `get(...)`、`keys()`、`values()`、`items()` 等操作统一放在第3章。
 
 如果直接写：
 
