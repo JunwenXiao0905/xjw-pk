@@ -60,6 +60,19 @@ https://api.example.com:443/users/1?active=true
   - `Cache-Control`
   - `Location`
 
+## Authorization
+
+- `Authorization` 是显式认证请求头。
+- 常见格式：
+
+```text
+Authorization: Bearer <token>
+```
+
+- 这里的 `Bearer` 表示后面携带的是一段访问令牌。
+- 客户端后续访问受保护接口时，通常由前端代码主动附加这个请求头。
+- 它和 Cookie 的区别是：Cookie 更偏浏览器自动携带；`Authorization` 更偏客户端显式控制。
+
 ## Cookie
 
 - Cookie 是浏览器保存的一小段键值数据。
@@ -97,6 +110,15 @@ https://api.example.com:443/users/1?active=true
 
 ```text
 name=alice&age=18
+```
+
+- 登录接口经常使用这种格式，尤其是在 OAuth2 password flow 场景下。
+- 这时请求体虽然不在 URL 上，但编码形态仍然像查询字符串。
+
+常见登录请求体：
+
+```text
+username=study_user&password=study_pass_123
 ```
 
 ## multipart/form-data
@@ -138,6 +160,17 @@ name=alice&age=18
 5. 执行认证和参数校验
 6. 执行业务逻辑
 7. 返回状态码、响应头、响应体
+
+## 登录接口为什么常用 form
+
+- 登录接口不一定必须使用 `application/json`。
+- 在 OAuth2 password flow 里，约定更常见的是 `application/x-www-form-urlencoded`。
+- 这也是很多后端框架在“账号密码登录”场景下优先提供表单解析器的原因。
+
+所以要区分两件事：
+
+- 登录接口提交用户名密码时，常用 form
+- 后续访问受保护接口时，常用 `Authorization: Bearer <token>`
 
 ## 关联
 
