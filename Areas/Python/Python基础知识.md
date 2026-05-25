@@ -1031,6 +1031,92 @@ def handle_webhook():
 - `@dataclass`
 - `@lru_cache`
 
+`@lru_cache` 是标准库 `functools` 提供的缓存装饰器。
+
+```python
+from functools import lru_cache
+
+
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()
+```
+
+它的作用是：第一次调用时真正执行函数，并把返回值缓存起来；后续相同调用直接返回缓存结果，不再重新执行函数体。
+
+在没有参数的函数上，`@lru_cache` 通常等价于“把函数结果做成单例缓存”。上面的 `get_settings()` 常见于配置对象场景，目的是避免每次读取配置都重新实例化 `Settings()`。
+
+可以把它近似理解成：
+
+```python
+_settings = None
+
+
+def get_settings():
+    global _settings
+    if _settings is None:
+        _settings = Settings()
+    return _settings
+```
+
+`lru_cache` 原本是“最近最少使用缓存”，适合缓存函数结果；这里只是利用了它的“记住返回值”能力。
+
+有参数时，`@lru_cache` 会按参数值分别缓存结果，而不是只缓存一份。
+
+```python
+from functools import lru_cache
+
+
+@lru_cache
+def square(x: int) -> int:
+    print("run")
+    return x * x
+```
+
+调用：
+
+```python
+square(2)
+square(2)
+square(3)
+square(2)
+```
+
+大致效果是：
+
+- 第一次 `square(2)`：执行函数，缓存结果
+- 第二次 `square(2)`：直接返回缓存
+- `square(3)`：因为参数不同，重新执行函数并缓存另一份结果
+- 再次 `square(2)`：继续返回第一次的缓存
+
+可以近似理解成：
+
+```python
+cache = {
+    (2,): 4,
+    (3,): 9,
+}
+```
+
+如果有多个参数，缓存键也是整组参数：
+
+```python
+@lru_cache
+def add(a: int, b: int) -> int:
+    return a + b
+```
+
+近似缓存形态：
+
+```python
+{
+    (1, 2): 3,
+    (2, 3): 5,
+}
+```
+
+因此 `@lru_cache` 要求参数可哈希；像 `list`、`dict` 这类不可哈希对象通常不能直接作为缓存键。
+
 ## 第9章 Pydantic
 
 ### 9.1 `BaseModel`
