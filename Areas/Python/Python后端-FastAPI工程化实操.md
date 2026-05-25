@@ -84,6 +84,10 @@ FastAPI 工程里常见的模块分布可以画成：
 依赖注入
 └── fastapi.Depends     # 依赖入口：service、repository、db、settings、current_user
 
+安全与认证
+├── fastapi.security.OAuth2PasswordBearer    # 从 Authorization: Bearer 中提取 token
+└── fastapi.security.OAuth2PasswordRequestForm # 解析登录表单 username/password
+
 请求响应
 ├── fastapi.Request                 # 原始请求对象
 ├── fastapi.Response                # 原始响应对象
@@ -122,6 +126,10 @@ uvicorn -> FastAPI app -> router -> depends -> service -> repository
 数据库层
 ├── sqlalchemy                     # ORM / Session / SQL 抽象
 └── psycopg                        # PostgreSQL 驱动
+
+认证授权层
+├── PyJWT                          # JWT 编码与解码
+└── python-multipart               # OAuth2PasswordRequestForm 登录表单解析
 
 测试层
 ├── pytest                         # 测试框架
