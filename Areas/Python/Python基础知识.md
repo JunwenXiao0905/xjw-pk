@@ -33,6 +33,7 @@
   - [4.4 `TypedDict`](#44-typeddict)
   - [4.5 `Annotated`](#45-annotated)
   - [4.6 `Literal`](#46-literal)
+  - [4.7 `operator`](#47-operator)
 - [第5章 模块与导入](#第5章-模块与导入)
   - [5.1 模块](#51-模块)
   - [5.2 包与 `__init__.py`](#52-包与-__init__py)
@@ -48,6 +49,7 @@
   - [7.1 `Exception`](#71-exception)
   - [7.2 `raise`](#72-raise)
   - [7.3 自定义异常](#73-自定义异常)
+  - [7.4 `try` / `except`](#74-try--except)
 - [第8章 装饰器](#第8章-装饰器)
   - [8.1 `@decorator`](#81-decorator)
   - [8.2 带参数装饰器](#82-带参数装饰器)
@@ -56,8 +58,10 @@
   - [8.5 常见内置装饰器](#85-常见内置装饰器)
 - [第9章 Pydantic](#第9章-pydantic)
   - [9.1 `BaseModel`](#91-basemodel)
-  - [9.2 `Field`](#92-field)
-  - [9.3 `model_dump()`](#93-model_dump)
+  - [9.2 `model_validate()`](#92-model_validate)
+  - [9.3 `Field`](#93-field)
+  - [9.4 `model_dump()`](#94-model_dump)
+  - [9.5 `ValidationError`](#95-validationerror)
 - [第10章 工程实践](#第10章-工程实践)
   - [10.1 CLI 交互循环](#101-cli-交互循环)
   - [10.2 `.env` 与 `.env.local`](#102-env-与-envlocal)
@@ -256,7 +260,7 @@ add(1, 2)
 - 参数顺序
 - 哪些参数必填
 - 哪些参数有默认值
-- 参数种类，如位置参数、关键字参数、`*args`、`**kwargs`
+- 参数种类，如位置参数、关键字参数、`*args`、单独的 `*`、`**kwargs`
 - 返回值注解
 
 例如：
@@ -298,6 +302,32 @@ inspect.signature(add)
 ```
 
 函数签名经常会被框架读取，而不只是给人看。FastAPI 会先分析路由函数签名，再判断参数来自路径、查询参数、请求体还是依赖注入。
+
+单独的 `*` 也属于签名规则的一部分。它表示：
+
+- `*` 后面的参数只能用关键字传参
+
+例如：
+
+```python
+def build_prompt(*, question: str, error: str | None = None):
+    return {"question": question, "error": error}
+```
+
+可以这样调用：
+
+```python
+build_prompt(question="是否继续？")
+build_prompt(question="是否继续？", error="输入不正确")
+```
+
+不能这样调用：
+
+```python
+build_prompt("是否继续？")
+```
+
+这种写法常用于配置型函数，因为参数名本身就是语义的一部分。和 `*args` 不同，单独的 `*` 不是收集参数，而是把后面的参数标记成“必须写参数名”。
 
 ### 2.6 条件表达式
 
@@ -426,6 +456,45 @@ if (!tool_calls) {
   return gotoChatbot();
 }
 ```
+
+这里的 `not` 是逻辑取反运算。可以近似理解成：
+
+```python
+if not x:
+```
+
+先判断 `x` 的真假，再把结果取反。
+
+例如：
+
+```python
+bool([])
+```
+
+结果是 `False`，所以：
+
+```python
+not []
+```
+
+结果是 `True`。
+
+要和下面这种写法区分：
+
+```python
+if x is not None:
+```
+
+这里的 `is not` 是一个整体比较运算，意思是：
+
+- 判断 `x` 不是 `None`
+
+它不是先对 `x` 做 `not`，也不是先对 `None` 做 `not`。
+
+可以先按下面两句区分：
+
+- `not x`：逻辑取反，看真假
+- `x is not None`：整体比较，看是不是 `None`
 
 ## 第3章 容器与解包
 
@@ -784,6 +853,44 @@ Literal["writer", "chatbot", "fallback"]
 
 它常用于路由、分支选择、枚举式返回值。和 `TypedDict` 一样，它主要是类型标注，不是运行时对象模型。
 
+### 4.7 `operator`
+
+`operator` 是 Python 内置标准库模块，把运算符暴露成普通函数。
+
+```python
+import operator
+
+operator.add(1, 2)    # 等价于 1 + 2，结果 3
+operator.add([1], [2]) # 等价于 [1] + [2]，结果 [1, 2]
+```
+
+常用函数：
+
+| 函数 | 等价运算符 |
+|------|-----------|
+| `operator.add(a, b)` | `a + b` |
+| `operator.sub(a, b)` | `a - b` |
+| `operator.mul(a, b)` | `a * b` |
+| `operator.truediv(a, b)` | `a / b` |
+| `operator.concat(a, b)` | `a + b`（序列拼接，与 add 等价） |
+
+当需要把运算以函数形式传参时，`operator` 提供了直接的方式。
+
+在实际工程里，`operator` 最常见的用途之一是配合 `Annotated` 做 LangGraph 的 **reducer**：
+
+```python
+from typing import Annotated
+import operator
+
+
+class MyState(TypedDict):
+    sections: Annotated[list[str], operator.add]
+    # 其他字段默认覆盖
+    topic: str
+```
+
+这里 `operator.add` 是字段合并策略，含义在 LangGraph 笔记 2.2 中展开。
+
 ## 第5章 模块与导入
 
 ### 5.1 模块
@@ -979,6 +1086,99 @@ raise Exception("error")
 ### 7.3 自定义异常
 
 自定义异常应继承 `Exception`。
+
+### 7.4 `try` / `except`
+
+`try` / `except` 用于捕获可能抛出的异常，防止程序直接崩溃。
+
+```python
+try:
+    result = 1 / 0
+except ZeroDivisionError:
+    print("除数不能为零")
+```
+
+如果 `try` 块执行成功（没有异常），`except` 块直接跳过。  
+如果 `try` 块执行时抛出了指定类型的异常，就进入 `except` 块。
+
+**`as` 绑定异常对象**
+
+```python
+try:
+    parsed = ApprovalDecision.model_validate(decision)
+except ValidationError as exc:
+    print(exc.errors())
+```
+
+`as exc` 把捕获到的异常实例绑定到变量 `exc`，之后可以在 `except` 块里读取异常的信息（如 `.errors()`、`.json()` 等）。
+
+如果不写 `as`，就只能知道"出错了"，拿不到异常对象本身。
+
+**捕获多种异常**
+
+```python
+try:
+    data = json.loads(raw)
+except (json.JSONDecodeError, TypeError) as exc:
+    ...
+```
+
+多个异常类型可以写成元组。
+
+**不匹配的异常会跳过透传**
+
+`except` 只接住类型匹配的异常。不匹配的异常不会掉进这个 `except` 块，而是继续往外冒：
+
+```python
+try:
+    parsed = ApprovalDecision.model_validate(decision)
+except ValidationError as exc:
+    ...                     # 只有 ValidationError 走这里
+```
+
+如果 `model_validate` 抛出的是 `TypeError`，这个 `except` 接不住，异常会跳过它继续向上透传到外层调用方。
+
+**多个 `except` 按顺序匹配**
+
+```python
+try:
+    result = do_thing()
+except ValidationError as exc:
+    ...                     # 校验失败
+except ValueError as exc:
+    ...                     # 其他值错误
+except Exception as exc:
+    ...                     # 兜底：其余所有异常
+```
+
+异常从上往下和各个 `except` 比对，匹配到第一个就停。因此更具体的异常要写在上方，`Exception` 这类宽泛的兜底写在最后。如果把 `except Exception` 写在了最上面，后面所有 `except` 永远不会被匹配到。
+
+**`try` / `except` / `else` / `finally`**
+
+```python
+try:
+    result = do_thing()
+except ValueError:
+    print("值不对")
+else:
+    print("成功，结果是", result)
+finally:
+    print("无论成功失败都执行")
+```
+
+- `try`：尝试执行的代码
+- `except`：指定异常时执行
+- `else`：没有异常时执行（可以拿到 try 块的结果）
+- `finally`：无论是否有异常都执行（常用于关闭文件、释放连接）
+
+它与 JavaScript 的对应关系：
+
+| Python | JavaScript |
+|--------|------------|
+| `try / except` | `try / catch` |
+| `except SomeError as e:` | `catch (e) { ... }` |
+| `else` | 无直接对应，需在 try 块末尾手动实现 |
+| `finally` | `finally` |
 
 ## 第8章 装饰器
 
@@ -1264,7 +1464,55 @@ note = NoteCreate(title=123)
 - 传入参数会以 `**data` 的形式进入父类 `__init__`
 - `BaseModel.__init__` 不只是赋值，还会按子类字段规则做校验
 
-### 9.2 `Field`
+### 9.2 `model_validate()`
+
+`model_validate(x)` 用来把一个“已经存在的原始值”按当前模型结构做校验和解析。
+
+```python
+class ApprovalDecision(BaseModel):
+    approved: bool
+    comment: str = ""
+
+
+decision = {"approved": True, "comment": "可以执行"}
+parsed = ApprovalDecision.model_validate(decision)
+```
+
+这里的 `decision` 已经是一个现成值。  
+`model_validate(...)` 做的是：
+
+- 检查它是否符合 `ApprovalDecision` 的字段结构
+- 合法则返回一个 `ApprovalDecision` 实例
+- 不合法则抛出校验错误
+
+它适合的场景是：
+
+- 你手里已经有一个字典、JSON 解析结果、外部输入对象
+- 现在想“按某个模型重新检查并转成模型实例”
+
+可以把 Pydantic 里几种常见入口区分成：
+
+```python
+note = NoteCreate(title="hello")
+```
+
+- `Model(...)`：边创建边校验
+
+```python
+note = NoteCreate.model_validate(data)
+```
+
+- `Model.model_validate(x)`：拿已有值做校验并转成模型
+
+```python
+data = note.model_dump()
+```
+
+- `instance.model_dump()`：把模型实例转回普通字典
+
+`model_validate(...)` 在接收外部输入时尤其常见，因为这时你通常拿到的不是分散参数，而是一整份已有数据。
+
+### 9.3 `Field`
 
 `Field` 用来给字段补充验证规则和元数据。
 
@@ -1278,7 +1526,7 @@ email: str = Field(..., pattern=r".+@.+")
 
 可以把 `Field(...)` 理解成“这个字段除了类型之外，还有额外约束”。
 
-### 9.3 `model_dump()`
+### 9.4 `model_dump()`
 
 `model_dump()` 用来把 Pydantic 模型实例转成普通字典。
 
@@ -1302,6 +1550,43 @@ note.model_dump(exclude_unset=True)
 for key, value in note.model_dump(exclude_unset=True).items():
     existing[key] = value
 ```
+
+### 9.5 `ValidationError`
+
+`ValidationError` 是 Pydantic 在校验失败时抛出的异常。
+
+```python
+from pydantic import ValidationError
+```
+
+它不是 Python 内置异常（如 `ValueError`、`KeyError`），而是 Pydantic 自己定义的异常类。
+
+触发场景：
+
+```python
+from pydantic import BaseModel, ValidationError
+
+
+class NoteCreate(BaseModel):
+    title: str
+    content: str = ""
+
+
+try:
+    note = NoteCreate(title=123)          # title 应该是 str，传了 int
+except ValidationError as exc:
+    print(exc.errors())                   # 查看具体哪些字段校验失败
+```
+
+`NoteCreate(title=123)` 和 `NoteCreate.model_validate({"title": 123})` 都会在校验失败时抛出 `ValidationError`。
+
+**常用属性**
+
+- `exc.errors()`：返回错误列表，每条包含 `loc`（出错字段路径）、`msg`（错误描述）、`type`（错误类型）
+- `exc.json()`：返回 JSON 格式的错误详情
+- `exc.error_count()`：返回错误数量
+
+`ValidationError` 继承自 Python 的 `Exception`，因此可以像普通异常一样用 `try / except` 捕获。
 
 ## 第10章 工程实践
 
