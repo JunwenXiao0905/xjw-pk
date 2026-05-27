@@ -56,6 +56,7 @@
   - [8.3 `@wraps`](#83-wraps)
   - [8.4 Flask 路由装饰器](#84-flask-路由装饰器)
   - [8.5 常见内置装饰器](#85-常见内置装饰器)
+  - [8.6 `@contextmanager` 与 `@asynccontextmanager`](#86-contextmanager-与-asynccontextmanager)
 - [第9章 Pydantic](#第9章-pydantic)
   - [9.1 `BaseModel`](#91-basemodel)
   - [9.2 `model_validate()`](#92-model_validate)
@@ -66,6 +67,7 @@
   - [10.1 CLI 交互循环](#101-cli-交互循环)
   - [10.2 `.env` 与 `.env.local`](#102-env-与-envlocal)
   - [10.3 `load_dotenv()`](#103-load_dotenv)
+  - [10.4 常量时间比较](#104-常量时间比较)
 
 ## 第1章 运行与入口
 
@@ -1317,6 +1319,190 @@ def add(a: int, b: int) -> int:
 
 因此 `@lru_cache` 要求参数可哈希；像 `list`、`dict` 这类不可哈希对象通常不能直接作为缓存键。
 
+### 8.6 `@contextmanager` 与 `@asynccontextmanager`
+
+这两个装饰器解决同一个问题：**不用手写类，就能造出一个上下文管理器。**
+
+#### 8.6.1 为什么需要上下文管理器
+
+假设有一段"开门—干活—关门"的逻辑：
+
+```python
+open_door()
+do_work()        # 如果这行报错，close_door() 就不会执行
+close_door()
+```
+
+最简单的保证是 `try/finally`：
+
+```python
+open_door()
+try:
+    do_work()
+finally:
+    close_door()   # 天塌了也执行
+```
+
+Python 提供了一个标准语法来封装这个模式——`with`：
+
+```python
+with door():       # 进入时开门，退出时自动关门
+    do_work()
+```
+
+`with` 后面跟的东西叫**上下文管理器**。
+
+#### 8.6.2 第一层：手写类（最底层）
+
+任何实现了 `__enter__` + `__exit__` 的类，都可以放在 `with` 后面。
+
+```python
+class Door:
+    def __enter__(self):
+        print("开门")
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        print("关门")
+        # 返回 False = 有异常继续往外抛
+
+with Door():
+    print("干活")
+# 开门
+# 干活
+# 关门
+```
+
+`with` 底层做的事：
+
+```text
+1. 调用 Door().__enter__() → 返回值赋给 as 后面的变量
+2. 执行 with 块里的代码
+3. 不管第2步成功还是崩了，调用 Door().__exit__()
+```
+
+#### 8.6.3 第二层：`@contextmanager` + `yield`（语法糖）
+
+每次写一个简单的开门/关门逻辑都要写类太啰嗦。`@contextmanager` 让你用**一个函数 + 一个 `yield`** 代替整个类。
+
+```python
+from contextlib import contextmanager
+
+@contextmanager
+def door():
+    print("开门")       # with 进入时执行
+    yield                # ← 分界点
+    print("关门")       # with 退出时执行
+```
+
+这个函数经过装饰器后，**变成了一个实现了 `__enter__`/`__exit__` 的对象**。你用 `with door():` 时底层发生的事和手写类完全一样。
+
+```text
+你写的函数                    装饰器帮你生成的（等效类）
+─────────────────────        ─────────────────────────
+def door():                  class _DoorContext:
+    print("开门")               def __enter__(self):
+    yield               →           print("开门")
+    print("关门")               def __exit__(self, ...):
+                                    print("关门")
+
+with door():                 with _DoorContext():
+    ...                          ...
+```
+
+`yield` 在这里**不是生成器**，而是分界点——把函数切成"进"和"出"两半。
+
+#### 8.6.4 第三层：`@asynccontextmanager`（异步版）
+
+和上面完全一样，只是把 `with` 换成 `async with`，`__enter__`/`__exit__` 换成 `__aenter__`/`__aexit__`，函数加 `async`。
+
+```text
+同步                             异步
+─────────────────────            ─────────────────────
+with                              async with
+__enter__ / __exit__              __aenter__ / __aexit__
+@contextmanager                   @asynccontextmanager
+def func():                       async def func():
+```
+
+本质是同一个协议的两套版本。
+
+#### 8.6.5 为什么必须搭配 `try/finally`
+
+`__exit__` 在出现异常时，会通过 `athrow()` **把异常扔到 `yield` 那一行**。没有 `try/finally` 的话：
+
+```python
+@asynccontextmanager
+async def lifespan(app):
+    engine = create_engine(...)
+    yield                        # ← 异常扔在这一行
+    engine.dispose()             # ← 永远跑不到
+```
+
+加上 `try/finally`：
+
+```python
+@asynccontextmanager
+async def lifespan(app):
+    engine = create_engine(...)
+    try:
+        yield                    # ← 异常扔到这里
+    finally:
+        engine.dispose()         # ← Python 的 finally：天塌了也执行
+```
+
+- `@asynccontextmanager` 保证：退出时尝试跑 `yield` 后面的代码
+- `try/finally` 保证：扔了异常也能跑
+- 两者组合 = 不管正常关闭还是崩了，清理逻辑必执行
+
+#### 8.6.6 经典用法
+
+**数据库事务：**
+
+```python
+@asynccontextmanager
+async def transaction(db: Session):
+    try:
+        yield db
+        db.commit()          # 正常结束 → 提交
+    except Exception:
+        db.rollback()        # 出异常 → 回滚
+        raise
+```
+
+**临时覆盖依赖：**
+
+```python
+@asynccontextmanager
+async def override_dependency(app, old, new):
+    app.dependency_overrides[old] = new
+    try:
+        yield
+    finally:
+        del app.dependency_overrides[old]   # 一定恢复原状
+```
+
+**计时/度量：**
+
+```python
+@asynccontextmanager
+async def measure(label: str):
+    start = time.time()
+    yield
+    print(f"{label} 耗时: {time.time() - start:.2f}s")
+```
+
+三个用法的本质完全相同：**进时做 A，退出时做 B，用 `try/finally` 保证 B 一定发生**。
+
+#### 8.6.7 两个装饰器的定位
+
+| 装饰器 | 用在 | 函数类型 | 消费方式 |
+|--------|------|----------|----------|
+| `@contextmanager` | 同步上下文管理器 | `def` + `yield` | `with` |
+| `@asynccontextmanager` | 异步上下文管理器 | `async def` + `yield` | `async with` |
+
+FastAPI 的 `lifespan` 要求异步上下文管理器，所以必须用后者。
+
 ## 第9章 Pydantic
 
 ### 9.1 `BaseModel`
@@ -1620,3 +1806,15 @@ load_dotenv()
 ```
 
 它的作用是把环境变量从文件加载到当前进程环境中。
+
+### 10.4 常量时间比较
+
+```python
+from hmac import compare_digest
+
+compare_digest(input_password, correct_password)
+```
+
+普通 `==` 比较密码时，Python 逐字符比对，第一个不匹配立刻返回 `False`。攻击者可以通过"哪个密码返回 401 耗时更长"来逐步猜出正确密码（时序攻击）。
+
+`compare_digest` 不管第几个字符不匹配，耗时都一样长，杜绝了这种侧信道攻击。属于防御性编程，通常用在登录校验、token 比对等安全敏感场景。
