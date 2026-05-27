@@ -883,6 +883,8 @@ async def log_requests(request, call_next):
 
 FastAPI 中通常通过 `lifespan` 来统一管理这类逻辑。
 
+FastAPI 的生命周期通过 `async with` 协议实现。`lifespan` 函数上标注 `@asynccontextmanager`，`yield` 之前是启动逻辑，`yield` 之后是关闭逻辑。底层原理见 [[Python基础知识#8.6 `@contextmanager` 与 `@asynccontextmanager`|Python基础知识 8.6]]。
+
 # 5. 工程实践
 
 ## 5.1 分层边界
