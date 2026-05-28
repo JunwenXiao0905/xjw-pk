@@ -46,6 +46,11 @@
   - [7.3 观测差异](#73-观测差异)
   - [7.4 完整示例](#74-完整示例)
   - [7.5 与普通节点的区别](#75-与普通节点的区别)
+- [第8章 持久化存储（SqliteSaver）](#第8章-持久化存储sqlitesaver)
+  - [8.1 与 InMemorySaver 的区别](#81-与-inmemorysaver-的区别)
+  - [8.2 接入方式](#82-接入方式)
+  - [8.3 时间旅行](#83-时间旅行)
+  - [8.4 完整示例](#84-完整示例)
 
 
 ## 第1章 模块分布与产品分层
@@ -1616,15 +1621,137 @@ def build_parent_graph():
 
 ### 7.5 与普通节点的区别
 
-| | 普通节点 | 子图 |
-|---|---|---|
+|      | 普通节点                     | 子图                                 |
+| ---- | ------------------------ | ---------------------------------- |
 | 注册方式 | `add_node("name", func)` | `add_node("name", compiled_graph)` |
-| 内部结构 | 单个函数 | 完整 graph（节点 + 边 + START/END）|
-| 对父图 | 一个叶子步骤 | 一个黑盒步骤 |
-| 状态交互 | 函数参数直接接收 state | 同名字段自动双向传递 |
-| 内部观测 | 不需要 | `stream(subgraphs=True)` 穿透 |
-| 适用场景 | 简单处理逻辑 | 可复用的、内部有多个步骤的流程 |
+| 内部结构 | 单个函数                     | 完整 graph（节点 + 边 + START/END）       |
+| 对父图  | 一个叶子步骤                   | 一个黑盒步骤                             |
+| 状态交互 | 函数参数直接接收 state           | 同名字段自动双向传递                         |
+| 内部观测 | 不需要                      | `stream(subgraphs=True)` 穿透        |
+| 适用场景 | 简单处理逻辑                   | 可复用的、内部有多个步骤的流程                    |
+|      |                          |                                    |
 
 子图的本质是**封装**：把一个多步流程打包成一个可复用节点，父图只关心输入输出，不关心中间步骤。
+
+## 第8章 持久化存储（SqliteSaver）
+
+### 8.1 与 InMemorySaver 的区别
+
+笔记 4.1 学的 `InMemorySaver` 把 state 存在内存中。`SqliteSaver` 写到 `.sqlite` 文件。
+
+| | `InMemorySaver` | `SqliteSaver` |
+|---|---|---|
+| 存储位置 | 内存 | `.sqlite` 文件 |
+| 进程重启 | 数据丢失 | 按 `thread_id` 自动恢复 |
+| 适合场景 | 开发调试、单轮测试 | 生产对话、长期多轮会话 |
+| 并发 | 单线程 | `check_same_thread=False` 支持简单多线程 |
+
+`SqliteSaver` 适合轻量级生产场景：不需要额外部署 Postgres，但进程重启后对话依然完整。
+
+### 8.2 接入方式
+
+只需要三行变化：
+
+```python
+import sqlite3
+from langgraph.checkpoint.sqlite import SqliteSaver
+
+
+# 创建 SQLite 连接
+conn = sqlite3.connect("data/memory.sqlite", check_same_thread=False)
+memory = SqliteSaver(conn)
+
+graph = builder.compile(checkpointer=memory)
+```
+
+之后所有 `invoke()` 调用自动存档。用同一个 `thread_id` 再次调用，会自动加载上一轮的 state。
+
+如果连接串方式（注意：`from_conn_string` 是 generator，用 `with` 管理生命周期）：
+
+```python
+with SqliteSaver.from_conn_string("data/memory.sqlite") as memory:
+    graph = builder.compile(checkpointer=memory)
+    ...
+```
+
+生产环境推荐直接传 `sqlite3.Connection`，生命周期由应用自己管理。
+
+### 8.3 时间旅行
+
+`SqliteSaver` 按 `thread_id` 存历史，每次 `invoke()` 都产生一个新的 checkpoint。这意味着：
+
+**查看历史**
+
+```python
+for state in graph.get_state_history(config):
+    print(state.config, state.values)
+```
+
+按时间倒序返回所有 checkpoint，最新的在前。
+
+**回滚到历史状态**
+
+拿到任意 checkpoint 的 `config`，传给 `invoke()` 就能从那个状态继续：
+
+```python
+# 拿到最早的 checkpoint
+states = list(graph.get_state_history(config))
+first_checkpoint = states[-1].config
+
+# 从那个状态继续（模拟"如果当时说了另一句话"）
+result = graph.invoke(
+    {"messages": [HumanMessage(content="新的消息...")]},
+    config=first_checkpoint,
+)
+```
+
+这会产生新的分支历史，但不会覆盖已有的 checkpoint。本质上是"时间旅行 + 新建分支"。
+
+### 8.4 完整示例
+
+基于 `sqlite_graph.py`，演示多轮对话记忆 + 时间旅行回滚：
+
+```python
+import sqlite3
+from langgraph.checkpoint.sqlite import SqliteSaver
+from langgraph.graph import START, END, MessagesState, StateGraph
+from langchain_core.messages import HumanMessage
+
+# ── 连接与构建 ──
+conn = sqlite3.connect("data/memory.sqlite", check_same_thread=False)
+memory = SqliteSaver(conn)
+
+builder = StateGraph(MessagesState)
+builder.add_node("chatbot", chatbot)
+builder.add_edge(START, "chatbot")
+builder.add_edge("chatbot", END)
+
+graph = builder.compile(checkpointer=memory)
+
+# ── 第1轮：正常对话 ──
+config_a = {"configurable": {"thread_id": "demo-user-1"}}
+result = graph.invoke({"messages": [HumanMessage(content="你好，我是 Alice。")]}, config_a)
+
+# ── 第2轮：同一 thread，模型记得 Alice ──
+result = graph.invoke({"messages": [HumanMessage(content="我叫什么名字？")]}, config_a)
+# AI: 你叫 Alice！
+
+# ── 第3轮：新 thread，全新对话 ──
+config_b = {"configurable": {"thread_id": "demo-user-2"}}
+result = graph.invoke({"messages": [HumanMessage(content="我叫什么名字？")]}, config_b)
+# AI: 抱歉，我不知道您的名字...
+
+# ── 时间旅行：查看历史 ──
+for state in graph.get_state_history(config_a):
+    print(state.config)
+
+# ── 时间旅行：回滚到早期继续 ──
+states = list(graph.get_state_history(config_a))
+first = states[-1].config
+result = graph.invoke(
+    {"messages": [HumanMessage(content="我是 Bob。")]},
+    config=first,
+)
+```
 
 
