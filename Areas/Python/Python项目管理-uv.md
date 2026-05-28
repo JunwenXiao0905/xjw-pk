@@ -2,11 +2,6 @@
 
 [从pip到uv：一口气梳理现代Python项目管理全流程！_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV13WGHz8EEz/?spm_id_from=333.1391.0.0)
 
-
-
-# 传统项目管理-pip
-
-
 # uv
 视频地址：
 

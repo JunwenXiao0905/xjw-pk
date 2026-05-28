@@ -19,3 +19,4 @@
 启动项目的-用tmux管理
 
 
+Press Shift+Enter to send a multi-line message
