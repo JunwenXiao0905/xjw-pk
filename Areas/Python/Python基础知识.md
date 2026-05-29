@@ -20,12 +20,13 @@
 - [第3章 容器与解包](#第3章-容器与解包)
   - [3.1 `list`、`tuple`、`dict`](#31-listtupledict)
   - [3.2 列表拼接与构造](#32-列表拼接与构造)
-  - [3.3 列表解包](#33-列表解包)
-  - [3.4 元组解包](#34-元组解包)
-  - [3.5 `dict` 的读取、写入、更新](#35-dict-的读取写入更新)
-  - [3.6 `dict.get()`](#36-dictget)
-  - [3.7 `dict.keys()`、`dict.values()`、`dict.items()`](#37-dictkeysdictvaluesdictitems)
-  - [3.8 遍历 `dict`](#38-遍历-dict)
+  - [3.3 切片](#33-切片)
+  - [3.4 列表解包](#34-列表解包)
+  - [3.5 元组解包](#35-元组解包)
+  - [3.6 `dict` 的读取、写入、更新](#36-dict-的读取写入更新)
+  - [3.7 `dict.get()`](#37-dictget)
+  - [3.8 `dict.keys()`、`dict.values()`、`dict.items()`](#38-dictkeysdictvaluesdictitems)
+  - [3.9 遍历 `dict`](#39-遍历-dict)
 - [第4章 类型标注](#第4章-类型标注)
   - [4.1 参数与返回值注解](#41-参数与返回值注解)
   - [4.2 `list[str]`、`dict[str, int]`](#42-liststrdictstr-int)
@@ -50,6 +51,7 @@
   - [7.2 `raise`](#72-raise)
   - [7.3 自定义异常](#73-自定义异常)
   - [7.4 `try` / `except`](#74-try--except)
+  - [7.5 `with` 语句与上下文管理器](#75-with-语句与上下文管理器)
 - [第8章 装饰器](#第8章-装饰器)
   - [8.1 `@decorator`](#81-decorator)
   - [8.2 带参数装饰器](#82-带参数装饰器)
@@ -520,7 +522,37 @@ items = items + [4]
 
 如果需要保留旧列表不变，更适合构造新列表，而不是原地修改。
 
-### 3.3 列表解包
+### 3.3 切片
+
+`[start:stop:step]` 用于从 `list`、`tuple`、`str` 中截取子序列。
+
+```python
+items = [0, 1, 2, 3, 4, 5]
+items[1:4]     # [1, 2, 3]   取索引 1~3
+items[:3]      # [0, 1, 2]   省略 start，从开头取
+items[3:]      # [3, 4, 5]   省略 stop，取到最后
+items[::2]     # [0, 2, 4]   步长为 2，跳着取
+items[::-1]    # [5, 4, 3, 2, 1, 0]  倒序
+items[-1]      # 5           最后一个元素
+items[-3:-1]   # [3, 4]      倒数第 3 个到倒数第 2 个
+```
+
+字符串同样适用：
+
+```python
+text = "hello world"
+text[:5]       # "hello"
+text[6:]       # "world"
+text[-1]       # "d"
+```
+
+常见截断写法——防止消息过长：
+
+```python
+preview = text[:50] + "..." if len(text) > 50 else text
+```
+
+### 3.4 列表解包
 
 `*items` 会把可迭代对象中的元素逐个展开。
 
@@ -537,7 +569,7 @@ result = [*items, 3]
 
 `[*messages, HumanMessage(content=user_input)]` 表示先展开旧消息列表，再追加新消息。这一写法常用于基于旧列表构造新列表，避免原地修改。
 
-### 3.4 元组解包
+### 3.5 元组解包
 
 ```python
 a, b = (1, 2)
@@ -545,7 +577,7 @@ a, b = (1, 2)
 
 它的作用是同时取多个值，并按顺序赋给多个变量。
 
-### 3.5 `dict` 的读取、写入、更新
+### 3.6 `dict` 的读取、写入、更新
 
 字典是键值映射结构。
 
@@ -573,7 +605,7 @@ data["name"] = "Alice"
 
 这里新增的是字典键，不是对象属性。
 
-### 3.6 `dict.get()`
+### 3.7 `dict.get()`
 
 `dict.get(key, default)` 用来按键读取字典值，并且可以提供默认值。
 
@@ -603,7 +635,7 @@ data["age"]
 
 不同，后者在键不存在时会报 `KeyError`。
 
-### 3.7 `dict.keys()`、`dict.values()`、`dict.items()`
+### 3.8 `dict.keys()`、`dict.values()`、`dict.items()`
 
 假设：
 
@@ -651,7 +683,7 @@ list(data.items())
 - 会反映字典的当前状态
 - 需要真正列表时再手动 `list(...)`
 
-### 3.8 遍历 `dict`
+### 3.9 遍历 `dict`
 
 字典默认遍历的是键：
 
@@ -1181,6 +1213,83 @@ finally:
 | `except SomeError as e:` | `catch (e) { ... }` |
 | `else` | 无直接对应，需在 try 块末尾手动实现 |
 | `finally` | `finally` |
+
+### 7.5 `with` 语句与上下文管理器
+
+`with` 语句用于"获取资源 → 使用资源 → 清理资源"的三段式操作，是 `try/finally` 的语法糖。
+
+```python
+with open("data.json", "r", encoding="utf-8") as f:
+    data = json.load(f)
+```
+
+**等价于：**
+
+```python
+f = open("data.json", "r", encoding="utf-8")
+try:
+    data = json.load(f)
+finally:
+    f.close()  # 无论是否异常都执行
+```
+
+**`as` 绑定的是什么**
+
+`as f` 中的 `f` 不是 `open()` 的直接返回值，而是对象 `__enter__()` 方法的返回值。
+
+```python
+with open("data.json") as f:
+    ...
+
+# 底层等价物：
+_mgr = open("data.json")
+f = _mgr.__enter__()
+try:
+    ...
+finally:
+    _mgr.__exit__(None, None, None)
+```
+
+**底层机制：上下文管理器协议**
+
+任何实现了 `__enter__` + `__exit__` 方法的对象都可以放在 `with` 后面。
+
+```python
+class Door:
+    def __enter__(self):
+        print("开门")
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        print("关门")
+        # 返回 False = 有异常继续往外抛（默认行为）
+```
+
+- `__enter__()`：进入 `with` 时调用，返回值赋给 `as` 后面的变量
+- `__exit__()`：退出 `with` 时调用，无论是否异常都执行
+- `__exit__` 的三个参数：异常类型、异常值、traceback（没有异常时都是 `None`）
+
+**常见上下文管理器**
+
+| 对象 | `__enter__` 返回 | `__exit__` 做的事 |
+|------|-----------------|-------------------|
+| `open()` | 文件对象 | 关闭文件 |
+| `threading.Lock()` | 锁对象 | 释放锁 |
+| `requests.Session()` | Session 实例 | 关闭连接池 |
+
+**不用 `with` 的隐患**
+
+```python
+f = open("data.json")
+data = json.load(f)
+f.close()  # 如果上一行抛异常，这行永远不会执行
+```
+
+长时间不关闭文件会导致**文件描述符泄漏**，超过系统限制后 `open()` 会报 `OSError: Too many open files`。
+
+**如何创建上下文管理器**
+
+不用手写类也能造出上下文管理器，用 `@contextmanager` 装饰器即可。详见 [8.6 `@contextmanager` 与 `@asynccontextmanager`](#86-contextmanager-与-asynccontextmanager)。
 
 ## 第8章 装饰器
 

@@ -51,6 +51,13 @@
   - [8.2 接入方式](#82-接入方式)
   - [8.3 时间旅行](#83-时间旅行)
   - [8.4 完整示例](#84-完整示例)
+- [第9章 Multi-Agent Supervisor](#第9章-multi-agent-supervisor)
+  - [9.1 架构模式](#91-架构模式)
+  - [9.2 Supervisor 节点](#92-supervisor-节点)
+  - [9.3 Worker 节点](#93-worker-节点)
+  - [9.4 图结构与循环](#94-图结构与循环)
+  - [9.5 完整示例](#95-完整示例)
+  - [9.6 与子图的区别](#96-与子图的区别)
 
 
 ## 第1章 模块分布与产品分层
@@ -1639,12 +1646,12 @@ def build_parent_graph():
 
 笔记 4.1 学的 `InMemorySaver` 把 state 存在内存中。`SqliteSaver` 写到 `.sqlite` 文件。
 
-| | `InMemorySaver` | `SqliteSaver` |
-|---|---|---|
-| 存储位置 | 内存 | `.sqlite` 文件 |
-| 进程重启 | 数据丢失 | 按 `thread_id` 自动恢复 |
-| 适合场景 | 开发调试、单轮测试 | 生产对话、长期多轮会话 |
-| 并发 | 单线程 | `check_same_thread=False` 支持简单多线程 |
+|      | `InMemorySaver` | `SqliteSaver`                     |
+| ---- | --------------- | --------------------------------- |
+| 存储位置 | 内存              | `.sqlite` 文件                      |
+| 进程重启 | 数据丢失            | 按 `thread_id` 自动恢复                |
+| 适合场景 | 开发调试、单轮测试       | 生产对话、长期多轮会话                       |
+| 并发   | 单线程             | `check_same_thread=False` 支持简单多线程 |
 
 `SqliteSaver` 适合轻量级生产场景：不需要额外部署 Postgres，但进程重启后对话依然完整。
 
@@ -1753,5 +1760,159 @@ result = graph.invoke(
     config=first,
 )
 ```
+
+## 第9章 Multi-Agent Supervisor
+
+### 9.1 架构模式
+
+Multi-Agent 是 LangGraph 的进阶编排模式。核心思路：**一个 supervisor LLM 负责决策，多个 worker 负责执行**。
+
+```text
+                  ┌→ writer ────────┐
+                  ├→ researcher ────┤
+START → supervisor ┤                └→ supervisor → ... → END
+                  └→ reviewer ──────┘
+```
+
+与传统单 Agent 的区别：
+
+- 单 Agent：一个 LLM 既思考又执行
+- Supervisor 模式：一个 LLM 只负责路由决策，具体工作交给专门的 worker
+
+### 9.2 Supervisor 节点
+
+supervisor 是图里唯一的决策节点。它的工作不是"干活"，而是"分活"。
+
+```python
+SUPERVISOR_SYSTEM = SystemMessage(
+    "你是任务调度中心。根据用户请求，决定调用哪个 worker。"
+    "只返回 worker 名称或 END。"
+    "- writer: 写代码/文章"
+    "- researcher: 查找资料/解释概念"
+    "- reviewer: 检查代码/找 bug"
+)
+
+
+def supervisor(state: MessagesState) -> dict:
+    model = build_model()
+    # 让模型根据对话历史决定下一步去哪个 worker
+    response = model.invoke([SUPERVISOR_SYSTEM, *state["messages"]])
+    # 解析返回结果，提取 worker 名称
+    next_node = parse_worker_name(response.content)  # writer/researcher/reviewer/END
+    return {"messages": [HumanMessage(content=f"路由到: {next_node}")]}
+```
+
+supervisor 的输出是一个路由消息，告诉图下一步去哪个 worker。
+
+### 9.3 Worker 节点
+
+每个 worker 是独立的执行节点，有自己专门的 system prompt。
+
+```python
+WRITER_SYSTEM = SystemMessage("你是一个代码/文章写作者。简洁回答。")
+
+
+def writer(state: MessagesState) -> dict:
+    model = build_model()
+    response = model.invoke([WRITER_SYSTEM, *state["messages"]])
+    return {"messages": [HumanMessage(content=response.content, name="writer")]}
+```
+
+worker 的特点：
+- 有专门的 system prompt，限定其角色和输出格式
+- 完成后把结果写回 state 的 messages 列表
+- 不负责路由决策，只执行具体任务
+
+### 9.4 图结构与循环
+
+关键在边的设计：
+
+```python
+# supervisor → 动态路由 → worker
+builder.add_conditional_edges("supervisor", route_after_supervisor)
+
+# worker → supervisor（每个 worker 完成后回到 supervisor）
+for worker in ["writer", "researcher", "reviewer"]:
+    builder.add_edge(worker, "supervisor")
+```
+
+这形成了一个**循环**：
+
+```
+supervisor → writer → supervisor → researcher → supervisor → END
+```
+
+supervisor 每次决定去哪个 worker，worker 完成后回到 supervisor，supervisor 再次决定。直到 supervisor 决定 END 为止。
+
+**防止无限循环**
+
+因为图有循环，需要设置最大步数：
+
+```python
+graph = builder.compile()
+graph = graph.with_config({"recursion_limit": 10})
+```
+
+`recursion_limit` 限制图的最大执行步数，超过就报错，而不是无限循环。
+
+### 9.5 完整示例
+
+基于 `multi_agent_supervisor.py`：
+
+```python
+from typing import Literal
+from langgraph.graph import END, START, MessagesState, StateGraph
+
+# ── Supervisor ──
+def supervisor(state: MessagesState) -> dict:
+    model = build_model()
+    response = model.invoke([SUPERVISOR_SYSTEM, *state["messages"]])
+    # 解析：如果包含 "writer" 就去 writer，包含 "researcher" 就去 researcher...
+    for worker in WORKERS:
+        if worker in response.content.lower():
+            return {"messages": [HumanMessage(content=f"路由到: {worker}")]}
+    return {"messages": [HumanMessage(content="路由到: END")]}
+
+
+# ── Workers ──
+def writer(state: MessagesState) -> dict:
+    model = build_model()
+    response = model.invoke([WRITER_SYSTEM, *state["messages"]])
+    return {"messages": [HumanMessage(content=response.content, name="writer")]}
+
+
+# ── 路由函数 ──
+def route_after_supervisor(state: MessagesState) -> Literal["writer", "researcher", "reviewer", "__end__"]:
+    last = state["messages"][-1]
+    for worker in WORKERS:
+        if worker in last.content.lower():
+            return worker
+    return "__end__"
+
+
+# ── 构建图 ──
+builder = StateGraph(MessagesState)
+builder.add_node("supervisor", supervisor)
+builder.add_node("writer", writer)
+builder.add_edge(START, "supervisor")
+builder.add_conditional_edges("supervisor", route_after_supervisor)
+builder.add_edge("writer", "supervisor")  # worker 完成后回到 supervisor
+graph = builder.compile().with_config({"recursion_limit": 10})
+```
+
+### 9.6 与子图的区别
+
+| | Supervisor 模式 | 子图模式 |
+|---|---|---|
+| 决策方式 | LLM 动态决定下一步 | 边/condition 静态或半静态决定 |
+| 节点关系 | supervisor 和 worker 都在同一个图里 | 子图是独立的，父图把它当一个节点 |
+| state 共享 | 所有节点共享同一份 MessagesState | 子图和父图通过同名字段传递 |
+| 适合场景 | 需要 LLM 智能路由的复杂任务 | 可复用的、封装好的流程 |
+| 循环控制 | supervisor 决定何时 END | 子图内部有独立的 START/END |
+
+简单记：
+
+- Supervisor = **LLM 负责路由**
+- 子图 = **代码负责路由**
 
 
