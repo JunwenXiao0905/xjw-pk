@@ -27,49 +27,56 @@
   - [3.7 `dict.get()`](#37-dictget)
   - [3.8 `dict.keys()`、`dict.values()`、`dict.items()`](#38-dictkeysdictvaluesdictitems)
   - [3.9 遍历 `dict`](#39-遍历-dict)
-- [第4章 类型标注](#第4章-类型标注)
-  - [4.1 参数与返回值注解](#41-参数与返回值注解)
-  - [4.2 `list[str]`、`dict[str, int]`](#42-liststrdictstr-int)
-  - [4.3 `str | None`](#43-str--none)
-  - [4.4 `TypedDict`](#44-typeddict)
-  - [4.5 `Annotated`](#45-annotated)
-  - [4.6 `Literal`](#46-literal)
-  - [4.7 `operator`](#47-operator)
-- [第5章 模块与导入](#第5章-模块与导入)
-  - [5.1 模块](#51-模块)
-  - [5.2 包与 `__init__.py`](#52-包与-__init__py)
-  - [5.3 绝对导入与相对导入](#53-绝对导入与相对导入)
-  - [5.4 `sys.path`](#54-syspath)
-- [第6章 类与对象](#第6章-类与对象)
-  - [6.1 `class`](#61-class)
-  - [6.2 实例、属性、方法](#62-实例属性方法)
-  - [6.3 对象属性、字典键与 `getattr()`](#63-对象属性字典键与-getattr)
-  - [6.4 继承](#64-继承)
-  - [6.5 类、实例与类型](#65-类实例与类型)
-- [第7章 异常](#第7章-异常)
-  - [7.1 `Exception`](#71-exception)
-  - [7.2 `raise`](#72-raise)
-  - [7.3 自定义异常](#73-自定义异常)
-  - [7.4 `try` / `except`](#74-try--except)
-  - [7.5 `with` 语句与上下文管理器](#75-with-语句与上下文管理器)
-- [第8章 装饰器](#第8章-装饰器)
-  - [8.1 `@decorator`](#81-decorator)
-  - [8.2 带参数装饰器](#82-带参数装饰器)
-  - [8.3 `@wraps`](#83-wraps)
-  - [8.4 Flask 路由装饰器](#84-flask-路由装饰器)
-  - [8.5 常见内置装饰器](#85-常见内置装饰器)
-  - [8.6 `@contextmanager` 与 `@asynccontextmanager`](#86-contextmanager-与-asynccontextmanager)
-- [第9章 Pydantic](#第9章-pydantic)
-  - [9.1 `BaseModel`](#91-basemodel)
-  - [9.2 `model_validate()`](#92-model_validate)
-  - [9.3 `Field`](#93-field)
-  - [9.4 `model_dump()`](#94-model_dump)
-  - [9.5 `ValidationError`](#95-validationerror)
-- [第10章 工程实践](#第10章-工程实践)
-  - [10.1 CLI 交互循环](#101-cli-交互循环)
-  - [10.2 `.env` 与 `.env.local`](#102-env-与-envlocal)
-  - [10.3 `load_dotenv()`](#103-load_dotenv)
-  - [10.4 常量时间比较](#104-常量时间比较)
+- [第4章 循环与迭代](#第4章-循环与迭代)
+  - [4.1 `for` 循环](#41-for-循环)
+  - [4.2 `range()`](#42-range)
+  - [4.3 `enumerate()`](#43-enumerate)
+  - [4.4 `while` 循环](#44-while-循环)
+  - [4.5 `break` 与 `continue`](#45-break-与-continue)
+  - [4.6 惰性生成器](#46-惰性生成器)
+- [第5章 类型标注](#第5章-类型标注)
+  - [5.1 参数与返回值注解](#51-参数与返回值注解)
+  - [5.2 `list[str]`、`dict[str, int]`](#52-liststrdictstr-int)
+  - [5.3 `str | None`](#53-str--none)
+  - [5.4 `TypedDict`](#54-typeddict)
+  - [5.5 `Annotated`](#55-annotated)
+  - [5.6 `Literal`](#56-literal)
+  - [5.7 `operator`](#57-operator)
+- [第6章 模块与导入](#第6章-模块与导入)
+  - [6.1 模块](#61-模块)
+  - [6.2 包与 `__init__.py`](#62-包与-__init__py)
+  - [6.3 绝对导入与相对导入](#63-绝对导入与相对导入)
+  - [6.4 `sys.path`](#64-syspath)
+- [第7章 类与对象](#第7章-类与对象)
+  - [7.1 `class`](#71-class)
+  - [7.2 实例、属性、方法](#72-实例属性方法)
+  - [7.3 对象属性、字典键与 `getattr()`](#73-对象属性字典键与-getattr)
+  - [7.4 继承](#74-继承)
+  - [7.5 类、实例与类型](#75-类实例与类型)
+- [第8章 异常](#第8章-异常)
+  - [8.1 `Exception`](#81-exception)
+  - [8.2 `raise`](#82-raise)
+  - [8.3 自定义异常](#83-自定义异常)
+  - [8.4 `try` / `except`](#84-try--except)
+  - [8.5 `with` 语句与上下文管理器](#85-with-语句与上下文管理器)
+- [第9章 装饰器](#第9章-装饰器)
+  - [9.1 `@decorator`](#91-decorator)
+  - [9.2 带参数装饰器](#92-带参数装饰器)
+  - [9.3 `@wraps`](#93-wraps)
+  - [9.4 Flask 路由装饰器](#94-flask-路由装饰器)
+  - [9.5 常见内置装饰器](#95-常见内置装饰器)
+  - [9.6 `@contextmanager` 与 `@asynccontextmanager`](#96-contextmanager-与-asynccontextmanager)
+- [第10章 Pydantic](#第10章-pydantic)
+  - [10.1 `BaseModel`](#101-basemodel)
+  - [10.2 `model_validate()`](#102-model_validate)
+  - [10.3 `Field`](#103-field)
+  - [10.4 `model_dump()`](#104-model_dump)
+  - [10.5 `ValidationError`](#105-validationerror)
+- [第11章 工程实践](#第11章-工程实践)
+  - [11.1 CLI 交互循环](#111-cli-交互循环)
+  - [11.2 `.env` 与 `.env.local`](#112-env-与-envlocal)
+  - [11.3 `load_dotenv()`](#113-load_dotenv)
+  - [11.4 常量时间比较](#114-常量时间比较)
 
 ## 第1章 运行与入口
 
@@ -714,9 +721,129 @@ for (const [key, value] of Object.entries(data)) {
 }
 ```
 
-## 第4章 类型标注
+## 第4章 循环与迭代
 
-### 4.1 参数与返回值注解
+### 4.1 `for` 循环
+
+`for` 循环逐个取出可迭代对象中的元素，对每个元素执行相同的代码块。
+
+```python
+for item in [1, 2, 3]:
+    print(item)
+# 1
+# 2
+# 3
+```
+
+`for` 可以遍历任何可迭代对象：
+
+```python
+for ch in "hello":        # 字符串
+    print(ch)
+
+for key in {"a": 1}:      # 字典（默认遍历键）
+    print(key)
+```
+
+### 4.2 `range()`
+
+`range()` 生成一个整数序列，最常见搭配 `for` 使用。
+
+```python
+range(stop)               # 从 0 开始，到 stop-1
+range(start, stop)        # 从 start 开始，到 stop-1
+range(start, stop, step)  # 步长为 step
+```
+
+**规则：包含 start，不包含 stop。**
+
+```python
+range(5)           # 0, 1, 2, 3, 4
+range(1, 5)        # 1, 2, 3, 4
+range(1, 10, 2)    # 1, 3, 5, 7, 9      步长为 2
+range(10, 0, -1)   # 10, 9, 8, ..., 1   步长为负，递减
+```
+
+`range()` 是惰性生成器——只有在被遍历时才逐个产出数字。`range(1, 1000000)` 不会占 100 万个整数的内存。
+
+常见组合：
+
+```python
+for i in range(5):
+    print(i)      # 0, 1, 2, 3, 4
+```
+
+### 4.3 `enumerate()`
+
+`enumerate()` 在遍历时同时提供索引和值。
+
+```python
+names = ["Alice", "Bob", "Charlie"]
+
+for i, name in enumerate(names):
+    print(i, name)
+# 0 Alice
+# 1 Bob
+# 2 Charlie
+```
+
+可以指定起始索引：
+
+```python
+for i, name in enumerate(names, start=1):
+    print(i, name)
+# 1 Alice
+# 2 Bob
+# 3 Charlie
+```
+
+### 4.4 `while` 循环
+
+`while` 在条件为真时重复执行。
+
+```python
+count = 0
+while count < 3:
+    print(count)
+    count += 1
+# 0
+# 1
+# 2
+```
+
+### 4.5 `break` 与 `continue`
+
+- `break`：立即退出整个循环
+- `continue`：跳过本次循环的剩余代码，进入下一次迭代
+
+```python
+for i in range(5):
+    if i == 2:
+        continue       # 跳过 2
+    if i == 4:
+        break          # 到 4 就停止
+    print(i)
+# 0
+# 1
+# 3
+```
+
+### 4.6 惰性生成器
+
+`range()` 和 `enumerate()` 都不是列表——它们返回的是**惰性对象**，只在遍历时逐个产出值。
+
+```python
+r = range(1, 1000000)
+type(r)     # <class 'range'>
+len(r)      # 999999，可以取长度
+r[0]        # 1，可以按索引取值
+```
+
+和列表的根本区别：列表把全部元素存在内存里，惰性对象只在需要时计算下一个值。
+
+## 第5章 类型标注
+
+### 5.1 参数与返回值注解
 
 ```python
 def add(a: int, b: int) -> int:
@@ -725,7 +852,7 @@ def add(a: int, b: int) -> int:
 
 这里的 `a: int`、`b: int` 是参数注解，`-> int` 是返回值注解。
 
-### 4.2 `list[str]`、`dict[str, int]`
+### 5.2 `list[str]`、`dict[str, int]`
 
 ```python
 names: list[str] = ["a", "b"]
@@ -734,7 +861,7 @@ ages: dict[str, int] = {"Tom": 18}
 
 这类写法用于标注容器里元素的类型。
 
-### 4.3 `str | None`
+### 5.3 `str | None`
 
 `str | None` 表示值可能是 `str`，也可能是 `None`。
 
@@ -742,7 +869,7 @@ ages: dict[str, int] = {"Tom": 18}
 nickname: str | None = None
 ```
 
-### 4.4 `TypedDict`
+### 5.4 `TypedDict`
 
 `TypedDict` 用来描述“键集合固定的字典结构”。
 
@@ -806,7 +933,7 @@ def decide_route(state: RouterState) -> dict:
 
 这种数据形态天然适合用 `TypedDict` 描述。
 
-### 4.5 `Annotated`
+### 5.5 `Annotated`
 
 `Annotated[T, meta1, meta2]` 表示“真实类型仍然是 `T`，但额外附带一段可被外部读取的元信息”。
 
@@ -857,7 +984,7 @@ def read_me(user: Annotated[str, "token"]) -> None:
 get_type_hints(read_me, include_extras=True)
 ```
 
-### 4.6 `Literal`
+### 5.6 `Literal`
 
 `Literal` 用来限制值只能是几个固定字面量之一。
 
@@ -887,7 +1014,7 @@ Literal["writer", "chatbot", "fallback"]
 
 它常用于路由、分支选择、枚举式返回值。和 `TypedDict` 一样，它主要是类型标注，不是运行时对象模型。
 
-### 4.7 `operator`
+### 5.7 `operator`
 
 `operator` 是 Python 内置标准库模块，把运算符暴露成普通函数。
 
@@ -925,9 +1052,9 @@ class MyState(TypedDict):
 
 这里 `operator.add` 是字段合并策略，含义在 LangGraph 笔记 2.2 中展开。
 
-## 第5章 模块与导入
+## 第6章 模块与导入
 
-### 5.1 模块
+### 6.1 模块
 
 每个 `.py` 文件天然就是一个模块。
 
@@ -945,7 +1072,7 @@ from app.routers.notes import get_note
 from app.routers import notes as notes_router
 ```
 
-### 5.2 包与 `__init__.py`
+### 6.2 包与 `__init__.py`
 
 包是目录层面的组织方式，`__init__.py` 常用于：
 
@@ -961,7 +1088,7 @@ __all__ = ["notes_router"]
 
 不要把重逻辑塞进 `__init__.py`。
 
-### 5.3 绝对导入与相对导入
+### 6.3 绝对导入与相对导入
 
 ```python
 from app.routers.notes import get_note
@@ -973,15 +1100,15 @@ from ..schemas import NoteCreate
 
 顶层脚本不在包内时，不能使用 `from .xxx import ...`；超过顶层包会报 `ImportError: beyond top-level package`。
 
-### 5.4 `sys.path`
+### 6.4 `sys.path`
 
 Python 导入模块时，会按 `sys.path` 里的目录顺序查找。
 
 理解 `sys.path` 的意义，主要是为了排查“为什么这个导入能找到”或“为什么找不到”。
 
-## 第6章 类与对象
+## 第7章 类与对象
 
-### 6.1 `class`
+### 7.1 `class`
 
 `class` 用来定义类。Python 创建对象时不需要 `new`。
 
@@ -994,14 +1121,14 @@ class User:
 user = User("Tom")
 ```
 
-### 6.2 实例、属性、方法
+### 7.2 实例、属性、方法
 
 - 类：模板。
 - 实例：按类创建出来的对象。
 - 属性：对象上的数据。
 - 方法：对象上的行为。
 
-### 6.3 对象属性、字典键与 `getattr()`
+### 7.3 对象属性、字典键与 `getattr()`
 
 对象属性和字典键不是一回事。
 
@@ -1076,7 +1203,7 @@ getattr(user, "age", None)
 
 就不会在这一行直接报错，而是返回 `None`。
 
-### 6.4 继承
+### 7.4 继承
 
 ```python
 class Child(Base):
@@ -1086,7 +1213,7 @@ class Child(Base):
 
 `super()` 用来调用父类方法。
 
-### 6.5 类、实例与类型
+### 7.5 类、实例与类型
 
 类既是构造器，也是类型定义。
 
@@ -1096,9 +1223,9 @@ builder = StateGraph(ArticleState)
 
 这里传入的 `ArticleState` 是类型本身，不是实例。`HumanMessage` 也是同类情况：既是类，也定义了一种对象类型。
 
-## 第7章 异常
+## 第8章 异常
 
-### 7.1 `Exception`
+### 8.1 `Exception`
 
 `Exception` 是大多数 Python 异常的基类。
 
@@ -1109,7 +1236,7 @@ builder = StateGraph(ArticleState)
 - `KeyError`
 - `RuntimeError`
 
-### 7.2 `raise`
+### 8.2 `raise`
 
 `raise` 用于抛出异常。
 
@@ -1117,11 +1244,11 @@ builder = StateGraph(ArticleState)
 raise Exception("error")
 ```
 
-### 7.3 自定义异常
+### 8.3 自定义异常
 
 自定义异常应继承 `Exception`。
 
-### 7.4 `try` / `except`
+### 8.4 `try` / `except`
 
 `try` / `except` 用于捕获可能抛出的异常，防止程序直接崩溃。
 
@@ -1214,7 +1341,7 @@ finally:
 | `else` | 无直接对应，需在 try 块末尾手动实现 |
 | `finally` | `finally` |
 
-### 7.5 `with` 语句与上下文管理器
+### 8.5 `with` 语句与上下文管理器
 
 `with` 语句用于"获取资源 → 使用资源 → 清理资源"的三段式操作，是 `try/finally` 的语法糖。
 
@@ -1289,11 +1416,11 @@ f.close()  # 如果上一行抛异常，这行永远不会执行
 
 **如何创建上下文管理器**
 
-不用手写类也能造出上下文管理器，用 `@contextmanager` 装饰器即可。详见 [8.6 `@contextmanager` 与 `@asynccontextmanager`](#86-contextmanager-与-asynccontextmanager)。
+不用手写类也能造出上下文管理器，用 `@contextmanager` 装饰器即可。详见 [9.6 `@contextmanager` 与 `@asynccontextmanager`](#96-contextmanager-与-asynccontextmanager)。
 
-## 第8章 装饰器
+## 第9章 装饰器
 
-### 8.1 `@decorator`
+### 9.1 `@decorator`
 
 `@decorator` 等价于：
 
@@ -1303,7 +1430,7 @@ func = decorator(func)
 
 装饰器常用于日志、权限校验、缓存和注册。
 
-### 8.2 带参数装饰器
+### 9.2 带参数装饰器
 
 `@decorator(a, b)` 等价于：
 
@@ -1311,7 +1438,7 @@ func = decorator(func)
 func = decorator(a, b)(func)
 ```
 
-### 8.3 `@wraps`
+### 9.3 `@wraps`
 
 `@wraps` 用来保留原函数的 `__name__`、文档、注解等元数据。
 
@@ -1321,7 +1448,7 @@ from functools import wraps
 
 不使用 `@wraps` 时，被包装函数名可能变成 `wrapper`。
 
-### 8.4 Flask 路由装饰器
+### 9.4 Flask 路由装饰器
 
 `@api_app.route(...)` 是带参数装饰器。路由注册发生在模块导入时。
 
@@ -1334,7 +1461,7 @@ def handle_webhook():
 
 路由装饰器通常放在最上面，这样 Flask 注册到的是包装后的最终函数。
 
-### 8.5 常见内置装饰器
+### 9.5 常见内置装饰器
 
 - `@staticmethod`
 - `@classmethod`
@@ -1428,11 +1555,11 @@ def add(a: int, b: int) -> int:
 
 因此 `@lru_cache` 要求参数可哈希；像 `list`、`dict` 这类不可哈希对象通常不能直接作为缓存键。
 
-### 8.6 `@contextmanager` 与 `@asynccontextmanager`
+### 9.6 `@contextmanager` 与 `@asynccontextmanager`
 
 这两个装饰器解决同一个问题：**不用手写类，就能造出一个上下文管理器。**
 
-#### 8.6.1 为什么需要上下文管理器
+#### 9.6.1 为什么需要上下文管理器
 
 假设有一段"开门—干活—关门"的逻辑：
 
@@ -1461,7 +1588,7 @@ with door():       # 进入时开门，退出时自动关门
 
 `with` 后面跟的东西叫**上下文管理器**。
 
-#### 8.6.2 第一层：手写类（最底层）
+#### 9.6.2 第一层：手写类（最底层）
 
 任何实现了 `__enter__` + `__exit__` 的类，都可以放在 `with` 后面。
 
@@ -1490,7 +1617,7 @@ with Door():
 3. 不管第2步成功还是崩了，调用 Door().__exit__()
 ```
 
-#### 8.6.3 第二层：`@contextmanager` + `yield`（语法糖）
+#### 9.6.3 第二层：`@contextmanager` + `yield`（语法糖）
 
 每次写一个简单的开门/关门逻辑都要写类太啰嗦。`@contextmanager` 让你用**一个函数 + 一个 `yield`** 代替整个类。
 
@@ -1521,7 +1648,7 @@ with door():                 with _DoorContext():
 
 `yield` 在这里**不是生成器**，而是分界点——把函数切成"进"和"出"两半。
 
-#### 8.6.4 第三层：`@asynccontextmanager`（异步版）
+#### 9.6.4 第三层：`@asynccontextmanager`（异步版）
 
 和上面完全一样，只是把 `with` 换成 `async with`，`__enter__`/`__exit__` 换成 `__aenter__`/`__aexit__`，函数加 `async`。
 
@@ -1536,7 +1663,7 @@ def func():                       async def func():
 
 本质是同一个协议的两套版本。
 
-#### 8.6.5 为什么必须搭配 `try/finally`
+#### 9.6.5 为什么必须搭配 `try/finally`
 
 `__exit__` 在出现异常时，会通过 `athrow()` **把异常扔到 `yield` 那一行**。没有 `try/finally` 的话：
 
@@ -1564,7 +1691,7 @@ async def lifespan(app):
 - `try/finally` 保证：扔了异常也能跑
 - 两者组合 = 不管正常关闭还是崩了，清理逻辑必执行
 
-#### 8.6.6 经典用法
+#### 9.6.6 经典用法
 
 **数据库事务：**
 
@@ -1603,7 +1730,7 @@ async def measure(label: str):
 
 三个用法的本质完全相同：**进时做 A，退出时做 B，用 `try/finally` 保证 B 一定发生**。
 
-#### 8.6.7 两个装饰器的定位
+#### 9.6.7 两个装饰器的定位
 
 | 装饰器 | 用在 | 函数类型 | 消费方式 |
 |--------|------|----------|----------|
@@ -1612,9 +1739,9 @@ async def measure(label: str):
 
 FastAPI 的 `lifespan` 要求异步上下文管理器，所以必须用后者。
 
-## 第9章 Pydantic
+## 第10章 Pydantic
 
-### 9.1 `BaseModel`
+### 10.1 `BaseModel`
 
 `BaseModel` 是 Pydantic 提供的父类。定义数据模型时，通常让自己的类继承它。
 
@@ -1759,7 +1886,7 @@ note = NoteCreate(title=123)
 - 传入参数会以 `**data` 的形式进入父类 `__init__`
 - `BaseModel.__init__` 不只是赋值，还会按子类字段规则做校验
 
-### 9.2 `model_validate()`
+### 10.2 `model_validate()`
 
 `model_validate(x)` 用来把一个“已经存在的原始值”按当前模型结构做校验和解析。
 
@@ -1807,7 +1934,7 @@ data = note.model_dump()
 
 `model_validate(...)` 在接收外部输入时尤其常见，因为这时你通常拿到的不是分散参数，而是一整份已有数据。
 
-### 9.3 `Field`
+### 10.3 `Field`
 
 `Field` 用来给字段补充验证规则和元数据。
 
@@ -1821,7 +1948,7 @@ email: str = Field(..., pattern=r".+@.+")
 
 可以把 `Field(...)` 理解成“这个字段除了类型之外，还有额外约束”。
 
-### 9.4 `model_dump()`
+### 10.4 `model_dump()`
 
 `model_dump()` 用来把 Pydantic 模型实例转成普通字典。
 
@@ -1846,7 +1973,7 @@ for key, value in note.model_dump(exclude_unset=True).items():
     existing[key] = value
 ```
 
-### 9.5 `ValidationError`
+### 10.5 `ValidationError`
 
 `ValidationError` 是 Pydantic 在校验失败时抛出的异常。
 
@@ -1883,9 +2010,9 @@ except ValidationError as exc:
 
 `ValidationError` 继承自 Python 的 `Exception`，因此可以像普通异常一样用 `try / except` 捕获。
 
-## 第10章 工程实践
+## 第11章 工程实践
 
-### 10.1 CLI 交互循环
+### 11.1 CLI 交互循环
 
 `while True + input()` 是常见终端交互模式。
 
@@ -1900,13 +2027,13 @@ while True:
 
 这种写法常见于聊天式 CLI、调试工具和小型交互脚本。
 
-### 10.2 `.env` 与 `.env.local`
+### 11.2 `.env` 与 `.env.local`
 
 是否自动读取 `.env.local`，取决于代码如何调用 dotenv。
 
 `load_dotenv()` 默认主要读取 `.env`。如果项目使用 `.env.local`，通常需要显式指定。
 
-### 10.3 `load_dotenv()`
+### 11.3 `load_dotenv()`
 
 ```python
 from dotenv import load_dotenv
@@ -1916,7 +2043,7 @@ load_dotenv()
 
 它的作用是把环境变量从文件加载到当前进程环境中。
 
-### 10.4 常量时间比较
+### 11.4 常量时间比较
 
 ```python
 from hmac import compare_digest

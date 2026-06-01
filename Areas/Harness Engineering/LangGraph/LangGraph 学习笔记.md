@@ -20,7 +20,7 @@
   - [3.1 `MessagesState`](#31-messagesstate)
   - [3.2 `model.bind_tools()`、`ToolNode`、`tools_condition`](#32-modelbind_tools-toolnode-tools_condition)
   - [3.3 `tools_condition` 与隐式 `END`](#33-tools_condition-与隐式-end)
-  - [3.4 `create_react_agent`](#34-create_react_agent)
+  - [3.4 `create_agent` — ReAct Agent 工厂](#34-create_agent--react-agent-工厂)
 - [第4章 记忆、暂停与执行](#第4章-记忆暂停与执行)
   - [4.1 `checkpointer`](#41-checkpointer)
   - [4.2 `interrupt()` 与 `Command(resume=...)`](#42-interrupt-与-commandresume)
@@ -28,6 +28,10 @@
   - [4.3 `invoke()`、`stream()` 与执行入口](#43-invokestream-与执行入口)
   - [4.4 输出形态](#44-输出形态)
   - [4.5 示例阅读顺序](#45-示例阅读顺序)
+  - [4.6 递归限制与步数管理](#46-递归限制与步数管理)
+    - [`recursion_limit` 的两种配置方式](#recursion_limit-的两种配置方式)
+    - [`IsLastStep` 与 `RemainingSteps`](#islaststep-与-remainingsteps)
+    - [分层保护实践](#分层保护实践)
 - [第5章 并行执行](#第5章-并行执行)
   - [5.1 为什么需要并行](#51-为什么需要并行)
   - [5.2 `Send`](#52-send)
@@ -58,6 +62,15 @@
   - [9.4 图结构与循环](#94-图结构与循环)
   - [9.5 完整示例](#95-完整示例)
   - [9.6 与子图的区别](#96-与子图的区别)
+
+
+## 参考链接
+
+- LangGraph 官方文档：<https://langchain-ai.github.io/langgraph/>
+- LangGraph API 参考：<https://reference.langchain.com/python/langgraph>
+- LangChain v1 文档：<https://docs.langchain.com/oss/python/langchain>
+- LangChain API 参考：<https://reference.langchain.com/python/langchain>
+- LangSmith 平台：<https://smith.langchain.com/>
 
 
 ## 第1章 模块分布与产品分层
@@ -741,45 +754,171 @@ builder.add_edge("chatbot", END)
 
 因为 `tools_condition` 已经通过返回 `__end__` 表达了”结束”。
 
-### 3.4 `create_react_agent`
+### 3.4 `create_agent` — ReAct Agent 工厂
 
-`create_react_agent` 是 LangGraph 提供的预构建 agent 入口：一行代码生成完整的 tool-calling graph，不用手写 StateGraph。
+`create_agent` 是 LangChain v1 提供的 ReAct Agent 工厂函数（前身是 `langgraph.prebuilt.create_react_agent`，已于 LangGraph v1 废弃）。调用它，自动返回一个编译好的 `CompiledStateGraph`，内部实现标准的 Reason → Act → Reason → Act → ... → Final Answer 循环。
 
 ```python
-from langgraph.prebuilt import create_react_agent
+from langchain.agents import create_agent
 
-graph = create_react_agent(model, tools)
+agent = create_agent(
+    model=”openai:gpt-4o”,
+    tools=[check_weather],
+    system_prompt=”You are a helpful assistant.”,
+)
 ```
 
-这一行等价于手写以下全部代码：
+返回的 `agent` 是一个**可直接调用的子图**，可以作为普通节点嵌入更大的父图。
+
+**内部结构：仍是 2 节点 LangGraph 子图**
+
+`create_agent` 本质是 LangGraph 的上层封装，底层编译出来的图结构不变：
+
+```
+┌──────────┐     ┌──────────┐
+│  model   │────▶│  tools   │
+│ (LLM)    │◀────│ (exec)   │
+└──────────┘     └──────────┘
+```
+
+| 节点 | 做什么 |
+|------|--------|
+| `model` | 调用 LLM。LLM 返回两种可能：① `AIMessage`（纯文本，循环结束）② `AIMessage` + `tool_calls`（要求调工具） |
+| `tools` | 执行 LLM 要求的工具调用，结果包装成 `ToolMessage` 返回 model 节点 |
+
+循环逻辑：LLM 思考 → 要调工具？→ 是 → 执行工具 → 结果喂回 LLM → LLM 再思考 → 还要调工具？→ 否 → 输出最终回答。
+
+等价手写代码（底层就是这张图）：
 
 ```python
-from langgraph.graph import StateGraph, MessagesState, START, END
-from langgraph.prebuilt import ToolNode, tools_condition
-
 builder = StateGraph(MessagesState)
-builder.add_node(“chatbot”, model.bind_tools(tools))
+builder.add_node(“model”, model.bind_tools(tools))
 builder.add_node(“tools”, ToolNode(tools))
-builder.add_edge(START, “chatbot”)
-builder.add_conditional_edges(“chatbot”, tools_condition)
-builder.add_edge(“tools”, “chatbot”)
+builder.add_edge(START, “model”)
+builder.add_conditional_edges(“model”, tools_condition)
+builder.add_edge(“tools”, “model”)
 graph = builder.compile()
 ```
 
-它内部做的事：
+**关键参数**
 
-1. 以 `MessagesState` 作为 state schema
-2. 创建 `chatbot` 节点，把 `tools` 绑定到 `model`
-3. 创建 `tools` 节点（`ToolNode`）
-4. 用 `tools_condition` 连接 chatbot → tools / END 的条件路由
-5. `compile()` 返回可执行 graph
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `model` | `str \| BaseChatModel` | 推理用大模型。支持字符串 `”openai:gpt-4o”` 或 `ChatOpenAI()` 实例。内部自动 `bind_tools(tools)` |
+| `tools` | `list[BaseTool] \| None` | 可调用工具列表。`None` 或空列表时不启用工具循环，退化为单次 LLM 调用 |
+| `system_prompt` | `str \| SystemMessage \| None` | **仅接受静态字符串或 SystemMessage**。注入到消息列表开头 |
+| `middleware` | `list[AgentMiddleware]` | 钩子系统，替代旧 `state_modifier` 的动态 Prompt 能力（见下方） |
+| `state_schema` | `type[AgentState] \| None` | 自定义 State schema，必须继承 `AgentState`。用于添加业务字段 |
+| `response_format` | `PydanticModel \| dict \| None` | 结构化输出 schema，Agent 最终回复按此格式返回 |
+| `checkpointer` | `Checkpointer \| None` | 持久化。提供后，同一 `thread_id` 累积历史消息 |
 
-因此 `create_react_agent` 不是新概念，而是 3.2 和 3.3 节所述手写模式的预制版。它和手写图的区别不在能力上，在控制粒度上：
+**`system_prompt`：静态 Prompt 注入**
 
-- `create_react_agent`：适合快速起步、标准 tool-calling 场景
-- 手写 StateGraph：适合需要在 chatbot ↔ tools 循环中插入自定义节点（如人工审批、日志、路由改写）
+```python
+# 字符串 — 自动转为 SystemMessage
+agent = create_agent(model, tools, system_prompt=”You are a GIS assistant.”)
 
-一旦需要在工具调用前后加自定义逻辑，就从 `create_react_agent` 退回到手写 StateGraph。
+# SystemMessage — 直接传入
+agent = create_agent(
+    model, tools,
+    system_prompt=SystemMessage(content=”You are a GIS assistant.”),
+)
+```
+
+`system_prompt` 只接受静态内容。如果 Prompt 需要从 state 中动态拼接（如 GeoAgent 的 `_modify_planState`），改用 **middleware**。
+
+**`middleware`：动态钩子系统**
+
+middleware 是 `create_agent` 的核心新增能力，统一了旧 `state_modifier`、`pre_model_hook`、`post_model_hook` 的职责。
+
+```python
+from langchain.agents.middleware import AgentMiddleware
+
+class PlanMiddleware(AgentMiddleware):
+    “””每次 LLM 调用前，从 state 中提取业务字段拼入 Prompt。”””
+
+    def before_model(self, state, runtime):
+        task_desc = state.get(“task_description”, “”)
+        plan_text = state.get(“plan_text”, “”)
+        prompt = f”任务: {task_desc}\n已有计划: {plan_text}”
+        return {“messages”: [SystemMessage(content=prompt)]}
+        # 返回的 messages 会插入到 LLM 输入中
+
+agent = create_agent(
+    model, tools,
+    middleware=[PlanMiddleware()],
+)
+```
+
+middleware 可用的钩子点：
+
+| 钩子 | 触发时机 | 典型用途 |
+|------|---------|---------|
+| `before_model` | LLM 调用前 | 动态拼 System Prompt、消息裁剪、上下文注入 |
+| `after_model` | LLM 调用后 | 输出校验、内容过滤、guardrails |
+| `before_tools` | 工具执行前 | 人工审批、参数改写、权限检查 |
+| `after_tools` | 工具执行后 | 结果后处理、日志记录 |
+| `wrap_tool_call` | 单个工具调用前后 | 超时控制、重试、结果缓存 |
+
+**`state_schema`：扩展业务字段**
+
+默认 `AgentState` 只有 `messages` 一个字段。要添加业务字段，定义继承 `AgentState` 的 TypedDict：
+
+```python
+from langchain.agents import AgentState
+
+class CodeAgentState(AgentState):
+    code: str
+    target_file_name: str
+    working_directory: str
+    execution_result: str
+
+agent = create_agent(
+    model, tools,
+    state_schema=CodeAgentState,  # 现在 Agent 能读写这些业务字段了
+)
+```
+
+GeoAgent 的等价场景：每个 Agent 类型（Planner/Coder/Cartographer）定义自己的 `XxxAgentState`，把 `code`、`target_file_name` 等字段加进去。
+
+**结束条件**
+
+LLM 什么时候停止循环？两个条件：
+
+1. **LLM 主动结束**：LLM 输出纯 `AIMessage`（不含 `tool_calls`），表示”回答完了”
+2. **递归限制**：达到 `recursion_limit`，LangGraph 抛 `GraphRecursionError`。Agent 内部在最后 3 步注入 `”You have X steps remaining”` 提醒消息，催促 LLM 收尾
+
+**作为子图嵌入父图**
+
+`create_agent` 返回的是 `CompiledStateGraph`，可以像普通节点一样嵌入更大的图：
+
+```python
+# 每个 Agent 是一个独立子图
+planner_agent = create_agent(plan_model, plan_tools, system_prompt=”你是任务规划师。”)
+coder_agent = create_agent(code_model, code_tools, state_schema=CodeAgentState)
+
+# 嵌入父图
+builder = StateGraph(ParentState)
+builder.add_node(“planner”, planner_agent)
+builder.add_node(“coder”, coder_agent)
+builder.add_edge(“planner”, “coder”)
+```
+
+**与手写子图的对比**
+
+| 维度 | 手写多节点子图（GeoAgent Coder） | `create_agent` |
+|------|-------------------------------|----------------|
+| 节点数 | 5（CodeWriter/Reviewer/Executor/...） | 2（model + tools） |
+| 调试循环 | 固定 1-2 次，硬编码 | LLM 自主决定几次 |
+| 错误修复 | 依赖 Reviewer 节点一次判断 | LLM 看到错误 → 修改 → 再执行，直到正确 |
+| 代码量 | ~200 行 | ~5 行 |
+| 钩子插入 | 每个节点前后手动加 | middleware 统一管理 |
+
+选择规则：
+
+- `create_agent`：标准 tool-calling 场景，LLM 自主决策何时调工具、调几次
+- 手写 StateGraph：需要在 agent ⇄ tools 循环**之间**插入固定步骤（如每次工具执行后必须走审批）
+- 混合：`create_agent` 作为子图嵌入父图，父图在子图前后加自定义节点（GeoAgent 的架构模式）
 
 ## 第4章 记忆、暂停与执行
 
@@ -1044,6 +1183,42 @@ START -> chatbot -> (有 tool call) -> review
 - 但 graph 内部不一定重新从 `START` 开始
 - 它可能从上一次保存的 pending state 继续
 
+**`stream()` 的参数**
+
+```python
+events = graph.stream(input, config, stream_mode="values")
+```
+
+三个参数：
+
+| 参数 | 含义 |
+|------|------|
+| `input` | 初始 State，传给图的 START 节点 |
+| `config` | `{"configurable": {"thread_id": "..."}, "recursion_limit": N}` |
+| `stream_mode` | 控制每次事件输出什么（见下表） |
+
+`stream_mode` 四种取值：
+
+| 模式 | 每次事件输出 | 适用场景 |
+|------|------------|---------|
+| `"values"` | 完整当前 State | 需要看到完整上下文 |
+| `"updates"` | 只有本次改动（默认） | 只关心发生了什么变化 |
+| `"messages"` | 逐 token / 逐消息 | 聊天流式打字效果 |
+| `"custom"` | 节点内部自定义事件 | 节点主动曝露状态 |
+
+以 GeoAgent 为例，用 `"values"` 是为了打印完整 State 的最后一条消息：
+
+```python
+events = graph.stream(input, config, stream_mode="values")
+for s in events:
+    message = s["messages"][-1]       # s 是完整 state
+    print(message.content)
+```
+
+**`stream()` 不影响节点间传值**
+
+节点之间的 state 传递走的是图内部的合并机制，`stream()` 只是**向外观察**——等图内部完成一次合并后，把当前 state 拷贝一份抛出来。关掉 `print_stream()` 图照样跑。
+
 ### 4.4 输出形态
 
 图编译完成后，可通过 `invoke()` 传入初始 state 并执行：
@@ -1086,6 +1261,76 @@ graph.invoke({"messages": [HumanMessage(content=user_input)]}, config=config)
 3. 再看边和条件路由，确认状态如何流转
 4. 再看是否用了 `ToolNode`、`checkpointer`、`interrupt`
 5. 最后看 `invoke()` / `stream()` 的输入、`thread_id`、输出格式
+
+### 4.6 递归限制与步数管理
+
+**`recursion_limit` 的两种配置方式**
+
+`recursion_limit` 限制单次 `invoke()`/`stream()` 调用中图谱可执行的**超步（superstep）**数量，默认 25。达到限制时抛出 `GraphRecursionError`。
+
+两种设置方式：
+
+```python
+# 方式一：运行时 config（旧写法，各平台通用）
+graph.invoke(input, {"recursion_limit": 50})
+
+# 方式二：编译时设置（LangGraph 1.x 新写法，更清晰）
+graph = builder.compile(recursion_limit=50)
+```
+
+**`IsLastStep` 与 `RemainingSteps`**
+
+LangGraph 提供两个由运行时自动管理的状态值，从 `langgraph.managed` 导入。两者在 2025 年中后标记为 `NotRequired`——State 中可包含也可省略。
+
+```python
+from langgraph.managed import IsLastStep, RemainingSteps
+
+class State(TypedDict):
+    messages: list
+    is_last_step: IsLastStep        # bool：当前是否到最后一步
+    remaining_steps: RemainingSteps  # int：还剩多少步，每步自动减 1
+```
+
+| | `IsLastStep` | `RemainingSteps` |
+|---|---|---|
+| 类型 | `bool` | `int` |
+| 含义 | 当前是否到达最后一步 | 还剩多少步 |
+| 用法 | `True` → 强制结束 | 倒计时用于提前退出 |
+
+两者都是**运行时注入的只读值**，不能在节点返回中手动修改。`RemainingSteps` 可以设初始值：
+
+```python
+class State(TypedDict):
+    remaining_steps: RemainingSteps = 25  # 从 25 开始倒数
+```
+
+**分层保护实践**
+
+`recursion_limit` 是安全网，不是退出策略。真正的退出策略应该通过条件边路由到 `END`。
+
+```text
+Layer 1: 状态计数器（业务逻辑硬限制）
+         → 条件路由主动检查 iteration_count >= max，返回 END
+
+Layer 2: 编译时 recursion_limit（框架安全网）
+         → graph = builder.compile(recursion_limit=50)
+
+Layer 3: 超时保护（基础设施层兜底）
+         → asyncio.wait_for(graph.ainvoke(...), timeout=300)
+```
+
+实际用法：条件路由里先查计数器，再查 `remaining_steps`，剩余 ≤ 3 步时主动结束而不是撞墙报错：
+
+```python
+def should_continue(state: State) -> Literal["loop", "end"]:
+    if state["iteration_count"] >= state["max_iterations"]:
+        return "end"                        # 业务逻辑：够了，退出
+    if state["remaining_steps"] <= 3:
+        return "end"                        # 框架预警：快超了，优雅退出
+    return "loop"
+```
+
+与 `IsLastStep` 的区别：`IsLastStep` 只在倒数第一步才为 `True`，是"撞墙之前最后一次机会"。`RemainingSteps` 可以在还有余量时提前结束，体验更好。
 
 ## 第5章 并行执行
 
@@ -1521,6 +1766,27 @@ class ArticleState(TypedDict):
 - **仅子图有的字段**：子图内部可用，子图结束后被丢弃（不合并回父图）
 
 例子：父图传入 `{"topic": "LangGraph", "research_done": False, "outline": [], "article": ""}` → 子图收到 `topic` 和 `research_done`，写入 `research_done=True` → 父图后续节点拿到 `research_done=True`
+
+**关键：结构化字段 vs 消息文本**
+
+子图需要向父图传递结构化信息时，**在子图 Schema 里加同名字段，让节点直接返回**，而不是把信息塞进消息文本再让父图解析。
+
+```python
+# ✅ 正确：子图节点直接返回结构化字段
+class SubState(TypedDict):
+    messages: Annotated[list, add_messages]
+    process_decision: str   # ← 与父图同名，自动传回
+
+def sub_node(state: SubState):
+    return {"process_decision": '{"next": "Coder"}'}  # 直接写字段
+
+# ❌ 错误：塞进消息文本，父图再抠出来解析
+def sub_node(state: SubState):
+    return {"messages": [AIMessage(content='{"next": "Coder"}')]}
+    # 父图被迫 messages[-1].content → json.loads → 提取字段
+```
+
+同名字段自动传递就是 LangGraph 子图的 native 机制。需要 wrapper 翻译层就说明子图 Schema 设计有遗漏。
 
 ### 7.3 观测差异
 
