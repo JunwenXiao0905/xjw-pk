@@ -1,298 +1,292 @@
-视频地址：
+# Python 项目管理
 
-[从pip到uv：一口气梳理现代Python项目管理全流程！_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV13WGHz8EEz/?spm_id_from=333.1391.0.0)
+## 目录
 
-# uv
-视频地址：
+- [第1章 版本管理](#第1章-版本管理)
+  - [1.1 查看可用版本](#11-查看可用版本)
+  - [1.2 安装指定版本](#12-安装指定版本)
+  - [1.3 `.python-version`](#13-python-version)
+  - [1.4 临时指定版本](#14-临时指定版本)
+- [第2章 项目初始化](#第2章-项目初始化)
+  - [2.1 `uv init`](#21-uv-init)
+  - [2.2 src layout](#22-src-layout)
+- [第3章 CLI 入口](#第3章-cli-入口)
+  - [3.1 `[project.scripts]`](#31-projectscripts)
+  - [3.2 `uv run` 的三种调用方式](#32-uv-run-的三种调用方式)
+- [第4章 依赖管理](#第4章-依赖管理)
+  - [4.1 声明 vs 安装](#41-声明-vs-安装)
+  - [4.2 `uv add`](#42-uv-add)
+  - [4.3 `uv sync`](#43-uv-sync)
+  - [4.4 两类依赖](#44-两类依赖)
+  - [4.5 `uv.lock`](#45-uvlock)
+  - [4.6 常用选项](#46-常用选项)
+- [第5章 Workspace](#第5章-workspace)
+  - [5.1 声明](#51-声明)
+  - [5.2 效果](#52-效果)
+  - [5.3 目录结构](#53-目录结构)
+  - [5.4 子包互引](#54-子包互引)
+  - [5.5 根目录调用](#55-根目录调用)
+- [第6章 导入与路径](#第6章-导入与路径)
+  - [6.1 `sys.path`](#61-syspath)
+  - [6.2 `python` vs `uv run`](#62-python-vs-uv-run)
 
-[让uv管理Python的一切_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1Stwfe1E7s/?spm_id_from=333.1391.0.0)
+## 第1章 版本管理
 
-文章地址：
+### 1.1 查看可用版本
 
-[https://juejin.cn/post/7553547794456739879?searchId=202510082035178CFA8D70AA1A76C4C6E7](https://juejin.cn/post/7553547794456739879?searchId=202510082035178CFA8D70AA1A76C4C6E7)
-
-
-
-## 1.版本管理
-查看uv支持的所有python版本
-
-```powershell
+```bash
 uv python list
 ```
 
-安装指定的python版本
+### 1.2 安装指定版本
 
-```powershell
-uv python install cpython-3.14
+```bash
+uv python install cpython-3.13
 ```
 
-<!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2025/png/34655355/1759929590942-52e6955f-69d3-4525-ac93-52c00f2a8674.png)
+### 1.3 `.python-version`
 
-使用指定python版本运行文件【会自动安装对应版本】
+项目根目录下放 `.python-version` 文件，内容为版本号：
 
-```powershell
-uv run  -p 3.14 <script.py>
+```
+3.13
 ```
 
-使用指定版本的交互界面【会自动安装对应版本】
+`uv run`、`uv sync` 等命令会自动读取此文件。如果该版本未安装，uv 会自动下载安装。
 
-```powershell
-uv run -p 3.14 python
+等效于每次手动指定 `-p 3.13`。
+
+### 1.4 临时指定版本
+
+```bash
+uv run -p 3.14 python        # 用 3.14 打开交互界面
+uv run -p 3.14 script.py     # 用 3.14 运行脚本
 ```
 
-<!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2025/png/34655355/1759930085626-f27b72cf-88ba-4fca-bd0d-367d1f00059a.png)
+## 第2章 项目初始化
 
+### 2.1 `uv init`
 
-
-## 2.项目初始化
-```powershell
-uv init -p 3.14  
+```bash
+uv init -p 3.13
 ```
 
-<!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2025/png/34655355/1759931220610-ba680c5c-113b-4b27-85e1-4099b7833742.png)
+生成：
 
-
-
-## 3.单包项目
-```typescript
-  fastapi-study/
-  ├── pyproject.toml          ← 一个配置
-  ├── src/app/                ← 源码
-  │   ├── __init__.py
-  │   ├── main.py             ← FastAPI 入口
-  │   ├── routers/            ← 路由
-  │   ├── schemas/            ← Pydantic 模型
-  │   └── services/           ← 业务逻辑
-  └── tests/
+```
+project/
+├── pyproject.toml       # 项目元数据与依赖声明
+├── .python-version      # 锁定 Python 版本
+├── README.md
+└── hello.py             # 示例入口
 ```
 
-## 3.workspace
-```typescript
-  [project]
-  name = "fastapi-study"
-  version = "0.1.0"
-  description = "FastAPI 学习笔记项目 — Todo 笔记 API"
-  requires-python = ">=3.12"
-  readme = "README.md"
+### 2.2 src layout
 
-  [tool.uv.workspace]
-  members = ["core", "api"]
+Python 工程实践推荐把源码放在 `src/` 下，防止开发时误导入未安装的代码。
+
+```
+project/
+├── pyproject.toml
+├── src/
+│   └── app/
+│       ├── __init__.py
+│       ├── main.py
+│       ├── routers/
+│       ├── schemas/
+│       └── services/
+└── tests/
 ```
 
- 意思是：core/ 和 api/ 这两个目录各自是一个独立的 Python 包，但它们属于同一个 workspace。
+uv 对 src layout 项目自动做可编辑安装，不需要手动配路径（详见第6章）。
 
-  具体效果
+## 第3章 CLI 入口
 
-  1. 共享依赖 — 两个包都用了 pydantic，workspace 只下载一次
+### 3.1 `[project.scripts]`
 
-  2. 互相引用 — api 可以 from core.utils import xxx，不需要 pip install core
+在 `pyproject.toml` 中定义命令名到函数的映射：
 
-  3. 统一安装 — 在根目录跑 uv sync，所有子包的依赖一起装好
-
-  4. 独立运行 — uv run --package api ... 或 uv run --package core ...
-
-
-
-  具象化
-
-```typescript
-  fastapi-study/          ← 根（workspace）
-  ├── pyproject.toml      ← 根配置：members = ["core", "api"]
-  ├── uv.lock             ← 所有子包的依赖统一锁定
-  │
-  ├── core/               ← 子包 1：共享工具
-  │   ├── pyproject.toml  ← 独立配置
-  │   └── src/core/utils.py
-  │
-  └── api/                ← 子包 2：FastAPI 应用
-      ├── pyproject.toml  ← 独立配置，dependencies = ["core", "fastapi", ...]
-      └── src/api/main.py
+```toml
+[project.scripts]
+lg-tutorial = "lg_tutorial.main:main"
 ```
 
-+ 根目录的 uv sync 会同时处理 core 和 api 的依赖
-    - api 的 pyproject.toml 里写 "core"，就能直接导入 core 的代码
-    - 两个包共享同一个 uv.lock，不会出现 core 用 fastapi 0.114、api 用 0.115 的冲突
+格式为 `命令名 = "模块路径:函数名"`。`uv sync` 后即可用：
 
-子包中调用
+```bash
+uv run lg-tutorial
+```
 
-第 1 步：api 声明对 core 的依赖。
+等价于：
 
-  在 api/pyproject.toml 中：
+```bash
+uv run python -m lg_tutorial.main
+```
 
-```typescript
+可以定义多个入口：
+
+```toml
+[project.scripts]
+lg-tutorial = "lg_tutorial.main:main"
+dev = "app.main:dev"
+```
+
+### 3.2 `uv run` 的三种调用方式
+
+```bash
+uv run <script>              # 执行 [project.scripts] 中定义的命令
+uv run python script.py      # 直接运行脚本（在虚拟环境中）
+uv run python -m module      # 以模块方式运行
+```
+
+`uv run` 保证代码运行在项目的虚拟环境中，不需要先手动激活 `.venv`。
+
+## 第4章 依赖管理
+
+### 4.1 声明 vs 安装
+
+- **声明**：写在 `pyproject.toml` 里，告诉项目"需要什么包"
+- **安装**：把包下载到虚拟环境，通过 `uv sync` 或 `uv add`
+
+### 4.2 `uv add`
+
+```bash
+uv add fastapi          # 写入 pyproject.toml + 安装
+uv add --dev pytest     # 加到 dev 依赖组并安装
+```
+
+`uv add` = 改配置 + 安装。
+
+### 4.3 `uv sync`
+
+```bash
+uv sync                 # 按 pyproject.toml 安装全部依赖
+uv sync --no-dev        # 只装生产依赖（CI/CD 常用）
+uv sync --frozen        # 严格按 uv.lock 装，不解析新版本
+```
+
+`uv sync` = 只安装，不修改配置。
+
+### 4.4 两类依赖
+
+```toml
+dependencies = ["fastapi", "uvicorn"]     # 生产依赖
+
+[dependency-groups]
+dev = ["pytest"]                           # 开发依赖
+```
+
+生产部署时只装 `dependencies`，不装 `dev`。
+
+### 4.5 `uv.lock`
+
+`pyproject.toml` 写范围，`uv.lock` 记录精确版本：
+
+```
+pyproject.toml:  fastapi>=0.115.0,<1.0.0   # 范围
+uv.lock:         fastapi==0.115.6           # 精确版本
+```
+
+`uv sync` 读 `uv.lock`，保证所有人装的都是同一个版本。`uv.lock` 应提交到 Git。
+
+### 4.6 常用选项
+
+```bash
+uv add --dev pytest                  # 加到 dev 组
+uv sync --no-dev                     # 跳过 dev 依赖
+uv sync --frozen                     # 不解析版本，严格按 lock 文件安装
+uv lock --upgrade-package fastapi    # 升级单个包
+```
+
+## 第5章 Workspace
+
+### 5.1 声明
+
+根 `pyproject.toml` 中：
+
+```toml
+[tool.uv.workspace]
+members = ["core", "api"]
+```
+
+表示 `core/` 和 `api/` 各自是独立 Python 包，但同属一个 workspace。
+
+### 5.2 效果
+
+1. **共享依赖** — 两个包都用了 pydantic，workspace 只下载一次
+2. **互相引用** — api 可以直接 `from core.utils import xxx`
+3. **统一安装** — 在根目录跑 `uv sync`，所有子包的依赖一起装好
+4. **独立运行** — `uv run --package api ...` 或 `uv run --package core ...`
+5. **统一 lock** — 两个包共享 `uv.lock`，不会出现版本冲突
+
+### 5.3 目录结构
+
+```
+fastapi-study/           # 根（workspace）
+├── pyproject.toml       # members = ["core", "api"]
+├── uv.lock              # 所有子包统一锁定
+├── core/                # 子包 1：共享工具
+│   ├── pyproject.toml
+│   └── src/core/utils.py
+└── api/                 # 子包 2：FastAPI 应用
+    ├── pyproject.toml   # dependencies = ["core", "fastapi"]
+    └── src/api/main.py
+```
+
+### 5.4 子包互引
+
+`api/pyproject.toml` 中声明对 core 的依赖：
+
+```toml
 [project]
-  name = "api"
-  version = "0.1.0"
-  requires-python = ">=3.12"
-  dependencies = [
-      "core",
-      "fastapi>=0.115.0,<1.0.0",
-  ]
+name = "api"
+dependencies = [
+    "core",
+    "fastapi>=0.115.0,<1.0.0",
+]
 ```
 
-  关键就这一行 "core" —— 告诉 uv：这个包依赖 workspace 里的 core 包。
-
-  第 2 步：在 api 的代码中直接 import。
-
-api/src/api/main.py
-
-```typescript
- from core.utils import format_response
-
-print(format_response({"hello": "world"}))
-```
-
-  原理
-
-  uv 在 uv sync 时看到 "core"，会去找：
-
-1. workspace 成员里有没有叫 core 的包？有 → core/pyproject.toml 里 name = "core"
-2. 把它安装到虚拟环境中，作为可导入的包
-
-  所以你写的 from core.utils import format_response 就能正常工作，不需要额外配置路径。
-
-
-
-根目录调用
-
-根的 pyproject.toml
-
-```typescript
-\ dependencies = ["core", "api"]
-```
-
- # main.py（根目录）
-
-```typescript
-  from core.utils import format_response
-  from api.main import app
-
-  print(format_response({"status": "ok"}))
-```
-
-
-
-## 5.依赖管理
-  声明 vs 安装
-
-  声明：告诉项目"我需要什么包" —— 写在 pyproject.toml 里
-
-  安装：把包下载到虚拟环境 —— 跑 uv sync 或 uv add
-
-
-
-  两类依赖
-
-```typescript
-  dependencies = ["fastapi", "uvicorn"]        ← 生产依赖，代码运行时需要的
-  [dependency-groups]
-  dev = ["pytest"]                              ← 开发依赖，测试/构建时用的
-```
-
-  区别：生产部署时只装 dependencies，不装 dev（类似 dependencies vs devDependencies）。
-
-
-
-  两个命令
-
-```typescript
-┌────────────────┬────────────────────────────────┬──────────────────┐
-  │      命令      │            做了什么            │       类比       │
-  ├────────────────┼────────────────────────────────┼──────────────────┤
-  │ uv add fastapi │ 写入 pyproject.toml + 安装     │ pnpm add fastapi │
-  ├────────────────┼────────────────────────────────┼──────────────────┤
-  │ uv sync        │ 按 pyproject.toml 声明安装全部 │ pnpm install     │
-  └────────────────┴────────────────────────────────┴──────────────────┘
-```
-
-  关系：uv add = 改配置 + 安装；uv sync = 只安装（不修改配置）
-
-
-
-  --dev 和 --frozen
-
-```typescript
-  uv add --dev pytest           # 加到 dev 组并安装
-  uv sync --no-dev              # 只装生产依赖（CI/CD 常用）
-  uv sync --frozen              # 严格按 uv.lock 装，不解析新版本（保证可重复）
-```
-
-
-
-  uv.lock 的作用
-
-  pyproject.toml 写:  fastapi>=0.115.0,<1.0.0    ← 范围
-
-  uv.lock 记录:       fastapi==0.115.6            ← 精确版本
-
-
-
-  uv sync 读 uv.lock，保证所有人装的都是同一个版本。
-
-
-
-
-
-## 6.模块导入与路径解析
-  **核心概念：sys.path**
-
-  Python 导入模块时，会按 sys.path 列表中的目录依次查找。查看方式：
+然后在 api 代码中直接 import：
 
 ```python
-  import sys
-  print(sys.path)
+from core.utils import format_response
 ```
 
-**  Python 默认行为**
+uv 在 `uv sync` 时看到 `"core"`，会去 workspace 成员里找 `name = "core"` 的包，把它安装到虚拟环境中。
 
-  运行 python src/app/main.py 时，Python 只把脚本所在目录 加进 sys.path，也就是 src/app/。
+### 5.5 根目录调用
 
-  此时代码中写 from app.routers.notes import xxx，Python 去 src/app/ 下找 app/ 目录 → 找不到 →
+根 `pyproject.toml` 中声明依赖子包：
 
-  ModuleNotFoundError。
+```toml
+dependencies = ["core", "api"]
+```
 
-
-
-**  uv run 做了什么**
-
-  uv sync 时做了可编辑安装（editable install），把 src/ 注册进 Python 的导入路径。所以 uv run
-
-  启动时，Python 能直接从 src/ 下找到 app/ 包。
-
-
-
-**  对比表**
+之后根目录代码可以直接导入：
 
 ```python
-  ┌─────────────────────────────┬────────────────────┬──────────────────────────┐
-  │          运行方式           │   sys.path 包含    │ 能否 from app import ... │
-  ├─────────────────────────────┼────────────────────┼──────────────────────────┤
-  │ python src/app/main.py      │ src/app/           │ ❌                       │
-  ├─────────────────────────────┼────────────────────┼──────────────────────────┤
-  │ uv run uvicorn app.main:app │ src/（可编辑安装） │ ✅                       │
-  └─────────────────────────────┴────────────────────┴──────────────────────────┘
+from core.utils import format_response
+from api.main import app
 ```
 
+## 第6章 导入与路径
 
+### 6.1 `sys.path`
 
-**  src layout**
+Python 导入模块时，按 `sys.path` 列表中的目录依次查找：
 
-  Python 工程实践推荐把源码放在 src/ 下，防止开发时误导入未安装的代码。uv 的 src layout
+```python
+import sys
+print(sys.path)
+```
 
-  项目自动处理可编辑安装，不需要手动配路径
+### 6.2 `python` vs `uv run`
 
-# conda
+| 运行方式 | `sys.path` 包含 | `from app import ...` |
+|----------|----------------|----------------------|
+| `python src/app/main.py` | `src/app/` | 失败 |
+| `uv run python -m app.main` | `src/`（可编辑安装） | 成功 |
 
+直接 `python src/app/main.py` 时，Python 只把脚本所在目录 `src/app/` 加入 `sys.path`。代码中 `from app.routers.notes import xxx` 在这个目录下找不到 `app/`。
 
-# 
-# 编辑器
-## pyCharm
-
-
-### 
-## vscode
-
-
+`uv sync` 对 src layout 项目做了**可编辑安装**（editable install），把 `src/` 注册进 Python 导入路径。因此 `uv run` 启动时，Python 能直接从 `src/` 下找到 `app/` 包，不需要手动配 `PYTHONPATH`。
