@@ -354,3 +354,112 @@ snapshot -i      → 页面变化后重新快照，获取新编号
 
 ---
 
+### L6: CDP 直连
+
+当目标网站（如 DCD、路透社等）使用 Cloudflare Turnstile 等反爬机制时，MCP 自动化浏览器无法通过验证。此时可通过 **手动 Chrome + CDP 协议** 作为降级方案。
+
+```
+MCP 自动化浏览器 --被 Cloudflare 拦截--> ❌
+手动 Chrome（已通过真人验证）--通过 CDP 连接--> ✅
+```
+
+**操作步骤**
+
+**步骤一：启动可调试的 Chrome 实例**
+
+关闭所有 Chrome 窗口，然后运行：
+
+```powershell
+Start-Process -FilePath "C:\Program Files\Google\Chrome\Application\chrome.exe" -ArgumentList "--remote-debugging-port=9222 --user-data-dir=$env:TEMP\chrome-debug"
+```
+
+| 参数 | 作用 |
+|------|------|
+| `--remote-debugging-port=9222` | 开启远程调试端口，CDP 通过该端口连接 |
+| `--user-data-dir=...` | 指定独立用户数据目录，避免与正在运行的 Chrome 冲突 |
+
+**步骤二：手动打开目标网址**
+
+在刚启动的 Chrome 中手动访问需要验证的网站，完成：
+
+- Cloudflare Turnstile 勾选"我不是机器人"
+- 其他 CAPTCHA 验证
+
+页面正常加载后，**保持标签页打开**，不要关闭。
+
+**步骤三：通过 CDP 协议连接并操作**
+
+**3.1 查看已打开的标签页**
+
+```bash
+curl http://127.0.0.1:9222/json/list
+```
+
+返回示例：
+
+```json
+[
+  { "id": "9BF582B8...", "title": "Microsoft details...", "url": "https://..." }
+]
+```
+
+记录目标页面的 `id`。
+
+**3.2 读取页面内容**
+
+```javascript
+const ws = new WebSocket('ws://127.0.0.1:9222/devtools/page/{pageId}');
+
+ws.addEventListener('open', () => {
+  ws.send(JSON.stringify({
+    id: 1,
+    method: 'Runtime.evaluate',
+    params: {
+      expression: 'document.body.innerText.substring(0, 20000)',
+      returnByValue: true
+    }
+  }));
+});
+
+ws.addEventListener('message', (event) => {
+  console.log(event.data);
+  ws.close();
+});
+```
+
+**3.3 其他常用 CDP 操作**
+
+| 操作 | CDP 方法 | 说明 |
+|------|---------|------|
+| 导航新页面 | `Page.navigate` | `params: { url: "..." }` |
+| 截图 | `Page.captureScreenshot` | 返回 base64 图片 |
+| 执行 JS | `Runtime.evaluate` | 任意 JS 代码 |
+| 获取控制台日志 | `Runtime.consoleAPICalled` | 需先监听事件 |
+| 获取页面标题 | `Runtime.evaluate` | `expression: "document.title"` |
+
+**适用场景**
+
+| 场景 | MCP 可直接处理 | 需手动 Chrome + CDP |
+|------|:-------------:|:-------------------:|
+| 无反爬的普通网站 | ✅ | ❌ |
+| Cloudflare Turnstile | ❌ | ✅ |
+| DataDome CAPTCHA | ❌ | ✅ |
+| Google 系验证码 | ❌ | ✅ |
+| 需要登录态/SSO 的网站 | ⚠️ 部分支持 | ✅ 复用已登录会话 |
+
+**注意事项**
+
+1. **端口冲突**：若 9222 被占用，可改用其他端口（如 9223）
+2. **用户数据目录**：每次用完 `$env:TEMP\chrome-debug` 可手动删除，避免缓存干扰下次使用
+3. **安全性**：远程调试端口开放期间，本机任何进程都可控制该浏览器，用完建议关闭 Chrome
+4. **CDP 无状态**：每次操作需通过 WebSocket 发送完整 JSON 命令，MCP 封装的便利性（click、fill、screenshot 等）在此方案中需自行实现
+
+**对比：MCP vs 裸 CDP**
+
+| 维度 | MCP chrome-devtools | 手动 Chrome + CDP |
+|------|-------------------|-------------------|
+| 配置复杂度 | 低，一行配置即可 | 中，需启动 Chrome + 手写代码 |
+| 绕过 Cloudflare | ❌ | ✅ |
+| 工具丰富度 | 40+ 封装好的工具 | 需手写所有命令 |
+| AI 友好度 | AI 直接调 tool | 需生成 JS 代码执行 |
+| 适用场景 | 日常自动化 | Cloudflare 等反爬场景的降级方案 |
