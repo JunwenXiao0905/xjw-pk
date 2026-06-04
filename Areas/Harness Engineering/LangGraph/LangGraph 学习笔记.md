@@ -62,6 +62,19 @@
   - [9.4 图结构与循环](#94-图结构与循环)
   - [9.5 完整示例](#95-完整示例)
   - [9.6 与子图的区别](#96-与子图的区别)
+  
+- [第10章 LangGraph Platform与前后端集成](#第10章-langgraph-platform与前后端集成)
+  - [10.1 LangGraph Platform是什么](#101-langgraph-platform是什么)
+  - [10.2 Resume机制核心原理](#102-resume机制核心原理)
+  - [10.3 Resume的核心能力](#103-resume的核心能力)
+  - [10.4 前端集成完整示例](#104-前端集成完整示例)
+  - [10.5 Resume的进阶用法](#105-resume的进阶用法)
+  - [10.6 LangGraph Platform API Endpoints](#106-langgraph-platform-api-endpoints)
+  - [10.7 与第4章interrupt的区别](#107-与第4章interrupt的区别)
+  - [10.8 实际应用场景](#108-实际应用场景)
+  - [10.9 与传统前后端通信的区别](#109-与传统前后端通信的区别)
+  - [10.10 快速启动指南](#110-快速启动指南)
+  - [10.11 参考链接](#111-参考链接)
 
 
 ## 参考链接
@@ -2180,5 +2193,630 @@ graph = builder.compile().with_config({"recursion_limit": 10})
 
 - Supervisor = **LLM 负责路由**
 - 子图 = **代码负责路由**
+
+## 第10章 LangGraph Platform与前后端集成
+
+### 10.1 LangGraph Platform是什么
+
+LangGraph Platform 是 LangGraph 的部署和运行平台，核心组件：
+
+| 组件 | 作用 |
+|------|------|
+| **LangGraph Server** | API Server，自动提供 REST API + SSE streaming |
+| **LangGraph Studio** | GUI 调试界面，可视化查看 graph 执行流程 |
+| **LangGraph CLI** | 命令行工具，`langgraph up` 一行启动 API Server |
+| **LangGraph SDK** | 前端 Client 库，封装了与 API Server 的通信 |
+
+关键点：
+
+- LangGraph Server 是**后端 API Server**（默认端口 2024），不是前端库
+- 提供 REST API endpoints：`/threads`、`/runs`、`/stream`
+- 支持 SSE（Server-Sent Events）流式推送
+- 自动处理 interrupt/resume 机制
+
+### 10.2 Resume机制核心原理
+
+**核心问题**：interrupt 暂停 graph 后，如何让前端提供数据并恢复执行？
+
+**LangGraph Platform 的解决方案**：
+
+```text
+┌─────────────────────────────────────────────────────────┐
+│ 前端                                          │
+│  ├─ SSE连接: GET /threads/{thread_id}/runs/{run_id}/stream│
+│  │   └─ 接收: LLM流式输出 + interrupt事件               │
+│  │                                                       │
+│  ├─ HTTP POST: POST /threads/{thread_id}/runs            │
+│  │   └─ 发送: command: {resume: data} 恢复执行           │
+│  │                                                       │
+│  └─ LangGraph SDK Client                                 │
+│     client.runs.stream(...); // SSE监听                  │
+│     client.runs.create({command: {resume: ...}}); // 恢复 │
+└─────────────────────────────────────────────────────────┘
+                    ↕ HTTP/SSE
+┌─────────────────────────────────────────────────────────┐
+│ LangGraph API Server (端口2024)                          │
+│  ├─ REST API endpoints                                   │
+│  ├─ SSE streaming support                                │
+│  └─ Thread/Run management                                │
+└─────────────────────────────────────────────────────────┘
+                    ↕ 调用Python graph
+┌─────────────────────────────────────────────────────────┐
+│ Python Backend (你的graph定义)                           │
+│  ├─ StateGraph with interrupt()                          │
+│  ├─ Checkpointer (保存暂停时的state)                      │
+│  └─ graph.compile()                                      │
+└─────────────────────────────────────────────────────────┘
+```
+
+**关键流程**：
+
+1. **SSE推送interrupt事件**：当 graph 执行到 `interrupt()` 时，LangGraph Server 通过 SSE 推送 interrupt 事件给前端
+2. **前端展示UI**：前端收到 interrupt，展示表单/对话框让用户输入数据
+3. **HTTP POST resume**：前端通过 `POST /threads/{thread_id}/runs` 发送 `command: {resume: data}`
+4. **graph恢复执行**：LangGraph Server 接收 resume 数据，调用 `graph.invoke(Command(resume=data))`
+5. **interrupt返回数据**：`interrupt()` 函数返回前端提供的数据，graph 继续执行
+6. **SSE继续推送**：后续的 LLM 输出继续通过 SSE 推送
+
+### 10.3 Resume的核心能力
+
+**可以做什么**：
+
+| 场景 | interrupt请求 | resume数据 | 用途 |
+|------|--------------|-----------|------|
+| **审批决策** | `"是否执行此操作？"` | `{approved: true/false}` | 人工审批工具调用 |
+| **数据补充** | `"需要当前viewport"` | `{lat: 30.5, lon: 120.3}` | Agent请求前端状态 |
+| **参数调整** | `"请确认渲染参数"` | `{resolution: "high", style: "dark"}` | 用户调整Agent输出 |
+| **选择分支** | `"选择哪个数据源？"` | `{source: "database"}` | 人工选择执行路径 |
+| **内容编辑** | `"请修改生成的文本"` | `"修改后的文本内容"` | 人工编辑Agent输出 |
+| **信息输入** | `"请提供用户ID"` | `"user-123"` | Agent缺少必要信息 |
+
+**核心价值**：
+
+- ✅ Agent主动请求前端数据（而不是前端轮询推送）
+- ✅ 按需获取，避免无效请求
+- ✅ 支持复杂的表单输入（Pydantic校验）
+- ✅ 可循环多次interrupt直到输入合法
+
+### 10.4 前端集成完整示例
+
+**后端：Python graph定义**
+
+```python
+from langgraph.graph import StateGraph, MessagesState, START, END
+from langgraph.types import interrupt, Command
+from langgraph.checkpoint.memory import MemorySaver
+from pydantic import BaseModel
+
+class ViewportData(BaseModel):
+    """前端需要提供的数据格式"""
+    lat: float
+    lon: float
+    zoom: int
+
+def render_node(state: MessagesState) -> dict:
+    """Agent节点：需要前端提供viewport数据"""
+    
+    # 第1步：interrupt请求前端数据（会暂停graph）
+    viewport_raw = interrupt({
+        "kind": "request_viewport",
+        "question": "需要当前地图的viewport信息",
+        "expected_format": ViewportData.model_json_schema()
+    })
+    
+    # 第2步：Pydantic校验前端输入（如果不合法会再次interrupt）
+    while True:
+        try:
+            viewport = ViewportData.model_validate(viewport_raw)
+            break  # 校验成功
+        except Exception as e:
+            # 校验失败，再次interrupt请求重新输入
+            viewport_raw = interrupt({
+                "kind": "validation_error",
+                "error": str(e),
+                "expected_format": ViewportData.model_json_schema()
+            })
+    
+    # 第3步：使用前端提供的数据执行渲染
+    render_result = f"基于viewport({viewport.lat}, {viewport.lon})渲染完成"
+    
+    return {
+        "messages": [{"role": "ai", "content": render_result}]
+    }
+
+# 定义graph
+graph = StateGraph(MessagesState)
+    .add_node("render", render_node)
+    .add_edge(START, "render")
+    .add_edge("render", END)
+    .compile(checkpointer=MemorySaver())
+```
+
+**langgraph.json配置**
+
+```json
+{
+  "python_version": "3.11",
+  "dependencies": ["./requirements.txt"],
+  "graphs": {
+    "render_agent": "./src/agent.py:graph"
+  },
+  "env": ".env"
+}
+```
+
+**启动API Server**
+
+```bash
+langgraph up
+# API Server启动在 http://127.0.0.1:2024
+```
+
+**前端：React完整实现**
+
+```typescript
+import { Client } from "@langchain/langgraph-sdk";
+import { useState, useEffect } from "react";
+
+function RenderAgentApp() {
+  const [client] = useState(() => new Client({ 
+    apiUrl: "http://127.0.0.1:2024" 
+  }));
+  const [threadId, setThreadId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [interrupted, setInterrupted] = useState(false);
+  const [interruptData, setInterruptData] = useState<any>(null);
+
+  useEffect(() => {
+    // 创建thread
+    client.threads.create().then(thread => {
+      setThreadId(thread.thread_id);
+    });
+  }, [client]);
+
+  const startAgent = async () => {
+    if (!threadId) return;
+
+    // 创建run（开始执行）
+    const run = await client.runs.create(
+      threadId,
+      "render_agent",
+      { input: { messages: [{ role: "user", content: "渲染地图" }] } }
+    );
+
+    // ⭐ SSE监听（LLM输出 + interrupt事件）
+    const stream = client.runs.stream(threadId, run.run_id);
+    
+    for await (const chunk of stream) {
+      console.log("SSE chunk:", chunk);
+      
+      // 检查是否是interrupt
+      if (chunk.event === "interrupt" || chunk.data?.__interrupt__) {
+        setInterrupted(true);
+        setInterruptData(chunk.data?.__interrupt__?.[0] || chunk.data);
+        break;  // 暂停，等待用户输入
+      }
+      
+      // 正常LLM输出
+      if (chunk.data?.messages) {
+        setMessages(prev => [...prev, ...chunk.data.messages]);
+      }
+    }
+  };
+
+  const handleResume = async (viewportData: any) => {
+    if (!threadId) return;
+
+    setInterrupted(false);
+    setInterruptData(null);
+
+    // ⭐ HTTP POST resume（恢复执行）
+    const resumeRun = await client.runs.create(
+      threadId,
+      "render_agent",
+      {
+        command: { resume: viewportData }  // ⭐ 关键：发送resume数据
+      }
+    );
+
+    // ⭐ SSE继续监听后续输出
+    const stream = client.runs.stream(threadId, resumeRun.run_id);
+    
+    for await (const chunk of stream) {
+      if (chunk.event === "interrupt") {
+        // 可能还有更多interrupt
+        setInterrupted(true);
+        setInterruptData(chunk.data);
+        break;
+      }
+      
+      if (chunk.data?.messages) {
+        setMessages(prev => [...prev, ...chunk.data.messages]);
+      }
+    }
+  };
+
+  return (
+    <div>
+      <button onClick={startAgent}>开始渲染</button>
+      
+      <div>
+        {messages.map(msg => (
+          <div key={msg.id}>{msg.content}</div>
+        ))}
+      </div>
+      
+      {/* ⭐ Interrupt对话框 */}
+      {interrupted && interruptData?.kind === "request_viewport" && (
+        <ViewportDialog onSubmit={handleResume} />
+      )}
+      
+      {/* ⭐ 校验失败对话框 */}
+      {interrupted && interruptData?.kind === "validation_error" && (
+        <ValidationErrorDialog 
+          error={interruptData.error}
+          expectedFormat={interruptData.expected_format}
+          onSubmit={handleResume}
+        />
+      )}
+    </div>
+  );
+}
+
+// Viewport输入对话框
+function ViewportDialog({ onSubmit }) {
+  const [lat, setLat] = useState(30.5);
+  const [lon, setLon] = useState(120.3);
+  const [zoom, setZoom] = useState(10);
+
+  return (
+    <div className="modal">
+      <h3>Agent需要viewport数据</h3>
+      <input value={lat} onChange={e => setLat(parseFloat(e.target.value))} />
+      <input value={lon} onChange={e => setLon(parseFloat(e.target.value))} />
+      <input value={zoom} onChange={e => setZoom(parseInt(e.target.value))} />
+      
+      <button onClick={() => onSubmit({ lat, lon, zoom })}>
+        提交并继续
+      </button>
+    </div>
+  );
+}
+```
+
+### 10.5 Resume的进阶用法
+
+**1. 多次interrupt循环**
+
+```python
+def approval_node(state):
+    """循环审批直到输入合法"""
+    
+    while True:
+        decision_raw = interrupt({
+            "question": "请批准以下操作",
+            "action": state["action_details"]
+        })
+        
+        try:
+            decision = ApprovalDecision.model_validate(decision_raw)
+            break
+        except:
+            # 校验失败，自动再次interrupt
+            continue
+    
+    # 使用合法的decision继续执行
+    if decision.approved:
+        return Command(goto="execute")
+    else:
+        return Command(goto="cancel")
+```
+
+前端会收到多次interrupt事件，每次都展示UI，直到输入合法。
+
+**2. 并行interrupt处理**
+
+```python
+def parallel_requests(state):
+    """同时请求多个前端数据"""
+    
+    # 并行节点各自interrupt
+    answer_a = interrupt("question_a")
+    answer_b = interrupt("question_b")
+    
+    return {"results": [f"a:{answer_a}", f"b:{answer_b}"]}
+```
+
+前端收到 `__interrupt__: [{id: "...", value: "question_a"}, {id: "...", value: "question_b"}]`
+
+Resume时需要提供map：
+```typescript
+await client.runs.create(threadId, "agent", {
+  command: {
+    resume: {
+      "interrupt-id-a": "answer for question_a",
+      "interrupt-id-b": "answer for question_b"
+    }
+  }
+});
+```
+
+**3. Interrupt中携带复杂payload**
+
+```python
+def complex_request(state):
+    """发送复杂的数据请求"""
+    
+    data = interrupt({
+        "kind": "multi_field_request",
+        "fields": {
+            "viewport": {"lat": float, "lon": float, "zoom": int},
+            "layers": {"roads": bool, "buildings": bool},
+            "style": {"color_scheme": str, "opacity": float}
+        },
+        "context": {
+            "reason": "需要这些数据来渲染地图",
+            "current_state": state["progress"]
+        }
+    })
+    
+    # data包含前端提供的所有字段
+    viewport = data["viewport"]
+    layers = data["layers"]
+    
+    return {"render_config": {...}}
+```
+
+前端展示复杂表单，收集所有字段后一次性resume。
+
+### 10.6 LangGraph Platform API Endpoints
+
+**核心API**（默认端口2024）：
+
+| Endpoint | Method | 作用 |
+|----------|--------|------|
+| `/threads` | POST | 创建thread（会话） |
+| `/threads/{thread_id}` | GET | 查询thread状态 |
+| `/threads/{thread_id}/runs` | POST | 创建run / resume执行 |
+| `/threads/{thread_id}/runs/{run_id}/stream` | GET (SSE) | ⭐ 流式监听（LLM输出 + interrupt） |
+| `/threads/{thread_id}/runs/{run_id}` | GET | 查询run状态 |
+| `/assistants` | GET | 列出所有assistants（graph） |
+
+**Resume的关键**：
+
+- `POST /threads/{thread_id}/runs` 时传递 `command: {resume: data}`
+- SSE会推送 interrupt 事件（`event: interrupt`）
+- 前端监听SSE，收到interrupt后展示UI，然后POST resume
+
+### 10.7 与第4章interrupt的区别
+
+第4章讲的是**本地Python环境**中的interrupt用法：
+
+```python
+# 本地调用
+stream = graph.stream_events(input, config)
+if stream.interrupted:
+    decision = get_user_input(stream.interrupts[0])  # 本地函数
+    graph.invoke(Command(resume=decision), config)
+```
+
+第10章讲的是**前后端分离**场景：
+
+```typescript
+// 前端通过LangGraph Platform
+const stream = client.runs.stream(threadId, runId);
+if (chunk.event === "interrupt") {
+    const decision = await showUIDialog(chunk.data);  // 前端UI
+    client.runs.create(threadId, "agent", {
+        command: { resume: decision }  // HTTP POST
+    });
+}
+```
+
+**区别**：
+
+| 维度 | 本地调用 | LangGraph Platform |
+|------|---------|-------------------|
+| **通信方式** | Python函数调用 | HTTP API + SSE |
+| **interrupt通知** | `stream.interrupts` | SSE event: `interrupt` |
+| **resume数据** | `Command(resume=...)` 参数 | HTTP POST body |
+| **前端交互** | Python `input()` | React/Vue UI组件 |
+| **适用场景** | 本地测试、CLI工具 | 生产环境、Web应用 |
+
+### 10.8 实际应用场景
+
+**1. 智能地图渲染Agent**
+
+```python
+def render_agent(state):
+    # Agent分析用户需求
+    analysis = llm.invoke(state["messages"])
+    
+    # ⭐ 请求前端地图状态
+    viewport = interrupt({
+        "kind": "request_viewport",
+        "reason": "需要知道当前地图位置才能智能渲染"
+    })
+    
+    # 根据viewport智能调整渲染策略
+    if viewport["zoom"] > 15:
+        # 高zoom：渲染详细建筑
+        return {"render_command": "render_buildings_detail"}
+    else:
+        # 低zoom：渲染区域概览
+        return {"render_command": "render_region_overview"}
+```
+
+前端：Agent主动请求当前地图状态 → 用户确认 → Agent智能渲染
+
+**2. 数据查询审批Agent**
+
+```python
+def query_approval_agent(state):
+    # Agent生成SQL查询
+    sql = llm.invoke(f"生成SQL: {state['user_request']}")
+    
+    # ⭐ 请求人工审批
+    approved = interrupt({
+        "kind": "approval",
+        "sql": sql,
+        "risk_level": "high",
+        "question": "此SQL可能修改数据，是否批准执行？"
+    })
+    
+    if approved:
+        # 执行SQL
+        result = database.execute(sql)
+        return {"result": result}
+    else:
+        return {"messages": ["查询被拒绝"]}
+```
+
+前端：Agent生成SQL → 展示审批对话框 → 用户批准/拒绝 → Agent执行或取消
+
+**3. 多轮数据补充Agent**
+
+```python
+def data_collection_agent(state):
+    collected_data = {}
+    
+    # ⭐ 多次interrupt收集不同字段
+    collected_data["user_id"] = interrupt("请提供用户ID")
+    collected_data["time_range"] = interrupt("请提供时间范围")
+    collected_data["metrics"] = interrupt("请选择要分析的指标")
+    
+    # 使用所有数据生成报告
+    report = analytics.generate_report(collected_data)
+    return {"report": report}
+```
+
+前端：Agent逐步请求数据 → 用户分步填写 → Agent最终生成报告
+
+**4. 交互式代码生成Agent**
+
+```python
+def code_gen_agent(state):
+    # 生成初始代码
+    code = llm.invoke(state["requirement"])
+    
+    # ⭐ 请求用户编辑
+    edited_code = interrupt({
+        "kind": "code_edit",
+        "initial_code": code,
+        "instruction": "请检查并修改生成的代码"
+    })
+    
+    # 使用编辑后的代码
+    return {"final_code": edited_code}
+```
+
+前端：Agent生成代码 → 展示代码编辑器 → 用户修改 → Agent使用修改后的代码
+
+### 10.9 与传统前后端通信的区别
+
+**传统方式**（前端推送所有数据）：
+
+```typescript
+// 前端主动推送
+await fetch("/api/render", {
+  method: "POST",
+  body: JSON.stringify({
+    viewport: getCurrentViewport(),
+    layers: getVisibleLayers(),
+    style: getStyleConfig(),
+    // 所有数据都推送，不管Agent是否需要
+  })
+});
+```
+
+**LangGraph Platform方式**（Agent主动请求）：
+
+```typescript
+// Agent决定何时需要数据
+const stream = client.runs.stream(...);
+
+for await (const chunk of stream) {
+  if (chunk.event === "interrupt") {
+    // ⭐ Agent说"我现在需要viewport"
+    const viewport = getCurrentViewport();
+    
+    await client.runs.create(threadId, "agent", {
+      command: { resume: { viewport } }  // 按需提供
+    });
+  }
+}
+```
+
+**核心优势**：
+
+| 传统方式 | LangGraph Platform |
+|---------|-------------------|
+| 前端推送所有数据 | Agent按需请求 |
+| 数据可能过期/无效 | 数据实时获取 |
+| 前端逻辑复杂 | 前端只响应interrupt |
+| 无法处理缺失数据 | Agent自动请求缺失项 |
+| 单向数据流 | 双向交互循环 |
+
+### 10.10 快速启动指南
+
+**1. 本地开发**
+
+```bash
+# 安装CLI
+pip install "langgraph-cli[inmem]"
+
+# 创建项目
+langgraph new my-agent --template new-langgraph-project-python
+
+# 编写graph（添加interrupt）
+# src/agent.py
+
+# 配置langgraph.json
+
+# 启动API Server
+cd my-agent
+langgraph up
+
+# API Server启动在 http://127.0.0.1:2024
+# Studio UI: https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:2024
+```
+
+**2. 前端集成**
+
+```bash
+# 安装SDK
+npm install @langchain/langgraph-sdk
+
+# 使用Client
+const client = new Client({ apiUrl: "http://127.0.0.1:2024" });
+
+# 监听SSE
+const stream = client.runs.stream(threadId, runId);
+
+# 处理interrupt
+if (chunk.event === "interrupt") {
+  await client.runs.create(threadId, "agent", {
+    command: { resume: userInput }
+  });
+}
+```
+
+**3. 生产部署**
+
+```bash
+# 部署到LangSmith Cloud
+langgraph deploy
+
+# 或自托管（Docker）
+langgraph up --docker
+```
+
+### 10.11 参考链接
+
+- LangGraph Platform Overview: https://docs.langchain.com/oss/python/langgraph/local-server
+- LangGraph JavaScript SDK: https://reference.langchain.com/javascript/langchain-langgraph-sdk
+- LangGraph Python SDK: https://docs.langchain.com/langsmith/langgraph-python-sdk
+- API Reference: https://docs.langchain.com/langsmith/server-api-ref
+- Frontend Integration Example: https://github.com/langchain-ai/langgraph/tree/main/examples/frontend_integration
 
 
