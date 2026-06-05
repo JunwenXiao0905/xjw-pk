@@ -386,12 +386,16 @@
       <ul class="skills-list">
         <li>
           <div class="skill-category">Harness Engineering</div>
-          <div class="skill-detail">基于 <strong>LangGraph</strong> 构建具备可观测、评估与成本控制能力的生产级 Agent，通过 <strong>AI Action 协议</strong> 实现 Agent 对 Cesium 地图的实时操控，了解多层记忆系统（Working Memory + Semantic Memory）设计。了解 <strong>Mastra</strong> 与 <strong>Hermes Agent</strong> 的架构方案。
+          <div class="skill-detail">基于 LangGraph 构建具备<strong>可观测、评估与成本控制</strong>能力的生产级 Agent，通过 AI Action
+            协议实现<strong> Agent 操控 Cesium 地图</strong>，了解多层记忆系统<strong>（Working Memory + Semantic Memory）</strong>设计，了解
+            <strong>Mastra</strong> 与 <strong>Hermes Agent</strong> 的架构方案。
           </div>
         </li>
         <li>
           <div class="skill-category">Vibe Coding</div>
-          <div class="skill-detail">持续将 <strong>Claude Code / Codex</strong> 引入真实研发流程，围绕需求拆解、规范沉淀、代码生成、评审与验证构建可复用工作流；在团队内推动 <strong>OpenSpec（Proposal → Spec → Tasks）</strong> 实践，沉淀专属 Skill，并输出 AI 编码教程内容，系列公众号阅读量 <strong>2000+</strong>。
+          <div class="skill-detail">持续将 <strong>Claude Code / Codex</strong>
+            引入真实研发流程，围绕需求拆解、规范沉淀、代码生成、评审构建可复用工作流；在团队内推动 <strong>SDD</strong> 实践，沉淀专属
+            SKILL与Workflow，并输出 AI 编码教程内容，系列公众号阅读量 <strong>2000+</strong>。
           </div>
         </li>
         <li>
@@ -402,13 +406,14 @@
         </li>
         <li>
           <div class="skill-category">GIS 与 三维</div>
-          <div class="skill-detail">熟练构建基于 <strong>CesiumJS / MapLibre / Deck.gl</strong> 的二维三维一体化可视化应用；熟悉
-            <strong>GeoServer / PostGIS</strong> 与 OGC 标准，能够处理空间数据接入、服务发布与前端渲染联动。
+          <div class="skill-detail">熟练构建基于 <strong>CesiumJS / MapLibre / Deck.gl</strong> 的二维三维可视化应用；熟悉
+            <strong>PostGIS 与 OGC 标准</strong>，能够处理空间数据接入、服务发布与前端渲染联动。
           </div>
         </li>
         <li>
           <div class="skill-category">全栈交付</div>
-          <div class="skill-detail">熟悉多服务全栈架构：<strong>Next.js</strong> 承担前端与 BFF 层，<strong>Python / FastAPI</strong> 承载 AI Agent 运行时，通过 RESTful API 与 OpenAPI 规范打通前后端与 Agent 服务。</div>
+          <div class="skill-detail">熟悉多服务全栈架构：<strong>Next.js</strong> 承担前端与 BFF 层，<strong>Python / FastAPI</strong> 承载
+            AI Agent 运行时，通过 RESTful API 与 OpenAPI 规范打通前后端与 Agent 服务。</div>
         </li>
       </ul>
     </section>
@@ -425,11 +430,11 @@
       </div>
       <div class="item-desc">负责三维可视化平台的前端开发、GIS 能力建设与部分架构设计，参与需求分析、方案落地与项目交付。</div>
       <ul class="bullets">
-        <li><strong>WebGIS 核心研发与性能攻坚：</strong>参与视觉导航验证平台开发，基于 React + Cesium 构建高性能三维可视化底座。通过<span
+        <li><strong>WebGIS 核心研发与性能攻坚：</strong>参与视觉导航、智慧机场、农险等项目开发，基于 React + Cesium/MapLibre 构建高性能二/三维可视化底座。通过<span
             class="highlight">LOD层级优化与瓦片缓存策略</span>，实现 <span class="highlight">TB级</span> 数据秒级加载，支撑 <span
             class="highlight">10万+</span> 动态轨迹点实时渲染。</li>
-        <li><strong>AI 工程化体系建设：</strong>在团队内部引入 AI 辅助开发流程，基于 <strong>OpenSpec（Proposal → Spec →
-            Tasks）</strong>规范需求拆解，结合大模型（Claude）显著提升代码生成与迭代效率。</li>
+        <li><strong>AI 开发体系建设：</strong>在团队内部引入 AI 辅助开发流程，基于 <strong>OpenSpec</strong>规范需求拆解，CLAUDE.md分层管理。显著提升项目开发效率。
+        </li>
       </ul>
     </section>
 
@@ -450,8 +455,11 @@
         </div>
         <ul class="bullets">
           <li><strong>项目背景：</strong>传统 GIS 平台操作门槛高，空间数据分析依赖专业软件与编程能力，缺乏自然语言驱动的交互方式。</li>
-          <li><strong>Agent 运行时：</strong>基于 <strong>FastAPI + LangGraph</strong> 搭建 Agent 三层架构（Agent 决策 → Tool 执行 → Emit 推送），实现 LLM 对地图操作的自主规划与执行。</li>
-          <li><strong>AI Action 协议：</strong>定义 <span class="highlight">load_dataset / buffer_analysis / poi_search / route_layer</span> 等 8+ Action 类型，统一后端决策到前端 Cesium 渲染的调用规范；集成高德地图 API（地理编码、POI 搜索、路径规划）与 Shapely 缓冲区分析。</li>
+          <li><strong>Agent 运行时：</strong>基于 <strong>FastAPI + LangGraph</strong> 搭建 Agent 三层架构（Agent 决策 → Tool 执行 → Emit
+            推送），实现 LLM 对地图操作的自主规划与执行。</li>
+          <li><strong>AI Action 协议：</strong>定义 <span class="highlight">load_dataset / buffer_analysis / poi_search /
+              route_layer</span> 等 8+ Action 类型，统一后端决策到前端 Cesium 渲染的调用规范；集成高德地图 API（地理编码、POI 搜索、路径规划）与 Shapely 缓冲区分析。
+          </li>
           <li><strong>实时推送架构：</strong>基于 SSE 实现 Agent 事件流式推送到前端，前端通过 CesiumBridge 统一执行渲染，用户操作实时反馈。</li>
           <li><strong>项目成果：</strong>建成对话驱动的 WebGIS 分析平台，用户可通过自然语言完成数据加载、缓冲区分析、POI 查询等 GIS 操作，无需编程即可使用完整 GIS 能力。</li>
         </ul>
