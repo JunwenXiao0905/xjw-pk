@@ -1,42 +1,51 @@
 ---
 name: knowledge-note-writer
-description: Add or revise knowledge points inside an existing personal knowledge-base note. Use when the user says a concept, syntax point, API detail, framework behavior, engineering rule, GIS workflow, frontend mechanism, example, or pitfall should be added to a document and Codex must place it in the correct section, keep headings retrieval-friendly, and write concise reference-style content instead of tutorial filler or chatty prose.
+description: 在现有的个人知识库笔记中添加或修订知识点，或在学习新主题时从零或逐步构建结构化的参考笔记。当用户提到某个概念、语法点、API 细节、框架行为、工程规则、GIS 工作流、前端机制、示例或坑点需要写入笔记时使用。必须将其放入正确的章节，保持标题便于检索，并编写简洁的参考风格内容，而非教程填充或聊天式散文。
 ---
 
-# Knowledge Note Writer
+# 知识笔记书写器
 
-Use this skill for personal knowledge-base notes that are meant for later lookup.
+此技能用于个人知识库笔记，这类笔记旨在供日后查阅。
 
-## Primary Goal
+## 主要目标
 
-When the user says a knowledge point should be added:
+此技能支持两种工作模式：
 
-1. Find the most appropriate existing section.
-2. Insert the content there directly.
-3. Keep the note compact, searchable, and structurally stable.
+**模式 A — 插入**（笔记已存在时）：当用户表示需要添加某个知识点时：
 
-Do not default to appending at the end of the document.
+1. 找到最合适的现有章节。
+2. 将内容直接插入其中。
+3. 保持笔记紧凑、可搜索且结构稳定。
 
-## Writing Target
+不要默认将内容追加到文档末尾。
 
-Treat the document as:
+**模式 B — 积累**（学习新主题时）：当用户正在学习新主题并需要从零或逐步构建笔记时：
 
-- a personal reference note,
-- a lookup-oriented knowledge base,
-- a long-term accumulation file.
+1. 如果笔记还不存在，按照"笔记的结构模式"创建骨架。
+2. 每学到一个知识点，按照"单个知识点的展开格式"写入。
+3. 随学习深入，逐步将知识点从用法深化到机制和工程实践。
 
-Do not treat it as:
+## 书写目标
 
-- a beginner-facing textbook chapter,
-- a lecture transcript,
-- a chat-style explanation,
-- or a motivational tutorial article.
+将文档视为：
 
-## Heading Rule
+- 个人参考笔记，
+- 面向查阅的知识库，
+- 长期积累的文件，
+- 学习积累型笔记。
 
-Headings must be retrieval-oriented.
+不要将其视为：
 
-Prefer:
+- 面向初学者的教科书章节，
+- 讲座笔录，
+- 聊天式讲解，
+- 或励志教程文章。
+
+## 标题规则
+
+标题必须以检索为导向。
+
+推荐：
 
 - `位置参数与关键字参数`
 - `列表解包`
@@ -46,152 +55,228 @@ Prefer:
 - `PostGIS SRID`
 - `model_dump()`
 
-Avoid:
+避免：
 
 - `Python 是什么`
 - `理解 React 的核心思想`
 - `初识地图投影`
 - `从案例看列表展开`
 
-## Placement Rule
+## 放置规则
 
-Classify the new knowledge point before writing. Common categories include:
+分类不靠自创，而是参考编程书籍的目录结构来决定。
 
-- language syntax,
-- framework behavior,
-- runtime mechanism,
-- API usage,
-- data model,
-- frontend interaction,
-- GIS data / projection / coordinate system,
-- database / storage,
-- engineering practice,
-- debugging or pitfall notes.
+一本好书的章节划分是经过推敲的——你的笔记结构应该向它看齐，而不是凭想象自创一套分类。例如学 Python 就以 Python 教程的目录为纲，学 Zod 就以 Zod 文档的章节结构为参考。
 
-Insert the new content into the nearest correct category.
+具体做法：
 
-If no suitable section exists:
+1. 先确定该主题在成熟书籍或官方文档中的常见章节划分。
+2. 将知识点归入笔记中最接近的章节。
+3. 如果多个章节都可能涵盖该知识点，选最直接相关的那一个，不要重复放。
 
-1. Add a new section only if it clearly fits the note's long-term structure.
-2. Use a concise, index-like heading.
+如果没有合适的章节：
 
-## Content Rule
+1. 仅当该内容明确适合笔记的长期结构时，才添加新章节。
+2. 使用简洁、类似索引的标题。
 
-Write for fast lookup. Keep only high-value information:
+## 内容规则
 
-1. the concrete point that needs to be remembered;
-2. the minimum code, syntax, API shape, data shape, or rule;
-3. the key mechanism, condition, or constraint when it matters;
-4. the pitfall or boundary when it is easy to get wrong.
+为快速查阅而写。只保留高价值信息：
 
-Do not add broad introductions unless they are necessary for retrieval.
+1. 需要记住的具体知识点；
+2. 最少的代码、语法、API 形式、数据形式或规则；
+3. 关键机制、条件或约束（当它重要时）；
+4. 坑点或边界情况（当容易出错时）。
 
-Do not force every section into the same template. Explain enough to make the point understandable on later lookup.
+除非检索需要，否则不要添加宽泛的介绍。
 
-## Explanation Rule
+不要强制每个章节使用相同的模板。要确保在日后查阅时，解释足以让知识点可理解。
 
-Prefer explanation that is anchored to the actual mechanism in the domain.
+## 解释规则
 
-For Python, prefer:
+倾向于基于领域实际机制的解释。
 
-- inheritance
-- method lookup
+对于 Python，倾向于：
+
+- 继承
+- 方法查找
 - `__init__`
 - `**data`
-- class creation
-- instance method binding
+- 类创建
+- 实例方法绑定
 
-For frontend, prefer:
+对于前端，倾向于：
 
-- render timing
-- event flow
-- state update timing
-- prop flow
-- effect execution conditions
-- DOM / browser behavior when relevant
+- 渲染时机
+- 事件流
+- 状态更新时机
+- 属性传递
+- effect 执行条件
+- 相关 DOM / 浏览器行为
 
-For GIS, prefer:
+对于 GIS，倾向于：
 
-- coordinate system
-- projection
-- geometry type
-- spatial reference
-- data format constraints
-- analysis workflow steps
+- 坐标系
+- 投影
+- 几何类型
+- 空间参考
+- 数据格式约束
+- 分析工作流步骤
 
-For engineering practice, prefer:
+对于工程实践，倾向于：
 
-- process order
-- source of truth
-- build / runtime boundary
-- environment variable loading point
-- interface contract
+- 流程顺序
+- 真相来源
+- 构建 / 运行时边界
+- 环境变量加载点
+- 接口契约
 
-Do not hide the mechanism behind empty phrases such as:
+不要用空泛的措辞掩盖机制，例如：
 
-- "the framework handles it"
-- "the library takes over"
-- "the parent provides the logic"
-- "the map engine processes it automatically"
+- "框架会自动处理"
+- "库会接管"
+- "父组件提供逻辑"
+- "地图引擎会自动处理"
 
-If such a phrase is used, immediately follow it with the concrete mechanism that makes it true.
+如果使用了这类措辞，必须立即说明让它成立的具体机制。
 
-When introducing a new internal term such as `metaclass`, `schema`, `effect`, `SRID`, or `projection`, define it in relation to already-known concepts. If the term is not needed for the current level of understanding, defer it.
+在引入新的内部术语（如 `metaclass`、`schema`、`effect`、`SRID` 或 `projection`）时，要基于已知概念来定义它。如果当前理解层次不需要该术语，则推迟介绍。
 
-## Method Rule
+## 方法规则
 
-When documenting a method, hook, API, or inherited behavior:
+在记录方法、钩子、API 或继承行为时：
 
-1. Say where it comes from.
-2. Show how the call or behavior is reached.
-3. Show the equivalent direct shape when useful.
-4. Explain what receives the input and what happens next.
+1. 说明它来自哪里。
+2. 展示如何到达该调用或行为。
+3. 在有用时展示等效的直接形式。
+4. 解释什么接收了输入以及接下来发生了什么。
 
-For example:
+例如：
 
-- parent method resolution in Python,
-- hook execution conditions in React,
-- coordinate conversion requirements in GIS,
-- request / response shape in API notes.
+- Python 中的父方法解析，
+- React 中的钩子执行条件，
+- GIS 中的坐标转换要求，
+- API 笔记中的请求 / 响应形式。
 
-## Style Rule
+## 风格规则
 
-Use:
+使用：
 
-- concise prose;
-- direct statements;
-- small examples;
-- terminology-first writing;
-- explanation that stays close to the code, data, or mechanism.
+- 简洁的散文；
+- 直接的陈述；
+- 小例子；
+- 术语优先的写作方式；
+- 贴近代码、数据或机制的解释。
 
-Avoid:
+避免：
 
-- abstract metaphors;
-- analogies that do not map directly to code or data;
-- anthropomorphic language for libraries, frameworks, or methods;
-- long narrative descriptions of runtime behavior when a short mechanism-focused explanation will do.
+- 抽象比喻；
+- 不能直接映射到代码或数据的类比；
+- 将库、框架或方法拟人化的语言；
+- 冗长的运行时行为叙述（当简短的机制导向解释就足够时）。
 
-When possible, explain behavior with:
+在可能的情况下，用以下方式解释行为：
 
-- the relevant code;
-- the relevant data shape;
-- the actual mechanism that executes it;
-- a short direct statement tied to the code or data.
+- 相关代码；
+- 相关数据形式；
+- 实际执行它的机制；
+- 与代码或数据相关的简短直接陈述。
 
-## Structural Rule
+## 结构规则
 
-Use textbook-like organization only at the directory level, not at the prose level.
+仅在目录级别采用教科书式的组织方式，而非在散文级别。
 
-That means:
+也就是说：
 
-- categories may resemble a good technical book;
-- section bodies should behave like a compact reference manual.
+- 分类可以像一本好的技术书；
+- 章节正文应像紧凑的参考手册。
 
-## Output Expectation
 
-When editing:
+### 编号体系
 
-1. choose the correct insertion point;
-2. write the new content in concise reference style;
-3. preserve heading consistency;
-4. optimize for future retrieval.
+采用中文编程教材通用的编号体系：
+
+- 章级：`# 第1章 XXX`
+- 节级：`## 1.1 XXX`
+- 小节级：`### 1.1.1 XXX`
+- 三级截止，不使用 `1.1.1.1`
+
+例如：
+
+```
+# 第1章 Python 基础
+
+## 1.1 变量与类型
+
+### 1.1.1 数字类型
+
+### 1.1.2 字符串
+
+## 1.2 控制流
+```
+
+### 目录格式
+
+每篇笔记开头应包含一个 Obsidian 格式的目录，方便快速导航。
+
+在 `# 第1章 ...` 之前，先写 `## 目录`，用 `[[#标题|显示名]]` 列出所有章、节：
+
+```
+## 目录
+
+- [[#第1章 运行与入口]]
+  - [[#1.1 交互模式与脚本执行]]
+  - [[#1.2 python -m]]
+- [[#第2章 参数与调用]]
+  - [[#2.1 位置参数与关键字参数]]
+```
+
+章级用一级缩进，节级用二级缩进。目录只列到节级（`1.1`），不列到小节级（`1.1.1`）。
+
+### 全文骨架
+
+笔记整体按四层递进组织，每章按需落点：
+
+| 层级      | 内容                |
+| ------- | ----------------- |
+| L1 总览   | 主题全貌、解决什么问题、依赖关系图 |
+| L2 逐项详解 | 每个概念/组件逐一展开：用法、代码 |
+| L3 机制拆解 | 内部原理、执行流程、源码链路    |
+| L4 工程实践 | 最佳实践、常见坑点/反模式     |
+
+
+### 单个知识点的展开格式
+
+每个知识点按如下模式展开（不强制走满，取决于当前学习深度）：
+
+```
+1. 典型用法（代码示例）
+2. 执行流程（文字或 ASCII 图）
+3. 关键机制 / 源码位置
+4. 坑点或边界情况
+```
+
+例如：
+
+```python
+# 1. 用法
+Depends(get_note_service)
+
+# 2. 流程
+# 请求进入 → 读取 Depends → 调用依赖函数 → 注入返回值
+
+# 3. 机制
+# analyze_param() → get_dependant() → solve_dependencies()
+
+# 4. 坑点
+# 业务数据参数（note_id、skip）不该走 Depends
+```
+
+## 输出预期
+
+编辑时：
+
+1. 选择正确的插入点；
+2. 以简洁的参考风格编写新内容；
+3. 保持标题一致性；
+4. 为未来检索做优化。
