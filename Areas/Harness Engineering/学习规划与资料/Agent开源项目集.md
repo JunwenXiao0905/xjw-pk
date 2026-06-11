@@ -51,18 +51,18 @@
 
 构建 Agent 所需的运行时、编排、工具调用等基础设施。
 
-| 项目          | 定位                                   | 技术栈         | Stars     | 首次 release | Releases | 备注                             |
-| ----------- | ------------------------------------ | ----------- | --------- | ---------- | -------- | ------------------------------ |
-| LangGraph   | 有状态、可恢复、可人工介入的 agent orchestration   | Python / JS | 33,966 ⭐  | 2024-06    | 544      | 见"深入学习"章节                      |
-| Mastra      | TS 生态现代 Agent / AI app framework     | TypeScript  | 24,798 ⭐  | 2025-04    | 94       | 见"深入学习"章节                      |
-| PydanticAI  | 强类型、结构化输出、评测和观测友好                    | Python      | 17,539 ⭐  | 2024-10    | 267      | 工程感强，适合做稳一点的项目                 |
-| smolagents  | 最小化 agent library，突出 loop 和 tool use | Python      | 27,720 ⭐  | 2024-12    | 36       | HuggingFace 出品，适合看最小 agent 怎么跑 |
-| LlamaIndex  | 数据接入、检索、知识工作流                        | Python / TS | 49,932 ⭐  | 2023-01    | 431      | 最老牌，RAG 生态强，适合知识类项目            |
-| AutoGen     | 经典多 Agent 协作框架，微软出品                  | Python      | 58,714 ⭐  | 2023-09    | 98       | 历史影响大，当前不建议重投入                 |
-| CrewAI      | 角色分工、团队协作式多 Agent                    | Python      | 52,887 ⭐  | 2023-11    | 195      | 容易上手，但抽象较强                     |
-| DeepAgents  | batteries-included 的 agent harness   | Python      | 23,931 ⭐  | 2025-11    | 167      | LangChain 出品，适合看通用运行壳          |
-| OpenHarness | Agent harness 结构开源实现，HKU 出品          | Python       | ~13,000 ⭐ | 2026-04    | 4        | 43+ 工具，20k 行，适合看循环/权限/组件组织     |
-| Strands Agents | 模型驱动的 AI Agent SDK，AWS 出品           | Python / TS | 6,004 ⭐   | 2025-07    | 62       | 一等 MCP 支持，Amazon Q Developer 在用，极简启动 |
+| 项目             | 定位                                   | 技术栈         | Stars     | 首次 release | Releases | 备注                                   |
+| -------------- | ------------------------------------ | ----------- | --------- | ---------- | -------- | ------------------------------------ |
+| LangGraph      | 有状态、可恢复、可人工介入的 agent orchestration   | Python / JS | 33,966 ⭐  | 2024-06    | 544      | 见"深入学习"章节                            |
+| Mastra         | TS 生态现代 Agent / AI app framework     | TypeScript  | 24,798 ⭐  | 2025-04    | 94       | 见"深入学习"章节                            |
+| PydanticAI     | 强类型、结构化输出、评测和观测友好                    | Python      | 17,539 ⭐  | 2024-10    | 267      | 工程感强，适合做稳一点的项目                       |
+| smolagents     | 最小化 agent library，突出 loop 和 tool use | Python      | 27,720 ⭐  | 2024-12    | 36       | HuggingFace 出品，适合看最小 agent 怎么跑       |
+| LlamaIndex     | 数据接入、检索、知识工作流                        | Python / TS | 49,932 ⭐  | 2023-01    | 431      | 最老牌，RAG 生态强，适合知识类项目                  |
+| AutoGen        | 经典多 Agent 协作框架，微软出品                  | Python      | 58,714 ⭐  | 2023-09    | 98       | 历史影响大，当前不建议重投入                       |
+| CrewAI         | 角色分工、团队协作式多 Agent                    | Python      | 52,887 ⭐  | 2023-11    | 195      | 容易上手，但抽象较强                           |
+| DeepAgents     | batteries-included 的 agent harness   | Python      | 23,931 ⭐  | 2025-11    | 167      | LangChain 出品，适合看通用运行壳                |
+| OpenHarness    | Agent harness 结构开源实现，HKU 出品          | Python      | ~13,000 ⭐ | 2026-04    | 4        | 43+ 工具，20k 行，适合看循环/权限/组件组织           |
+| Strands Agents | 模型驱动的 AI Agent SDK，AWS 出品            | Python / TS | 6,004 ⭐   | 2025-07    | 62       | 一等 MCP 支持，Amazon Q Developer 在用，极简启动 |
 
 ### 2.5 Agent Memory（记忆系统）
 
