@@ -10,14 +10,12 @@ Zod 是一个 TypeScript-first schema 声明与验证库。核心思想：用代
 
 **TypeScript-first**：Zod 的设计优先级是"先有 TS 类型"，而不是"先有 JS 验证"。传统验证库（如 Joi）在 JS 里写校验规则，类型需要额外维护接口。Zod 反过来——写 schema，TS 类型自动从 schema 推导（`z.infer`），不用再写一遍 `interface`。schema 改则类型自动跟着改，不会不一致。
 
-**Schema**：意思是"数据结构的定义/蓝图"。来自数据库和 JSON Schema 标准。一个 Zod schema 同时干三件事：
+**Schema**：意思是"数据结构的定义/蓝图"。来自数据库和 JSON Schema 标准。
 
+一个 Zod schema 同时干三件事：
 ① 文档——一眼看出数据长什么样；
-
 ② 运行时校验——`.parse()` 检查真实数据是否符合描述；
-
 ③ 类型推导——`z.infer` 把它变成 TS 类型。
-
 
 
 **最小案例：**
