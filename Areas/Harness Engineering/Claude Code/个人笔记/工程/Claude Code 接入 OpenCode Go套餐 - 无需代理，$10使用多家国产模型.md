@@ -1,3 +1,9 @@
+---
+theme: default
+themeName: "默认主题"
+title: "Claude Code 接入 OpenCode Go套餐 - 无需代理，$10使用多家国产模型"
+---
+
 # Claude Code 接入 OpenCode Go 套餐- 无需代理，$10使用多家国产模型
 
 > OpenCode Go 是一项低成本的订阅服务 —— **首月 5 美元**，之后 **每月 10 美元** —— 能够稳定地访问流行的开源编程模型。
@@ -32,7 +38,7 @@ oc-go-cc 拦截 Anthropic Messages API 请求，转换为 OpenAI Chat Completion
 
 ## 1.2 二进制安装与 PATH 配置
 
-从 [samueltuyizere/oc-go-cc](https://github.com/samueltuyizere/oc-go-cc) releases 下载 `oc-go-cc_windows-amd64.exe`，放入 PATH 目录（如 `D:\xxxx\nodejs\node_global\`）。
+从 h t t p s : //github.com/samueltuyizere/oc-go-cc 下载 `oc-go-cc_windows-amd64.exe`，放入 PATH 目录（如 `D:\xxxx\nodejs\node_global\`）。
 
 oc-go-cc 是 CLI 工具，依赖终端参数（如 `serve`、`init`）运行，双击无窗口会直接退出。放入 PATH 后可在任意目录直接执行命令，无需写完整路径。
 
@@ -119,13 +125,20 @@ Qwen 系列流式请求间歇性 500，MiniMax 在含 tools 时返回 `function 
 
 ```json
 {
-  "name": "oc-go-cc",
-  "ANTHROPIC_BASE_URL": "http://127.0.0.1:3456",
-  "ANTHROPIC_AUTH_TOKEN": "unused",
-  "ANTHROPIC_MODEL": "kimi-k2.6",
-  "ANTHROPIC_DEFAULT_SONNET_MODEL": "qwen3.7-plus",
-  "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-5",
-  "ANTHROPIC_DEFAULT_HAIKU_MODEL": "deepseek-v4-flash"
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "sk-",
+    "ANTHROPIC_BASE_URL": "https://opencode.ai/zen/go",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL_NAME": "deepseek-v4-pro",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "deepseek-v4-pro",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL_NAME": "glm-5",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-5",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL_NAME": "deepseek-v4-flash",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "deepseek-v4-flash",
+    "ANTHROPIC_MODEL": "deepseek-v4-flash",
+    "ENABLE_TOOL_SEARCH": "true"
+  },
+  "skipDangerousModePermissionPrompt": true,
+  "includeCoAuthoredBy": false
 }
 ```
 
