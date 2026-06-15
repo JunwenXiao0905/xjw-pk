@@ -251,12 +251,10 @@ http.get('http://127.0.0.1:9222/json/list', (res) => {
     const wsUrl = page.webSocketDebuggerUrl;
     const id = wsUrl.match(/page\/([^\/]+)/)[1];
     
-    // 通过 HTTP API 获取页面内容
+    // /json/activate 只是把目标标签页前置到前台，本身不读取内容
     http.get('http://127.0.0.1:9222/json/activate/' + id, () => {});
-    
-    // 直接读取页面 — 保存为截图或执行 JS
-    // 方式一：通过 CDP WebSocket 协议（需 ws 模块，见下文备选）
-    // 方式二：直接用 evaluate_script 的思路走 HTTP
+
+    // 真正读取页面内容必须走 CDP WebSocket（见 3.3），HTTP /json/* API 无此能力
     
     console.log('Page:', page.title);
     console.log('URL:', page.url);
@@ -271,14 +269,16 @@ http.get('http://127.0.0.1:9222/json/list', (res) => {
 ```bash
 # 如果系统中已安装 ws 模块
 node -e "
+const http = require('http');
 const WebSocket = require('ws');
-const PAGE_URL = 'http://127.0.0.1:9222/json/list';
+const PAGE_INDEX = 0;  // ← 替换为目标页面的索引号
 
-http.get(PAGE_URL, (res) => {
+http.get('http://127.0.0.1:9222/json/list', (res) => {
   let data = '';
   res.on('data', c => data += c);
   res.on('end', () => {
-    const page = JSON.parse(data)[0];  // 第一个页面
+    const page = JSON.parse(data)[PAGE_INDEX];
+    if (!page) { console.error('Page not found'); process.exit(1); }
     const ws = new WebSocket(page.webSocketDebuggerUrl);
     ws.on('open', () => {
       ws.send(JSON.stringify({
