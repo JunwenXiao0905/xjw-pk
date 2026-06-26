@@ -17,13 +17,10 @@ Nest 提供了一套开箱即用的应用架构，使开发者和团队能够创
   - [[#1.6 后端依赖图|1.6 后端依赖图]]
 - [[#2. 全栈架构和内容讲解|2. 全栈架构和内容讲解]]
   - [[#2.1 全栈（monorepo）结构|2.1 全栈（monorepo）结构]]
-  - [[#2.2 main.ts|2.2 main.ts]]
-  - [[#2.3 app.module.ts|2.3 app.module.ts]]
-  - [[#2.4 controller|2.4 controller]]
-  - [[#2.5 service 与 provider|2.5 service 与 provider]]
-  - [[#2.6 dto|2.6 dto]]
-  - [[#2.7 entity 与 ORM|2.7 entity 与 ORM]]
-  - [[#2.8 测试|2.8 测试]]
+  - [[#2.2 src/ 的完整工程结构（common/ 与 config/）|2.2 src/ 的完整工程结构（common/ 与 config/）]]
+  - [[#2.3 dto|2.3 dto]]
+  - [[#2.4 entity 与 ORM|2.4 entity 与 ORM]]
+  - [[#2.5 测试|2.5 测试]]
 - [[#3. 跑起第一个服务|3. 跑起第一个服务]]
   - [[#3.1 目标|3.1 目标]]
   - [[#3.2 写模块：controller + service + module|3.2 写模块：controller + service + module]]
@@ -125,25 +122,12 @@ src/notes/
 
 Nest 走 **Spring 那一套**（基本是 Spring 在 Node 上的翻版）：把后端拆成一组**有标准职责的零件（构件）**（如 Controller、Service、Module、Guard、Pipe、Interceptor 等），你只写零件的业务内容，**框架负责装配它们、按固定顺序调度**。
 
-**① 启动期（装配，跑一次）**
-
-```text
-NestFactory.create(AppModule)
-  → 扫描器从根模块沿 imports 递归，收集所有 @Module
-  → 读元数据建"模块图"
-  → 容器按依赖链把所有 provider / controller 实例化、注入
-  → 从 controller 的 @Get / @Post 生成路由表
-  → app.listen()
-```
-
-**② 请求期（运行，每个请求跑一遍）**
-
 ```text
 请求 → Middleware → Guard → Interceptor(前) → Pipe → Controller 方法 → Interceptor(后) → 响应
        （任何一步抛异常 → Exception Filter）
 ```
 
-那 Nest 是怎么装配起来的？就拿你刚 `nest g resource notes` 生成、已经挂进 `AppModule` 的 notes 模块串一遍——真实代码（对照 `D:\my-app`），一条链：
+**那 Nest 是怎么装配起来的？** 就拿刚 `nest g resource notes` 生成、已经挂进 `AppModule` 的 notes 模块串一遍真实代码：
 
 **`src/main.ts`** —— 入口，把根模块交给容器：
 
@@ -152,8 +136,10 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);   // 【装配】把 AppModule 交给容器，触发扫描 + 实例化
+  const app = await NestFactory.create(AppModule);   
+  // 【装配】把 AppModule 交给容器，触发扫描 + 实例化
   await app.listen(process.env.PORT ?? 3000);
+  // 【监听】监听 3000 端口
 }
 bootstrap();
 ```
@@ -183,7 +169,7 @@ import { NotesController } from './notes.controller';
 
 @Module({
   controllers: [NotesController],  // 【装配】要实例化的控制器
-  providers: [NotesService],       // 【装配】要造、能注入的 provider
+  providers: [NotesService],       // 【装配】能注入的 provider （框架自动实例化）
 })
 export class NotesModule {}
 ```
@@ -196,9 +182,10 @@ import { NotesService } from './notes.service';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 
-@Controller('notes')                                    // 【贴标签】控制器，前缀 /notes
+@Controller('notes')                           // 【贴标签】控制器，前缀 /notes
 export class NotesController {
-  constructor(private readonly notesService: NotesService) {}   // 【声明依赖】要 NotesService
+  constructor(private readonly notesService: NotesService) {}   
+  // 【声明依赖】要 NotesService，配合 providers: [NotesService]、@Injectable()
 
   @Post()                           // 【贴标签】POST /notes
   create(@Body() createNoteDto: CreateNoteDto) { return this.notesService.create(createNoteDto); }
@@ -223,7 +210,16 @@ export class NotesService {
 }
 ```
 
-**串起来看装配：** `main.ts` 把 `AppModule` 交给容器 → 容器沿 `imports` 扫到 `NotesModule` → 读它的 `@Module` 元数据，要实例化 `NotesController` 和 `NotesService` → 实例化 `NotesController` 时，从 `design:paramtypes` 读出构造函数要 `NotesService` → 把（单例的）`NotesService` 塞进去 → 再从 `@Controller('notes')` + `@Post()`/`@Get(':id')` 元数据把 `POST /notes`、`GET /notes/:id` 等路由注册到底层 Express。请求一来，流水线跑完，`NotesService` 的返回就是响应。
+**串起来看装配：** 
+
+```text
+从main.ts中NestFactory.create(AppModule)起
+  → 扫描器从根模块AppModule沿 imports 递归，收集所有 @Module
+  → 读元数据建"模块图"
+  → 容器按依赖链把所有 provider / controller 实例化、注入
+  → 从 controller 的 @Get / @Post 生成路由表
+  → app.listen()
+```
 
 这条链里 **装饰器贴标签 + 容器读标签装配 + 流水线处理请求**——一件没少。每个业务模块都是这条链的复制品，挂进根模块的 `imports` 即生效。
 
@@ -231,16 +227,68 @@ export class NotesService {
 
 真实代码的装配追踪见 [[#1.3 设计理念：你填业务，框架装配|1.3]]。这一节用一张大白话表，把第 1 章反复出现的核心概念一行一个钉死：
 
-| 概念 | 一句话 |
-|---|---|
-| **容器** | `@nestjs/core` 里的运行时登记簿，一个应用只有一个；按配方造实例、管单例 |
-| **模块** | `@Module` 标注的声明单元，说清“我这有哪些 controller / provider，导入谁、导出谁” |
-| **依赖** | A 干活要用到 B，B 就是 A 的依赖（写在构造函数参数里） |
-| **provider** | 登记进容器的“造 B 配方”（类 / 值 / 工厂），告诉容器“我能造 B” |
-| **DI（依赖注入）** | 别自己 `new`——容器把造好的依赖，自动塞进构造函数 |
-| **装配** | 启动时容器读元数据，按依赖链（`design:paramtypes`）把所有实例造好、注入，再生成路由表 |
-| **装饰器** | 一个 `@xxx` 函数，定义时介入类/方法/参数——本质能**包装/重写**它们（如 `@log`）；Nest 里基本只用来贴元数据 |
-| **贴标签** | 装饰器执行时往目标贴元数据；`@Module/@Controller/@Injectable/@Get/@Body` 都是在贴标签，框架据此装配 |
+| 概念           | 一句话                                                                                               |
+| ------------ | ------------------------------------------------------------------------------------------------- |
+| **容器**       | `@nestjs/core` 里的运行时登记簿，一个应用只有一个；按配方造实例、管单例                                                       |
+| **模块**       | `@Module` 标注的声明单元，说清“我这有哪些 controller / provider，导入谁、导出谁”                                         |
+| **依赖**       | A 干活要用到 B，B 就是 A 的依赖（写在构造函数参数里，如：`constructor(private readonly notesService: NotesService) {} ` ） |
+| **provider** | 登记进容器的“造 B 配方”（类 / 值 / 工厂），告诉容器“我能造 B”                                                            |
+| **DI（依赖注入）** | 别自己 `new`——容器把造好的依赖，自动塞进构造函数                                                                      |
+| **装配**       | 启动时容器读元数据，按依赖链（`design:paramtypes`）把所有实例造好、注入，再生成路由表                                              |
+| **装饰器**      | 一个 `@xxx` 函数，定义时介入类/方法/参数——本质能**包装/重写**它们（如 `@log`）；Nest 里基本只用来贴元数据                               |
+| **贴标签**      | 装饰器执行时往目标贴元数据；`@Module/@Controller/@Injectable/@Get/@Body` 都是在贴标签，框架据此装配                          |
+
+**装饰器这一层，单独说清楚**
+
+Nest 满屏的 `@Module`、`@Controller`、`@Injectable`，这套“装饰器语法”到底怎么回事？
+
+它是一套 ES 提案，但 **JS 至今不原生支持**。Nest 用的是**早期 Stage 2 那套（Legacy）**——这套提案后来被推翻重做了，JS 引擎从没实现过；是 **TypeScript 从 1.5 起**靠 `experimentalDecorators` 开关提前实现的。最新的**新提案（Stage 3）**TS 5.0+ 已支持、引擎也在实现，但它和 Legacy **不兼容**，Nest 没用它（详见第 7 章）。
+
+所以跑 Nest，tsconfig 必须开两个开关：`experimentalDecorators`（让 TS 认 `@xxx` 语法）、`emitDecoratorMetadata`（让 TS 把类型信息也编译进去）。
+
+**tsc 把装饰器编译成了什么？就是普通函数调用。** 拿真实的 `NotesController` 看，你写的是：
+
+```ts
+@Controller('notes')
+export class NotesController {
+  constructor(private readonly notesService: NotesService) {}
+}
+```
+
+tsc 编译出来是：
+
+```js
+NotesController = __decorate([
+  Controller('notes'),                                  // 你写的装饰器 → 函数调用
+  __metadata("design:paramtypes", [NotesService])       // tsc 因 emitDecoratorMetadata 自动加的，你没写
+], NotesController);
+```
+
+`__decorate` 是 TS 自带 helper，把数组里两项依次 apply 到 `NotesController` 上——**这步不需要任何库**。运行时模块加载、这行代码执行时，两项分别跑：
+
+**第一项 `Controller('notes')`** ——它的源码就两行（Nest 真实的 `@Controller`，去掉校验、简化 key 名）：
+
+```ts
+export const Controller = (prefix = '') =>
+  (target) => {
+    Reflect.defineMetadata('nest:controller', true, target);   // 贴“我是控制器”
+    Reflect.defineMetadata('nest:path', prefix, target);       // 贴前缀 /notes
+  };
+```
+
+执行时就在 `NotesController` 上贴了 `nest:controller = true`、`nest:path = 'notes'` 两条。
+
+**第二项 `__metadata(...)`** ——内部调 `Reflect.metadata`（reflect-metadata 提供），贴 `design:paramtypes = [NotesService]`。
+
+三条元数据都进了 reflect-metadata 的 WeakMap，挂在 `NotesController` 上。**没装 reflect-metadata，第二项就静默空操作**（`__metadata` 返回 undefined 被 `__decorate` 跳过），类型丢了但不报错。
+
+**容器什么时候来读？** 启动时扫描器发现 `NotesController`，容器用 `Reflect.getMetadata` 把那三条读出来：读 `nest:controller` 确认“这是控制器”、读 `nest:path` 拿前缀 `notes`、读 `design:paramtypes` 拿 `[NotesService]` → 于是去造 `NotesService`、塞进构造函数。
+
+（先说清一个前提：构造参数的类型不管是**普通类、接口、还是 `number`/`string` 这种原始类型**，tsc 都会往 `design:paramtypes` 里记一个值（类记成类本身、原始类型记成 `Number`/`String`、接口记成 `Object`）——**照记不误**，跟它是不是 provider、有没有 `@Injectable` 都无关。但 Nest 能不能据此注入是另一回事：容器拿着记下来的 token 去找 provider，是已登记的类才注入；若是没登记的普通类、或接口（`Object`）/原始类型这种对不上的——启动报 `Nest can't resolve dependencies of the NotesController (?, ?)`。**记（tsc）和登记（providers）是两回事**，详见 [[#5.2 依赖注入机制|5.2]]。）
+
+所以**同一个 `@Controller`，从你写下到容器用上，就是“贴标签（tsc + reflect-metadata 存）→ 读标签（容器 getMetadata）”一条链**。其他装饰器（`@Module` / `@Injectable` / `@Get` / `@Body`）同理，本质都是 `Reflect.defineMetadata` 贴键值对——完整源码见 [[#7.4.2 Nest 的装饰器源码在做什么|7.4.2]]。
+
+回到那句话：**装饰器语法靠 TS（`experimentalDecorators`），类型元数据靠 reflect-metadata（`emitDecoratorMetadata` 生成代码、运行时执行）**，所以 Nest 的 tsconfig 三件套（`experimentalDecorators` + `emitDecoratorMetadata` + `import 'reflect-metadata'`）缺一不可。
 
 **记住一句：Nest = 装饰器贴标签 + 容器按标签装配 + 固定流水线处理请求。** 以后看到任何 Nest 概念，先问它属于这三件里的哪一件。
 
@@ -250,7 +298,7 @@ NestJS 把后端拆成一组可装配的"构件"，几乎每一个都对应一�
 
 ```text
 应用对象
-├── @Module()                    # 模块：声明一组 providers / controllers / imports / exports
+├── @Module()           # 模块：声明一组 providers / controllers / imports / exports
 ├── @Controller()                # 控制器：聚合一组路由
 └── @Injectable()                # provider 标记：可被 DI 容器管理的类
 
@@ -261,15 +309,14 @@ NestJS 把后端拆成一组可装配的"构件"，几乎每一个都对应一�
 └── @Req @Res                      # 原始 Express / Fastify 对象
 
 横切构件（按请求生命周期顺序）
-├── Middleware                    # 中间件：最外层，能拿到
- Request/Response
+├── Middleware                    # 中间件：最外层，能拿到Request/Response
 ├── Guard                         # 守卫：决定请求是否被允许进入
 ├── Interceptor                   # 拦截器：方法执行前后都能介入
 ├── Pipe                          # 管道：参数转换或校验
 └── Exception Filter              # 异常过滤器：异常到响应的映射
 
 异常与响应
-├── HttpException 及其子类        # 内置异常：BadRequestException、NotFoundException 等
+├── HttpException 及其子类      # 内置异常：BadRequestException、NotFoundException 等
 ├── @Catch()                      # 自定义异常过滤器的作用范围
 └── @Render()                     # 模板渲染（SSR 场景）
 ```
@@ -330,7 +377,7 @@ NestJS 本身只是"装配框架"，真正的 HTTP 能力来自底层平台，�
 
 # 2. 全栈架构和内容讲解
 
-第 1 章讲了 CLI 生成的最小骨架和总览机制。本章先把它演进成前后端共享类型的全栈（monorepo）结构，再逐个深入每个文件——既讲 `nest new` 生成的文件（main.ts / app.module / controller / service / test），也讲业务模块才有的 `dto` / `entity`，以及 `nest new` 不生成、要自己建的 `common/`、`config/`。
+第 1 章用真实代码把单应用的骨架和装配讲透了。本章往工程化再走一步：① 把后端演进成前后端共享类型的全栈（monorepo）结构；② 补上 `nest new` 不生成、真实工程要自己建的 `common/`、`config/`；③ 讲清业务模块里的 `dto`、`entity` 和测试。
 
 ## 2.1 全栈（monorepo）结构
 
@@ -366,100 +413,35 @@ my-app/                              # 工作区根（pnpm workspaces）
 
 工具选择：api + web 两个 app 起步用 pnpm workspaces 即可；等 app > 2 或 CI 构建变慢，再考虑 turborepo（别一上来就上 nx）。
 
-## 2.2 `main.ts`
+## 2.2 src/ 的完整工程结构（common/ 与 config/）
 
-`main.ts` 是应用装配层，不是业务实现层。
-
-它主要负责：
-
-- `NestFactory.create(AppModule)` 创建应用
-- 注册全局管道（如 `ValidationPipe`）、全局过滤器、全局拦截器、全局前缀
-- `app.listen(port)` 监听端口
-- 可选：`enableShutdownHooks()` 启用优雅关闭
-
-它和 HTTP 平台的关系是：
+`nest new` 只给骨架（`main.ts` / `app.module` / 示例 controller+service），`nest g resource` 只给一个业务模块。真实工程里还有两块**两个命令都不生成、必须自己建**的目录——`common/` 和 `config/`。把 `src/` 长完整是这样：
 
 ```text
-浏览器 -> Express/Fastify -> Nest app(main.ts 装配出的)
+src/
+├── main.ts / app.module.ts              # 入口 + 根模块（nest new 生成）
+├── app.controller.ts / app.service.ts   # 示例，可删（nest new 生成）
+├── common/                              # ★ 横切件，自己建
+│   ├── filters/                           #   全局/局部异常过滤器
+│   ├── interceptors/                      #   日志 / 缓存 / 响应包装
+│   ├── pipes/                             #   自定义校验（如 ZodValidationPipe）
+│   ├── guards/                            #   鉴权
+│   └── decorators/                        #   自定义装饰器
+├── config/                              # ★ 配置，自己建（@nestjs/config 读 .env）
+│   └── configuration.ts
+└── modules/                             # 业务模块（nest g resource 生成）
+    └── notes/
+        ├── notes.module / controller / service
+        ├── dto/                           #   请求/响应类型
+        └── entities/                      #   ORM 实体
 ```
 
-常见启动命令（Nest 默认用 npm/pnpm 脚本封装）：
+- **`common/`**：放跨业务的横切件——全局过滤器、拦截器、管道、守卫、自定义装饰器。它们也是 provider（带 `@Injectable()`），但服务所有模块，所以集中放这。每种是什么、怎么挂全局，见第 4 章。
+- **`config/`**：放配置。配 `@nestjs/config` 的 `ConfigModule.forRoot({ isGlobal: true })` 读 `.env`，业务里通过 `ConfigService` 取值——根模块 `imports` 里挂它（Ch1 1.3 的 app.module 没挂，真实项目会挂）。
 
-```bash
-pnpm start:dev      # = nest start --watch，开发热重启
-node dist/main.js   # 生产环境直接跑编译产物
-```
+`common/` 和 `config/` 没有强制结构（子目录名是约定、不是框架要求），但社区基本都这么放，照着来就行。
 
-不要把业务逻辑、数据库访问、校验规则写进 `main.ts`。它的角色等同于 FastAPI 的 `main.py`。
-
-典型内容：
-
-```ts
-// src/main.ts
-import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
-import { AppModule } from './app.module';
-
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-
-  app.setGlobalPrefix('api');                       // 所有路由加 /api 前缀
-  app.useGlobalPipes(
-    new ValidationPipe({ whitelist: true, transform: true }),
-  );
-
-  await app.listen(3000);
-}
-bootstrap();
-```
-
-## 2.3 `app.module.ts`
-
-`app.module.ts` 是根模块，是整个依赖图的入口。Nest 从这里开始扫描所有子模块。
-
-```ts
-// src/app.module.ts
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { NotesModule } from './modules/notes/notes.module';
-
-@Module({
-  imports: [
-    ConfigModule.forRoot({ isGlobal: true }), // 全局配置
-    NotesModule,
-  ],
-})
-export class AppModule {}
-```
-
-根模块通常只做 `imports`，不放具体业务 provider。每个业务域有自己的模块，根模块把它们拼起来——这一点和 FastAPI 在 `main.py` 里集中注册 router 的作用对等，但 Nest 把"注册"显式做成了 `@Module` 的 `imports`。
-
-## 2.4 `controller`
-
-控制器是 HTTP 层，职责等同 FastAPI 的 `router.py`：
-
-- 定义路由前缀（`@Controller('notes')`）
-- 声明方法与 HTTP 动词（`@Get`、`@Post`...）
-- 取参数（`@Param`、`@Query`、`@Body`）
-- 声明状态码、响应类型
-- 把工作交给 `service`
-
-控制器本身不写业务规则，只做协议层映射。
-
-## 2.5 `service 与 provider`
-
-`service` 是业务逻辑层，是 Nest 里最典型的 provider。
-
-`provider` 是 Nest 对"可被 DI 容器管理的对象"的统称，包括：
-
-- `service`：业务逻辑
-- `repository`：数据访问（封装 TypeORM / Prisma）
-- `factory` / `useValue`：配置值、第三方客户端、连接池
-- `guard` / `interceptor` / `pipe` / `filter`：横切构件，本身也是 provider
-
-provider 的标记是 `@Injectable()`。它告诉 DI 容器："这个类可以实例化、可以被注入到别的类的构造函数里。"
-
-## 2.6 `dto`
+## 2.3 `dto`
 
 DTO（Data Transfer Object）对应 FastAPI 的 Pydantic 模型，放在 `modules/<业务>/dto/`。
 
@@ -471,7 +453,7 @@ DTO（Data Transfer Object）对应 FastAPI 的 Pydantic 模型，放在 `module
 
 与 FastAPI 的关键区别：FastAPI 的 `BaseModel` 框架原生解析并强校验；Nest 的 DTO 是普通类，校验由 `class-validator` 装饰器驱动，**必须显式挂上 `ValidationPipe` 才会校验**，否则请求体只是被 `class-transformer` 转成一个实例（甚至直接是普通对象），字段约束全部失效。
 
-## 2.7 `entity 与 ORM`
+## 2.4 `entity 与 ORM`
 
 实体是数据库表的映射，放在 `modules/<业务>/entities/`。
 
@@ -480,7 +462,7 @@ DTO（Data Transfer Object）对应 FastAPI 的 Pydantic 模型，放在 `module
 
 `repository` 封装对实体的操作，和 FastAPI 的 `repository.py` 角色一致。
 
-## 2.8 `测试`
+## 2.5 `测试`
 
 Nest 自带测试工具 `@nestjs/testing`，测试分两类：
 
@@ -1037,7 +1019,7 @@ Nest 的整套装配都建立在"装饰器写元数据 + 运行时读元数据"�
 
 TypeScript 装饰器本身只是函数。`@Injectable()`、`@Controller()`、`@Get()`、`@Module()` 这些装饰器被调用时，会把"这是一段元信息"通过 `Reflect.defineMetadata` 存到目标对象上。Nest 在启动时再把这些元数据读出来，据此搭出模块图、路由表、依赖关系。
 
-`Reflect.defineMetadata(key, value, target)` 是 `reflect-metadata` 这个 polyfill 提供的，本质是把元信息挂在目标对象的隐藏属性里。TS 编译时如果开了 `emitDecoratorMetadata: true`，还会自动把构造函数参数的类型（`design:paramtypes`）、属性类型（`design:type`）一并写进元数据——这正是 DI 能"按类型注入"的来源。
+`Reflect.defineMetadata(key, value, target)` 是 `reflect-metadata` 这个 polyfill 提供的，本质是把元信息挂在目标对象的隐藏存储（WeakMap）里。TS 编译时如果开了 `emitDecoratorMetadata: true`，还会为带装饰器的类**生成**一行 `__metadata("design:paramtypes", [构造参数类型...])`（属性类型同理是 `design:type`）；这行代码运行时靠 reflect-metadata 执行、才把类型真正写进元数据——这正是 DI 能"按类型注入"的来源。
 
 ```text
 @Injectable() 执行
