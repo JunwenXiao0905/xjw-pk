@@ -1,3 +1,10 @@
 featuredFiles:
-  - "Areas/GIS/Cesium/cesium基础.md"
   - "Areas/Harness Engineering/发布文章/Claude Code超详细实战教程3.28(一)：一文带你接入国产模型、深度拆解记忆机制和权限设计，了解Auto-dream等新特性.md"
+  - "Areas/Harness Engineering/LangGraph/LangGraph 学习笔记.md"
+  - "Areas/Python/Python后端-FastAPI工程化实操.md"
+  - "Areas/Node.js/Node后端-NestJS工程化实操.md"
+
+# 首页"目录导航"显式指定的目录（仓库相对路径）；为空则回退到顶层目录
+navDirs:
+  - "Areas/Harness Engineering"
+  - "Areas/Python"
