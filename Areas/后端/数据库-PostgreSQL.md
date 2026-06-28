@@ -2,10 +2,21 @@
 
 ## 目录
 
-- [第1章 连接与客户端](#第1章-连接与客户端)
-  - [1.1 psql 命令行客户端](#11-psql-命令行客户端)
-  - [1.2 psql 中的两类命令](#12-psql-中的两类命令)
-  - [1.3 从 Docker 容器访问](#13-从-docker-容器访问)
+- [第0章 前置基础](#第0章-前置基础)
+  - [0.1 先搞清:数据库到底解决了什么](#01-先搞清数据库到底解决了什么)
+  - [0.2 关系型数据库:表、关系与 SQL](#02-关系型数据库表关系与-sql)
+  - [0.3 对象关系型:PostgreSQL 多了什么](#03-对象关系型postgresql-多了什么)
+  - [0.4 PostgreSQL vs MySQL:核心差异](#04-postgresql-vs-mysql核心差异)
+  - [0.5 生产选型:国内为何多用 MySQL](#05-生产选型国内为何多用-mysql)
+  - [0.6 PostgreSQL 的生态:扩展、PostGIS、pgvector](#06-postgresql-的生态扩展postgispgvector)
+  - [0.7 参考来源](#07-参考来源)
+- [第1章 安装与连接](#第1章-安装与连接)
+  - [1.1 用 Docker 安装 PostgreSQL](#11-用-docker-安装-postgresql)
+  - [1.2 连接五要素:服务端与客户端](#12-连接五要素服务端与客户端)
+  - [1.3 pgAdmin:官方图形工具](#13-pgadmin官方图形工具)
+  - [1.4 VS Code 数据库插件](#14-vs-code-数据库插件)
+  - [1.5 图形 vs 命令行(psql)](#15-图形-vs-命令行psql)
+  - [1.6 参考来源](#16-参考来源)
 - [第2章 数据库结构](#第2章-数据库结构)
   - [2.1 层级结构](#21-层级结构)
   - [2.2 数据库操作](#22-数据库操作)
@@ -39,67 +50,266 @@
   - [7.5 裸表名陷阱](#75-裸表名陷阱)
   - [7.6 对照 SQLAlchemy relationship](#76-对照-sqlalchemy-relationship)
 
-## 第1章 连接与客户端
+## 第0章 前置基础
 
-### 1.1 psql 命令行客户端
+> 本章不讲操作,先建立整体认知:**PostgreSQL 到底是什么?它和 MySQL 有什么区别?为什么国内生产多用 MySQL、而全球却在转向 PostgreSQL?** 搞懂这些,第1章起的实操才有根基。
 
-`psql` 是 PostgreSQL 自带的命令行客户端，连接参数：
+### 0.1 先搞清:数据库到底解决了什么
 
-| 参数 | 含义 | 示例 |
-|------|------|------|
-| `-U` | 用户名 | `psql -U postgres` |
-| `-d` | 数据库名 | `psql -d mydb` |
-| `-h` | 主机地址 | `psql -h localhost` |
-| `-p` | 端口号 | `psql -p 5433` |
-| `-c` | 执行一条命令后退出 | `psql -c "SELECT 1;"` |
+最直观的对比:你平时存数据用 **Excel**,那为什么还需要"数据库"?
 
-一条完整的连接命令：
+| 痛点 | Excel | 数据库 |
+|------|-------|--------|
+| 多人同时改 | 互相覆盖、锁文件冲突 | **事务** + 多版本并发,互不干扰 |
+| 断电 | 可能丢数据、文件损坏 | 提交即落盘,崩溃也不丢 |
+| 数据量 | 百万行就卡 | 几十亿行照查 |
+| 防脏数据 | 填啥收啥 | 主键 / 外键 / 约束,乱填直接拒 |
+| 安全权限 | 能开文件就能全看 | 谁能看 / 改,精细到列 |
+
+一句话:**数据库 = 一个专为"多人同时、可靠、大规模、守规矩"地存取数据而生的后台服务程序。** 留意"**后台服务程序**"几个字——这正是第1章"为什么不能像 Word 那样双击文件打开"的伏笔。
+
+### 0.2 关系型数据库:表、关系与 SQL
+
+**关系(relation)= 表。** PostgreSQL 官方原话:"relation 本质上是个数学术语,指的就是『表』"[1]。一张表 = 一组**行(rows)**,每行有同样的**列(columns)**,每列有固定类型。
+
+- **主键**:唯一标识一行的列,既唯一又非空(关系理论要求每张表都有主键)[2]。
+- **外键**:某列的值必须匹配另一张表里出现的值,维护两张表的**引用完整性**[3]。这就是"关系"——表与表之间的引用关联(如 `订单.user_id → 用户.id`)。
+
+> 💡 **"关系型"一词的由来**:1970 年 IBM 数学家 **E.F. Codd** 发表论文提出关系模型(后获图灵奖)。他说的"关系"在数学里就是"表",所以"关系型"本意是"用表组织数据的模型";日常理解成"表之间用外键互相关联"也对[4]。
+
+**SQL** 是操作关系型数据库的标准语言(IBM 的 Chamberlin 与 Boyce 在 System R 项目中发明)。最新标准是 **SQL:2023**;PostgreSQL 在其 177 项强制特性中符合 170 项,以严格遵循标准著称[5]。
+
+**事务与 ACID**:事务把多个操作绑成"要么全做、要么全不做"的整体。经典例子:转账 100 元 = ①你 −100 ②对方 +100,中途断电不会卡在"扣了钱却没到账"的中间态。四特性[6]:
+
+| 字母    | 特性  | 含义                  |
+| ----- | --- | ------------------- |
+| **A** | 原子性 | 全做或全不做              |
+| **C** | 一致性 | 从一个合法状态转到另一个(靠约束保证) |
+| **I** | 隔离性 | 并发事务互不可见对方未提交的中间结果  |
+| **D** | 持久性 | 提交即永久落盘,崩溃也不丢       |
+
+### 0.3 对象关系型:PostgreSQL 多了什么
+
+PostgreSQL 官方开篇第一句自称:**"PostgreSQL 是一个对象关系型数据库管理系统(ORDBMS)"**[7];MySQL 是**纯关系型**。多出的"对象"指**面向对象式的扩展能力**,官方列出用户可自行添加:自定义数据类型、复合类型、函数、操作符、索引方法、过程语言[7]。举两个最直观的:
+
+- **表继承**:`CREATE TABLE 省会 INHERITS (城市)`——子表继承父表所有列,直接对应 OOP 的"继承"[8]。
+- **自定义类型 + 操作符重载**:像定义"类",同一个 `+` 能按参数类型调不同实现。
+
+一句话:**关系型是地基,对象关系型在地基上允许你像写面向对象程序一样扩展数据库。** MySQL 不提供这类能力。
+
+### 0.4 PostgreSQL vs MySQL:核心差异
+
+| 维度       | PostgreSQL                         | MySQL                                 |
+| -------- | ---------------------------------- | ------------------------------------- |
+| 归属       | 全球开源社区 PGDG(无单一公司控制)               | Oracle 公司(经 Sun,2010 年被 Oracle 收购)[9] |
+| 定位       | 对象关系型(ORDBMS)                      | 纯关系型(RDBMS)                           |
+| 存储引擎     | 单一(统一堆表)                           | **插件式**:InnoDB / MyISAM 等可按表切换[10]    |
+| SQL 标准遵循 | 严格(170 / 177)                      | 有部分与标准的已知差异                           |
+| 数据类型     | 极丰富:JSONB、数组、范围、网络地址、几何…           | 较精简(也有 JSON、ENUM)                     |
+| 并发控制     | MVCC:读不阻塞写                         | MVCC(InnoDB 引擎层实现)[11]                |
+| 索引类型     | B-tree / GiST / GIN / BRIN…,擅长复杂查询 | 以 B-tree 为主(+ 全文 / 空间)                |
+| 扩展机制     | `CREATE EXTENSION` 是核心优势           | 插件机制(如可插拔存储引擎)                        |
+| 擅长场景     | 复杂查询、复杂类型、强一致性、可扩展                 | 高并发简单事务、Web / OLTP、易部署                |
+
+> 两者都是成熟的 ACID 开源数据库,**没有绝对优劣**,选型看具体工作负载。
+
+### 0.5 生产选型:国内为何多用 MySQL
+
+**国内生产多用 MySQL 是"中国特色 + 历史惯性",不代表全球趋势。**
+
+**国内为什么 MySQL 主导:**
+
+- **去 IOE 运动**:2009 年起阿里"用 MySQL 替代 Oracle",奠定国内互联网"默认数据库"地位[12]。
+- **云厂商主推**:阿里云 PolarDB(MySQL 兼容)国内市场份额 26%、六连冠;OceanBase、TDSQL、GaussDB 等"国产数据库"普遍兼容 MySQL 协议[13]。
+- **运维 / 招聘生态成熟**:中文资料、DBA 人才、工具链都最齐全。
+
+**全球却在转向 PostgreSQL(关键数据):**
+
+- **Stack Overflow 2025 开发者调查**:PostgreSQL **55.6%** 登顶第一,MySQL 40.5% 居第二;PG 同时拿下"最常用 + 最受赞(65.5%)+ 最想用"三冠王[14]。
+- **DB-Engines 2026 年 6 月榜**:Oracle ①、MySQL ②、PostgreSQL ④,但前 7 名里 **PG 是唯一还在涨**的关系库(+7.58 / 年),MySQL 在跌(−97 / 年);PG 已 5 次当选"年度数据库"[15]。
+- **AI / 向量时代加持**:pgvector 让 PostgreSQL 直接做向量检索(见 0.6),进一步推高采用。
+
+> 💡 **务实建议**:学 PostgreSQL 不吃亏(全球趋势 + AI 方向);同时了解 MySQL(国内存量与招聘短期仍以它为主)。两者都掌握最稳。
+
+### 0.6 PostgreSQL 的生态:扩展、PostGIS、pgvector
+
+PostgreSQL 最强的地方是**扩展(Extension)机制**——`CREATE EXTENSION` 一条命令装上一个"功能包"(新类型 / 函数 / 索引方法),`DROP EXTENSION` 一条命令干净卸载[16]。PGXN(扩展分发网络)直言:**"PostgreSQL 已不只是数据库,而是应用开发平台"**[17]。
+
+| 扩展              | 一句话定位                                                         |
+| --------------- | ------------------------------------------------------------- |
+| **PostGIS**     | 给 PG 加地理空间能力,变成空间数据库(GIS、地图、LBS、空间查询)[18]                     |
+| **pgvector**    | 向量类型 + 相似度搜索,让 PG 在 AI / RAG 时代直接做向量检索(GitHub ~22k stars)[19] |
+| **TimescaleDB** | 专为时序数据优化(按时间自动分区)[20]                                         |
+| **Citus**       | 把 PG 扩展成分布式集群(分片)[20]                                         |
+
+关键点:**这些重磅能力全以"扩展"形式存在,而不是塞进数据库内核**——这正是 PostgreSQL 生态繁荣的根基,也是它能在 AI 时代持续上升的原因。
+
+### 0.7 参考来源(均为官方 / 权威一手)
+
+**PostgreSQL 官方文档** — postgresql.org/docs/current/
+- [1][7] Concepts / What is PostgreSQL:tutorial-concepts.html、intro-whatis.html
+- [2][3] Constraints(主键 / 外键):ddl-constraints.html
+- [5] SQL Conformance(SQL:2023,170 / 177):features.html
+- [6] Transactions / ACID:tutorial-transactions.html(ACID 术语出处:Härder & Reuter 1983)
+- [8] Inheritance:tutorial-inherit.html
+- [11] MVCC:mvcc-intro.html
+- [16] CREATE EXTENSION:extend-extensions.html
+
+**关系模型历史**
+- [4] Codd 1970 原论文:dl.acm.org/doi/10.1145/362384.362685;IBM 官方史:ibm.com/history/relational-database
+
+**MySQL 官方文档** — dev.mysql.com/doc/
+- [10] 存储引擎 / 插件式架构:storage-engines.html、pluggable-storage-overview.html
+- [9] MySQL 归属变迁:en.wikipedia.org/wiki/MySQL
+
+**市场数据**
+- [12] 去 IOE:阿里云开发者社区《真实的阿里巴巴去 IOE 故事》、钛媒体王坚访谈
+- [13] IDC《2024H2 中国关系型数据库市场跟踪》、墨天轮中国数据库流行度榜
+- [14] Stack Overflow Developer Survey 2025:survey.stackoverflow.co/2025/technology
+- [15] DB-Engines 排名:db-engines.com/en/ranking
+
+**扩展生态**
+- [17] PGXN:pgxn.org/about
+- [18] PostGIS:postgis.net
+- [19] pgvector:github.com/pgvector/pgvector
+- [20] TimescaleDB:timescale.com;Citus:citusdata.com
+
+## 第1章 安装与连接
+
+> 本章把 PostgreSQL 真正跑起来，并用图形工具（pgAdmin / VS Code 插件）和命令行（psql）连上去。先会"装 + 连"，后面所有操作才有落点。
+
+### 1.1 用 Docker 安装 PostgreSQL
+
+**为什么用 Docker**：隔离干净、删容器即彻底卸载、一键启停、可同时跑多个版本。Windows 上用 **Docker Desktop**（WSL2 后端）。
+
+一条命令跑起 PostgreSQL 16（后台运行、数据持久化、开机自启）：
+
+```powershell
+docker run --name pg16 -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=appdb -p 5432:5432 -v pgdata:/var/lib/postgresql/data -d --restart unless-stopped postgres:16
+```
+
+> PowerShell 多行续行用反引号(backtick,且必须是行末最后一个字符),不是 bash 的反斜杠;嫌麻烦就写成一行复制即用。
+
+逐段解释：
+
+| 片段                                   | 含义                                                |
+| ------------------------------------ | ------------------------------------------------- |
+| `--name pg16`                        | 容器名，方便引用                                          |
+| `-e POSTGRES_PASSWORD=postgres`      | 超管密码（**必填**，不设启动报错）                               |
+| `-e POSTGRES_USER=postgres`          | 超管用户名（省略默认 `postgres`）                            |
+| `-e POSTGRES_DB=appdb`               | 首次启动自动建的默认库                                       |
+| `-p 5432:5432`                       | 端口映射：宿主 5432 → 容器 5432（宿主端口被占就换，如 `-p 5433:5432`） |
+| `-v pgdata:/var/lib/postgresql/data` | **数据持久化**：数据放进命名卷，否则删容器数据全没                       |
+| `-d`                                 | 后台运行                                              |
+| `--restart unless-stopped`           | 容器 / 开机自动重启                                       |
+| `postgres:16`                        | 镜像：用具体大版本（别用 `latest`，避免哪天升级出意外）                  |
+
+> ⚠️ **持久化是重点**：Docker 容器默认把数据写在临时层，**删容器 = 删数据**，所以必须挂 `-v`。[1]（PG18 起官方数据目录路径有变，PG16/17 挂 `/var/lib/postgresql/data` 即可。[2]）
+
+验证：
 
 ```bash
-psql -U fastapi_user -d fastapi_study -h localhost -p 5433
+docker ps                                        # 看到 pg16 在跑
+docker logs pg16                                 # 出现 ready to accept connections 即成功
+docker exec -it pg16 psql -U postgres -d appdb   # 进容器连库
 ```
 
-连接后提示符变化反映输入状态：
+> **国内拉镜像**：2024 年起大部分公开加速器（中科大、阿里云公共源等）已失效或受限。能直连就直连；不行就在 Docker Desktop → Settings → Docker Engine 里配 `registry-mirrors`，地址**以实测当时可用为准**，别照抄网上旧教程。[3]
 
+### 1.2 连接五要素：服务端与客户端
+
+数据库是**后台服务**（上面 docker 里的进程），你要用**客户端**通过网络连它。任何客户端连 PostgreSQL 都填这五个字段（官方叫 libpq 连接参数）：[4]
+
+| 要素       | 含义    | 本例的值            |
+| -------- | ----- | --------------- |
+| host     | 服务器地址 | `localhost`（本机） |
+| port     | 端口    | `5432`          |
+| database | 连哪个库  | `appdb`         |
+| user     | 用户名   | `postgres`      |
+| password | 密码    | `postgres`      |
+
+> 这五个字段就是下面 pgAdmin、VS Code 插件连接时要填的东西。记住它，所有 GUI 连接界面都围绕这五项。
+
+### 1.3 pgAdmin：官方图形工具
+
+> 一句话：所有 GUI 工具本质都在帮你生成并执行 SQL（点按钮、填表单，背后仍是 SQL），所以学 SQL 才是根本。
+
+**pgAdmin** 是 PostgreSQL 最流行的官方开源图形管理工具。[5] 新手用**桌面版**：去 [pgadmin.org/download](https://www.pgadmin.org/download/) 下 Windows 安装包，一路下一步装好。
+
+连接四步：
+
+1. 打开 pgAdmin → 顶部 **Add New Server**（或右键 Servers → Register → Server）
+2. **General** 选项卡：填个名字（如 `本机PG16`）
+3. **Connection** 选项卡：填**连接五要素**（Host `localhost`、Port `5432`、Maintenance database `appdb`、Username `postgres`、Password `postgres`）→ 勾 Save password
+4. Save → 左侧树展开就能看到数据库、表
+
+常用操作：右键表 → **View/Edit Data** 看数据；**Tools → Query Tool** 写 SQL（按 F5 或点 ▶ 执行，结果在下方 Data Output）。[6]
+
+### 1.4 VS Code 数据库插件
+
+**Database Client**——VS Code 里最常用的多数据库客户端，一个插件连 PostgreSQL / MySQL / Redis / MongoDB / SQL Server 等多种数据库 + SSH / Docker，国内开发者出品。[7]
+
+安装：扩展市场搜 **"Database Client"**——认准**发布者显示为 "Database Client"**（网站 database-client.com）的那个；扩展 ID `cweijan.vscode-database-client2`（约 120 万安装、标 Free Trial）。
+
+> 市场里还有个 **Database Client JDBC**——那是主插件的**组件 / 依赖**（连 Db2、Hive 等少数 JDBC 库才用），**PostgreSQL 用不到，不用单独装**，装主插件即可。
+
+> ⚠️ **别装错**：市场搜 "database" 排第一常是微软的 **SQL Database Projects**（`ms-mssql.sql-database-projects-vscode`）——那是 **MSSQL 专用的"表结构部署"工具，既不支持 PostgreSQL、也不是连接查询用的客户端**，跟我们要做的无关。认准**发布者为 "Database Client"**（网站 database-client.com）的那个。
+
+连接：左侧活动栏点 **Database** 图标 → 面板里点 **`+`** → 选 **PostgreSQL** → 填**连接五要素** → Connect。[7]
+
+用法：在库上点 **Open Query** 开 SQL 编辑器，写完按 `Ctrl+Enter` 执行；点表名直接看 / 改数据（表格内增删改查）。
+
+### 1.5 图形 vs 命令行（psql）
+
+GUI 直观，但命令行 **psql** 同样必备——服务器上往往没 GUI，脚本 / 自动化也只能用命令行。
+
+连接：
+
+```bash
+psql -U postgres -d appdb -h localhost -p 5432
 ```
-fastapi_study=>     等待新命令
-fastapi_study->     语句未结束（换行但未敲分号），等待续行
-fastapi_study">     字符串引号未闭合，等待补引号
+
+参数对照连接五要素：`-U` 用户、`-d` 库、`-h` 主机、`-p` 端口；密码连接时输入。
+
+Docker 里用 psql（进容器）：
+
+```bash
+docker exec -it pg16 psql -U postgres -d appdb
 ```
 
-### 1.2 psql 中的两类命令
-
-psql 里输入的内容分为两类：
+psql 里两类命令：
 
 | 类型 | 前缀 | 分号 | 示例 |
 |------|------|------|------|
 | SQL 语句 | 无 | **需要** `;` | `SELECT * FROM users;` |
-| psql 反斜杠命令 | `\` | **不需要** | `\dt` |
+| 反斜杠命令 | `\` | **不需要** | `\dt` |
 
 常见反斜杠命令：
 
 | 命令 | 含义 |
 |------|------|
 | `\l` | 列出所有数据库 |
+| `\dt` | 列出当前库所有表 |
+| `\d 表名` | 查看表结构（列、类型、约束） |
 | `\du` | 列出所有用户（角色） |
-| `\c dbname` | 切换到另一个数据库 |
-| `\dt` | 列出当前库的所有表 |
-| `\d 表名` | 查看表结构（列名、类型、约束） |
-| `\di` | 列出所有索引 |
+| `\c 库名` | 切换到另一个库 |
 | `\q` | 退出 psql |
 
-### 1.3 从 Docker 容器访问
+三者取舍：
 
-```bash
-# 查看容器
-docker ps
+| 工具 | 适合 |
+|------|------|
+| **pgAdmin** | 专管 PostgreSQL，功能全（备份、可视化、权限），新手浏览学习友好 |
+| **VS Code 插件** | 已在写代码，顺手查库改库，不想切窗口 |
+| **psql** | 服务器无 GUI、写脚本 / 自动化、轻量快速 |
 
-# 方式1：容器外执行一条命令（用完即走）
-docker exec txwx-postgis psql -U fastapi_user -d fastapi_study -c "\dt"
+### 1.6 参考来源
 
-# 方式2：进入容器交互式操作
-docker exec -it txwx-postgis psql -U fastapi_user -d fastapi_study
-```
+- [1][2] Docker 官方 `docker run` 文档（docs.docker.com）；postgres 镜像 PGDATA 说明（hub.docker.com/_/postgres）
+- [3] Docker daemon `registry-mirrors` 配置（docs.docker.com/engine/reference/commandline/dockerd/）；国内源现状以实测为准
+- [4] PostgreSQL 官方 libpq 连接参数：postgresql.org/docs/current/libpq-connect.html
+- [5][6] pgAdmin 官方文档（pgadmin.org/docs）：deployment、server_dialog、query_tool、editgrid
+- [7] cweijan Database Client：Marketplace（marketplace.visualstudio.com/items?itemName=cweijan.vscode-database-client2）、GitHub（cweijan/vscode-database-client）
 
 ## 第2章 数据库结构
 
@@ -186,14 +396,14 @@ CREATE ROLE txwx WITH
 
 权限可以精确控制到不同层级：
 
-| 层级 | 常见权限 | 例子 |
-|------|---------|------|
-| 实例级 | LOGIN、CREATEDB、SUPERUSER | 创建角色时决定 |
-| 数据库级 | CONNECT、CREATE、TEMP | 谁能连这个库 |
-| Schema 级 | USAGE、CREATE | 谁能在这个 schema 下建表 |
-| 表级 | SELECT、INSERT、UPDATE、DELETE | 谁能查/增/改/删 |
-| 列级 | SELECT、INSERT、UPDATE（按列） | 敏感列只读（极少用） |
-| 行级 | RLS（Row-Level Security） | 比如 user A 只能看到自己的 note |
+| 层级       | 常见权限                        | 例子                     |
+| -------- | --------------------------- | ---------------------- |
+| 实例级      | LOGIN、CREATEDB、SUPERUSER    | 创建角色时决定                |
+| 数据库级     | CONNECT、CREATE、TEMP         | 谁能连这个库                 |
+| Schema 级 | USAGE、CREATE                | 谁能在这个 schema 下建表       |
+| 表级       | SELECT、INSERT、UPDATE、DELETE | 谁能查/增/改/删              |
+| 列级       | SELECT、INSERT、UPDATE（按列）    | 敏感列只读（极少用）             |
+| 行级       | RLS（Row-Level Security）     | 比如 user A 只能看到自己的 note |
 
 最常用的表级权限：
 
