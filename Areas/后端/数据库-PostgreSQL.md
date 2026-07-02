@@ -384,13 +384,13 @@ CREATE ROLE txwx WITH
     SUPERUSER;      -- 超级管理员，无视所有权限检查
 ```
 
-| 属性 | 含义 |
-|------|------|
-| `LOGIN` | 能登录（有 LOGIN = 用户，没有 = 纯角色） |
-| `SUPERUSER` | 超级用户，无视所有权限检查 |
-| `CREATEDB` | 能新建数据库 |
-| `CREATEROLE` | 能新建/删除角色 |
-| `REPLICATION` | 能做主从复制 |
+| 属性            | 含义                         |
+| ------------- | -------------------------- |
+| `LOGIN`       | 能登录（有 LOGIN = 用户，没有 = 纯角色） |
+| `SUPERUSER`   | 超级用户，无视所有权限检查              |
+| `CREATEDB`    | 能新建数据库                     |
+| `CREATEROLE`  | 能新建/删除角色                   |
+| `REPLICATION` | 能做主从复制                     |
 
 ### 3.3 权限级别
 
@@ -414,18 +414,20 @@ REVOKE DELETE ON notes FROM fastapi_user;   -- 收回某个权限
 
 当数据库是用 `OWNER fastapi_user` 创建时，该用户自动拥有该库全部权限，无需逐表 GRANT。
 
+> ⚠️ **新用户默认建不了表（PG15+ 安全变更）**：`public` schema 默认只给所有人 `USAGE`（能用），**不再给 `CREATE`**（PG15 起改的安全默认）。所以新建的普通用户（如 `app_user`）直接 `CREATE TABLE` 会报 `permission denied for schema public`。解决：`GRANT CREATE ON SCHEMA public TO app_user;`。
+
 ### 3.4 认证机制（pg_hba.conf）
 
-为什么 `docker exec` 进容器后 `psql -U txwx` 不需要密码，但 VS Code 从外部连 `localhost:5433` 必须密码？
+为什么 `docker exec` 进容器后 `psql -U postgres` 不需要密码，但 pgAdmin / VS Code 从外部连 `localhost:5432` 必须密码？
 
 两种连接路径：
 
 ```
 Windows 宿主机
   │
-  ├── VS Code 插件 → localhost:5433 (TCP)  → 必须密码
+  ├── pgAdmin / VS Code → localhost:5432 (TCP) → 必须密码
   │
-  └── docker exec → 容器内 → Unix socket   → 免密码（本地信任）
+  └── docker exec → 容器内 → Unix socket      → 免密码（本地信任）
 ```
 
 PostgreSQL 的认证策略由 `pg_hba.conf` 文件控制，每行一条规则：
@@ -440,7 +442,7 @@ local    all         all                         trust            ← Unix socke
 - `local` = Unix socket 连接（本机），`trust` 表示信任，直接放行
 - `METHOD` 可选值：`trust`（免密）、`password`（明文密码）、`scram-sha-256`（加密密码）、`peer`（匹配 OS 用户名）
 
-Docker 容器内 `psql` 走 Unix socket → `trust` 免密码；容器外连 `localhost:5433` 走 TCP → 需要密码。
+Docker 容器内 `psql` 走 Unix socket → `trust` 免密码；容器外连 `localhost:5432` 走 TCP → 需要密码。
 
 | | 认证方式 | 需要密码？ |
 |----|---------|-----------|
@@ -453,12 +455,12 @@ Docker 容器内 `psql` 走 Unix socket → `trust` 免密码；容器外连 `lo
 
 ### 4.1 常用数据类型
 
-| PostgreSQL 类型 | 含义 | 对应 SQLAlchemy |
-|------|------|----------------|
-| `integer` | 32 位整数 | `Integer` |
-| `character varying(n)` / `varchar(n)` | 变长字符串，最多 n 字符，超长报错 | `String(n)` |
-| `text` | 变长字符串，无长度限制 | `Text` |
-| `boolean` | 真/假（psql 显示为 `t`/`f`） | `Boolean` |
+| PostgreSQL 类型                         | 含义                    | 对应 SQLAlchemy |
+| ------------------------------------- | --------------------- | ------------- |
+| `integer`                             | 32 位整数                | `Integer`     |
+| `character varying(n)` / `varchar(n)` | 变长字符串，最多 n 字符，超长报错    | `String(n)`   |
+| `text`                                | 变长字符串，无长度限制           | `Text`        |
+| `boolean`                             | 真/假（psql 显示为 `t`/`f`） | `Boolean`     |
 
 `varchar(n)` vs `text`：PostgreSQL 中两者**性能相同**，区别只是 `varchar` 多了长度校验。
 有明确上限的字段（用户名、标题）用 `varchar(n)`，长度不定的内容（正文）用 `text`。
@@ -511,6 +513,15 @@ DETAIL:  Key (user_id)=(999) is not present in table "users".
 
 这防止了"孤儿数据"（笔记挂在不存在的用户身上）。
 
+**外键是双向保护**——反过来，删 `users` 里一个"还被 notes 引用着"的用户也会被拦：
+
+```
+ERROR:  update or delete on table "users" violates foreign key constraint "notes_user_id_fkey"
+DETAIL:  Key (id)=(1) is still referenced from table "notes".
+```
+
+想删带笔记的用户，两条路：① 先删它的 notes 再删用户；② 建表时给外键加 `ON DELETE CASCADE`（`REFERENCES users(id) ON DELETE CASCADE`），删用户时自动连带删其笔记（订单类业务通常**不**级联，怕误删）。
+
 ### 4.4 自增主键与 Sequence
 
 PostgreSQL 无 MySQL 的 `AUTO_INCREMENT`，自增靠 **Sequence（序列）** 实现：
@@ -521,11 +532,13 @@ PostgreSQL 无 MySQL 的 `AUTO_INCREMENT`，自增靠 **Sequence（序列）** �
 **关键特性：序列只增不回退**。失败/回滚的事务也会消耗序列值，所以自增 id 可能跳号
 （如插入失败后下一条 id 从 2 跳到 3），**不保证连续，只保证唯一递增**。
 
+> ⚠️ 所以**别拿自增 id 当"第几条"来算**——它只是个唯一标识，会有空洞。业务需要连续序号得另外设计。
+
 ## 第5章 SQL 增删改查
 
 `INSERT`/`SELECT`/`UPDATE`/`DELETE` 是 SQL 关键字（DML，数据操作语言），不是函数。
 
-### 5.1 INSERT 插入
+### 5.1 INSERT 插入 
 
 ```sql
 INSERT INTO notes (title, content, done, user_id)
@@ -534,6 +547,15 @@ VALUES ('测试', '内容', false, 1);
 ```
 
 语法结构：`INSERT INTO 表名 (列名列表) VALUES (值列表)`，值的顺序与列名一一对应。
+
+**多行插入**：一条 INSERT 一次插多行，用逗号分隔（比循环单条插快得多）：
+
+```sql
+INSERT INTO notes (title, content, done, user_id)
+VALUES ('笔记A', '内容A', false, 1),
+       ('笔记B', '内容B', true,  1),
+       ('笔记C', '内容C', false, 2);
+```
 
 字符串值用**单引号** `'...'`；双引号 `"..."` 用于标识符（表名/列名），不可混用。
 
@@ -578,6 +600,8 @@ DELETE FROM notes;              -- 删光全表
 ```
 
 `WHERE` 决定操作哪些行，漏写即全表操作。
+
+> ⚠️ **保命习惯**：拿不准的 UPDATE/DELETE 先用 `BEGIN` 包起来，核对影响行数对了再 `COMMIT`，错了 `ROLLBACK`——这是后悔药。生产环境误删全表事故，绝大多数就是漏了 `WHERE`。
 
 ### 5.6 SQL 子句执行顺序
 
@@ -637,6 +661,8 @@ deleted_at timestamp DEFAULT NULL           -- 时间戳：NULL=未删，有值=
 ```sql
 SELECT * FROM notes WHERE deleted_at IS NULL;
 ```
+
+> ⚠️ **最大的坑**：每个业务查询都得记得加 `WHERE deleted_at IS NULL`，漏写一条就会把已删数据当正常数据查出来。靠人记不靠谱，ORM 层一般用钩子自动注入这个条件。
 
 ### 6.2 软删除的取舍
 

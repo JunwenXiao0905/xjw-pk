@@ -525,39 +525,39 @@
         <div class="project-block">
           <div class="project-header">
             <div class="project-title-wrapper">
-              <div class="item-title">WebGIS Agent - 地图分析助手</div>
-              <div class="project-role">个人项目</div>
+              <div class="item-title">GeoLens · 对话式地理空间分析 Agent</div>
+              <div class="project-role">全栈开发</div>
             </div>
-            <a href="https://github.com/JunwenXiao0905/x-dimension" target="_blank" class="project-link">
+            <a href="https://github.com/JunwenXiao0905/geolens" target="_blank" class="project-link">
               <svg viewBox="0 0 24 24">
                 <path
                   d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
                 />
               </svg>
-              github.com/JunwenXiao0905/x-dimension
+              github.com/JunwenXiao0905/geolens
             </a>
           </div>
           <div class="item-tech">
-            <span>TypeScript</span><span>Cesium</span><span>Python</span><span>pydantic</span><span>FastAPI</span><span>LangGraph</span
-            ><span>SSE</span>
+            <span>React</span><span>TypeScript</span><span>Cesium</span><span>Zod</span><span>Python</span><span>FastAPI</span><span>LangGraph</span><span>SSE</span>
           </div>
           <ul class="bullets">
-            <li><strong>项目背景：</strong>传统 GIS 平台操作门槛高，空间数据分析依赖专业软件与编程能力，缺乏自然语言驱动的交互方式。</li>
             <li>
-              <strong>Agent 运行时：</strong>基于 <strong>FastAPI + LangGraph</strong> 搭建 Agent 三层架构（Agent 决策 → Tool 执行 → Emit
-              推送），实现 LLM 对地图操作的自主规划与执行。
+              <strong>多智能体编排：</strong>基于 <strong>LangGraph StateGraph</strong> 构建对话式地理空间分析的多智能体编排——InteractionAgent（意图判断 + 用户交互）→ Manager（规划调度 + 结果收敛）⇄ SubAgents（执行）→ Reviewer（反馈审阅，返工上限防死循环）→ InteractionAgent 最终回复。
             </li>
             <li>
-              <strong>AI Action 协议：</strong>定义
-              <span class="highlight">load_dataset / buffer_analysis / poi_search / route_layer</span> 等 8+ Action 类型，统一后端决策到前端
-              Cesium 渲染的调用规范；集成高德地图 API（地理编码、POI 搜索、路径规划）与 Shapely 缓冲区分析。
+              <strong>可靠性设计：</strong>硬性预算护栏对步数 / LLM 调用 / 工具调用 / 动作数超限即终止运行（强制阻断），叠加超时与路径 / 命令安全策略；AsyncSqliteSaver 做 checkpoint 持久化、interrupt/resume 支撑人机协同中断恢复；结构化运行日志记录每次 run 的状态 / 任务数 / 工具调用 / 产出动作。
             </li>
             <li>
-              <strong>实时推送架构：</strong>基于 SSE 实现 Agent 事件流式推送到前端，前端通过 CesiumBridge 统一执行渲染，用户操作实时反馈。
+              <strong>CoderAgent 代码生成执行器：</strong>对未预制 GIS 需求，LLM 按 aider editblock 现场生成 Python，在受限执行环境（路径 + 命令双白名单、子进程超时）内运行，失败回灌 stderr 自修复重试至通过 Reviewer；高频任务物化为预置快路径，能力边界可扩展。
             </li>
             <li>
-              <strong>项目成果：</strong>建成对话驱动的 WebGIS 分析平台，用户可通过自然语言完成数据加载、缓冲区分析、POI 查询等 GIS
-              操作，无需编程即可使用完整 GIS 能力。
+              <strong>地图上下文：</strong>将地图状态建模为 Agent 上下文，实现空间状态在人机之间双向流转；产出经单一 <span class="highlight">MapAction 契约</span>（Zod ↔ Pydantic 对齐、共 12 类动作）由 SSE 推送、Cesium 消费同一 schema 渲染。
+            </li>
+            <li>
+              <strong>工程化与部署：</strong>单源双容器（nginx 反代 API 与数据到 FastAPI，全程同源无 CORS）；多类模型按 agent 角色差异化配置，重型模型子进程隔离、uv 锁定可复现。
+            </li>
+            <li>
+              <strong>项目成果：</strong>以自然语言驱动数据加载 / POI 搜索 / 路径规划 / 影像识别 / 视角描述 5 类 GIS 分析，将地图操作门槛从"需编程 + GIS 基础"降为"一句话交互"。
             </li>
           </ul>
         </div>

@@ -525,7 +525,7 @@
         <div class="project-block">
           <div class="project-header">
             <div class="project-title-wrapper">
-              <div class="item-title">WebGIS Agent - 地图分析助手</div>
+              <div class="item-title">GeoLens · 对话式地理空间分析 Agent</div>
               <div class="project-role">个人项目</div>
             </div>
             <a href="https://github.com/JunwenXiao0905/x-dimension" target="_blank" class="project-link">
@@ -538,26 +538,21 @@
             </a>
           </div>
           <div class="item-tech">
-            <span>TypeScript</span><span>Cesium</span><span>Python</span><span>pydantic</span><span>FastAPI</span><span>LangGraph</span
-            ><span>SSE</span>
+            <span>Python</span><span>FastAPI</span><span>LangGraph</span><span>Pydantic</span><span>uv</span><span>SSE</span><span>SAM</span>
           </div>
           <ul class="bullets">
-            <li><strong>项目背景：</strong>传统 GIS 平台操作门槛高，空间数据分析依赖专业软件与编程能力，缺乏自然语言驱动的交互方式。</li>
+            <li><strong>项目背景：</strong>传统 GIS 平台操作门槛高，空间分析依赖专业软件与编程能力。本项目构建自然语言驱动、多智能体协同的对话式地理空间分析系统。</li>
             <li>
-              <strong>Agent 运行时：</strong>基于 <strong>FastAPI + LangGraph</strong> 搭建 Agent 三层架构（Agent 决策 → Tool 执行 → Emit
-              推送），实现 LLM 对地图操作的自主规划与执行。
+              <strong>多智能体编排：</strong>基于 <strong>FastAPI + LangGraph</strong> 构建 Planner–Executor–Reflector 编排图，InteractionAgent 做 LLM 单一意图分类 + 确定性控制流，Manager 按 <span class="highlight">task_type</span> 路由并收敛结果，Reviewer 做 REVISION / CONTINUE 审阅（最多 2 次返工防循环），Executor 落图并 SSE 推送。
             </li>
             <li>
-              <strong>AI Action 协议：</strong>定义
-              <span class="highlight">load_dataset / buffer_analysis / poi_search / route_layer</span> 等 8+ Action 类型，统一后端决策到前端
-              Cesium 渲染的调用规范；集成高德地图 API（地理编码、POI 搜索、路径规划）与 Shapely 缓冲区分析。
+              <strong>CoderAgent 代码生成执行器：</strong>对未预制 GIS 需求，LLM 按 aider editblock 生成 Python，落入 <span class="highlight">trusted_write_roots</span> 沙箱、子进程执行（命令白名单 + 超时），报错自修复至通过审阅；高频任务物化为快路径，能力边界可扩展。
             </li>
             <li>
-              <strong>实时推送架构：</strong>基于 SSE 实现 Agent 事件流式推送到前端，前端通过 CesiumBridge 统一执行渲染，用户操作实时反馈。
+              <strong>架构与隔离：</strong>单源双容器，nginx 反代所有 API 与数据到 FastAPI，全程同源无 CORS，数据由 FastAPI 统一来源；SAM / geoai 重型模型隔离于 cu124 GPU venv 子进程，runtime 经 uv 锁文件固化可复现，前后端 MapAction 契约由 Zod / Pydantic 单一对齐。
             </li>
             <li>
-              <strong>项目成果：</strong>建成对话驱动的 WebGIS 分析平台，用户可通过自然语言完成数据加载、缓冲区分析、POI 查询等 GIS
-              操作，无需编程即可使用完整 GIS 能力。
+              <strong>项目成果：</strong>建成对话驱动的 WebGIS 多智能体平台，支持数据加载、POI 搜索、路径规划、建筑 / 水体识别与视角描述，无需编程完成完整 GIS 分析。
             </li>
           </ul>
         </div>
