@@ -23,10 +23,11 @@ Nest 提供了一套开箱即用的应用架构，使开发者和团队能够创
   - [[#2.5 测试|2.5 测试]]
 - [[#3. 跑起第一个服务|3. 跑起第一个服务]]
   - [[#3.1 目标|3.1 目标]]
-  - [[#3.2 写模块：controller + service + module|3.2 写模块：controller + service + module]]
-  - [[#3.3 装配进 app.module|3.3 装配进 app.module]]
-  - [[#3.4 跑起来|3.4 跑起来]]
-  - [[#3.5 这几个装饰器到底干了什么（源码视角）|3.5 这几个装饰器到底干了什么（源码视角）]]
+  - [[#3.2 写真 service：内存 CRUD|3.2 写真 service：内存 CRUD]]
+  - [[#3.3 DTO + 校验|3.3 DTO + 校验]]
+  - [[#3.4 装配 + 跑起来|3.4 装配 + 跑起来]]
+  - [[#3.5 Swagger 文档|3.5 Swagger 文档]]
+  - [[#3.6 这几个装饰器到底干了什么（源码视角）|3.6 这几个装饰器到底干了什么（源码视角）]]
 - [[#4. 接口构件参考|4. 接口构件参考]]
   - [[#4.1 控制器与路由|4.1 控制器与路由]]
   - [[#4.2 路径参数、查询参数、请求体|4.2 路径参数、查询参数、请求体]]
@@ -474,93 +475,239 @@ Nest 自带测试工具 `@nestjs/testing`，测试分两类：
 
 # 3. 跑起第一个服务
 
-第 1 章用 CLI 生成了骨架，第 2 章讲了文件分工。这一章亲手把一个最小业务接口“写出来 → 装进去 → 跑起来”，过程中用源码视角看清几个关键装饰器到底做了什么。跑通这一遍，Nest 的“贴标签 + 装配 + 流水线”就不再是概念，而是你能复现的东西。
+第 1 章用 CLI 生成了骨架，第 2 章讲了结构。这一章把 `pnpm exec nest g resource notes` 生成的**模板**，填成一个**真正能跑的服务**：内存 CRUD（5 个接口）+ 校验 + Swagger 文档。不接数据库（先用内存 `Map`），重点是"把模板填成真业务、跑通、看到真实响应"。
 
 ## 3.1 目标
 
-实现一个接口：`POST /notes`，传 `{ title, content }`，返回创建好的笔记。这里先不接数据库，service 里直接造一条返回——重点放在“模块怎么写、怎么装、路由怎么通”。
+把生成的桩 service（`return 'This action adds a new note'`）换成真的：用内存 `Map` 存笔记、自增 id、`NotFoundException` 处理找不到；再给请求体加校验、给接口加 Swagger 文档。跑通后 5 个接口都能用，且 `POST /notes` 会校验入参。
 
-## 3.2 写模块：controller + service + module
+## 3.2 写真 service：内存 CRUD
 
-三个文件，放 `src/modules/notes/`。
-
-**`notes.controller.ts`** —— HTTP 层，贴路由标签：
+`nest g resource notes` 已经生成了 controller / service / module / dto 的壳。controller 和 module 不用改，**只把 service 的桩换成真业务**：
 
 ```ts
-import { Body, Controller, Post } from '@nestjs/common';
-import { NotesService } from './notes.service';
+// src/notes/notes.service.ts
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateNoteDto } from './dto/create-note.dto';
+import { UpdateNoteDto } from './dto/update-note.dto';
 
-@Controller('notes')                 // 【贴标签】控制器，路由前缀 /notes
-export class NotesController {
-  constructor(private readonly notes: NotesService) {}   // 【声明依赖】要 NotesService
-
-  @Post()                            // 【贴标签】POST /notes
-  create(@Body() body: { title: string; content?: string }) {
-    return this.notes.create(body);  // 交给 service，controller 不写业务
-  }
+export interface Note {       // 存储形状：比 DTO 多个 id（id 由 service 分配）
+  id: number;
+  title: string;
+  content?: string;
 }
-```
 
-**`notes.service.ts`** —— 业务层，贴 provider 标签：
-
-```ts
-import { Injectable } from '@nestjs/common';
-
-@Injectable()                        // 【贴标签】可注入的 provider
+@Injectable()
 export class NotesService {
-  create(body: { title: string; content?: string }) {
-    return { id: Date.now(), ...body };   // 暂不接库，直接造一条返回
+  private notes: Map<number, Note> = new Map();   // ★ 内存存储 + 自增 id
+  private nextId = 1;
+
+  create(dto: CreateNoteDto): Note {
+    const note: Note = { id: this.nextId++, ...dto };
+    this.notes.set(note.id, note);
+    return note;                  // POST 默认 201 + 这条 note
+  }
+
+  findAll(): Note[] {
+    return [...this.notes.values()];
+  }
+
+  findOne(id: number): Note {
+    const note = this.notes.get(id);
+    if (!note) throw new NotFoundException(`Note #${id} not found`);   // 抛了 → Nest 自动 404
+    return note;
+  }
+
+  update(id: number, dto: UpdateNoteDto): Note {
+    const note = this.findOne(id);          // 找不到自动抛
+    Object.assign(note, dto);               // note 是 Map 里同一个引用，改它就改了存储
+    return note;
+  }
+
+  remove(id: number): void {
+    if (!this.notes.has(id)) throw new NotFoundException(`Note #${id} not found`);
+    this.notes.delete(id);                   // 返回 void → 200 空响应体
   }
 }
 ```
 
-**`notes.module.ts`** —— 把上面两个登记成一个模块：
+几个点：
 
-```ts
-import { Module } from '@nestjs/common';
-import { NotesController } from './notes.controller';
-import { NotesService } from './notes.service';
+- **`Map` 能当存储，因为 service 是单例**——整个应用一个实例，`this.notes` 跨请求一直活着。但**重启就没了、多实例不共享**，是接 DB 前的过渡（改了代码 watch 重启，id 会从 1 重新开始）。
+- **`NotFoundException`**（`@nestjs/common`）抛出去，Nest 内置异常过滤器自动转成 `404 { statusCode, message, error }`，不用写 `res.status(404)`。
+- **`update` 里 `Object.assign`** 改的是 `findOne` 返回的那个**引用**（就是 Map 里存的对象），所以不用再 `set` 回去。
+- `Note` 要 `export`：controller 的返回类型会被推断成 `Note`，不导出 TS 会报 "cannot be named"。
 
-@Module({
-  controllers: [NotesController],    // 【装配】要实例化的控制器
-  providers: [NotesService],         // 【装配】能造、能注入的 provider
-})
-export class NotesModule {}
+controller / module 用生成的就行：controller 已经在调这些方法；`notes.module.ts` 里 `controllers: [NotesController], providers: [NotesService]` 也已就位。
+
+## 3.3 DTO + 校验
+
+生成的 `create-note.dto.ts` 是空类。先装校验依赖，再填字段 + 装饰器：
+
+```bash
+pnpm add class-validator class-transformer
 ```
 
-## 3.3 装配进 app.module
+```ts
+// src/notes/dto/create-note.dto.ts
+import { IsString, IsNotEmpty, MaxLength, IsOptional } from 'class-validator';
 
-模块写好不会自动生效，必须挂进根模块的 `imports`：
+export class CreateNoteDto {
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(200)
+  title!: string;          // ! = 确定性赋值断言，告诉 TS"运行时框架会赋值"
+
+  @IsString()
+  @IsOptional()            // 可选字段，没传就跳过校验
+  content?: string;
+}
+```
+
+（`update-note.dto.ts` 生成的就是 `extends PartialType(CreateNoteDto)`，自动可选，**不用动**。）
+
+光有装饰器不会校验——得在 `main.ts` 挂全局 `ValidationPipe`：
+
+```ts
+// src/main.ts
+import { ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,            // 剥离 DTO 没声明的字段
+    forbidNonWhitelisted: true, // 出现未声明字段直接 400
+    transform: true,            // 普通对象 → DTO 类实例
+  }));
+  await app.listen(process.env.PORT ?? 3000);
+}
+bootstrap();
+```
+
+校验各种装饰器的完整参考见 [[#4.3 DTO 与校验|4.3]]。这步只看效果：发坏数据 → `ValidationPipe` 把 `class-validator` 的失败包成 `BadRequestException` → Nest 自动 400。
+
+## 3.4 装配 + 跑起来
+
+`NotesModule` 得挂进根模块的 `imports`（生成的 `app.module.ts` 已经挂了）：
 
 ```ts
 // src/app.module.ts
 import { Module } from '@nestjs/common';
-import { NotesModule } from './modules/notes/notes.module';
+import { NotesModule } from './notes/notes.module';
 
 @Module({ imports: [NotesModule] })
 export class AppModule {}
 ```
 
-这一步是装配链的关键一环：`main.ts` 把 `AppModule` 交给容器 → 容器沿 `imports` 扫到 `NotesModule` → 实例化它的 controller/service → 从 `@Controller`/`@Post` 元数据生成 `POST /notes` 路由。少挂一个 `imports`，接口就 404。
-
-## 3.4 跑起来
+`pnpm start:dev`，另开终端 curl 五个接口（PowerShell 用 `curl.exe` + 单引号 JSON）：
 
 ```bash
-pnpm start:dev
+# 建两条
+curl.exe -X POST http://localhost:3000/notes -H "Content-Type: application/json" -d '{"title":"first","content":"hello"}'
+# => {"id":1,"title":"first","content":"hello"}
+
+curl.exe -X POST http://localhost:3000/notes -H "Content-Type: application/json" -d '{"title":"second"}'
+# => {"id":2,"title":"second"}
+
+# 查全部
+curl.exe http://localhost:3000/notes
+# => [{"id":1,...},{"id":2,...}]
+
+# 查一条
+curl.exe http://localhost:3000/notes/1
+# => {"id":1,"title":"first","content":"hello"}
+
+# 查不存在的 → 404（NotFoundException 自动转的）
+curl.exe http://localhost:3000/notes/999
+# => {"message":"Note #999 not found","error":"Not Found","statusCode":404}
+
+# 改
+curl.exe -X PATCH http://localhost:3000/notes/1 -H "Content-Type: application/json" -d '{"title":"updated"}'
+# => {"id":1,"title":"updated","content":"hello"}
+
+# 删
+curl.exe -X DELETE http://localhost:3000/notes/2
+# => (200 空响应体)
 ```
 
-另开终端验证：
+校验那几个 400：
 
 ```bash
-curl -X POST http://localhost:3000/notes \
-  -H "Content-Type: application/json" \
-  -d '{"title":"hello","content":"第一条"}'
-# => {"id":1747...,"title":"hello","content":"第一条"}
+curl.exe -X POST http://localhost:3000/notes -H "Content-Type: application/json" -d '{}'
+# => {"message":["title should not be empty","title must be a string",...],"error":"Bad Request","statusCode":400}
+
+curl.exe -X POST http://localhost:3000/notes -H "Content-Type: application/json" -d '{"title":"ok","hack":1}'
+# => {"message":["property hack should not exist"],"error":"Bad Request","statusCode":400}
 ```
 
-能返回，说明“贴标签 → 容器装配 → 路由表 → 流水线”整条链路通了。
+**对照概念**：POST 返回 201 + 自增 id（controller 啥都没写）；`findAll` 能看到刚建的（service 单例、`Map` 跨请求存活）；`/999` → 404（抛 `NotFoundException`，零行 `res.status`）；`{}` → 400（`ValidationPipe` + `class-validator`，错误是**数组**、字段级）。
 
-## 3.5 这几个装饰器到底干了什么（源码视角）
+> 旁证"记 vs 登记"：把 `NotesService` 从 `providers` 删掉再启动，会报 `Nest can't resolve dependencies of the NotesController (?)`——tsc 照记 `[NotesService]`，但容器没配方，启动就挂。机制见 [[#5.2 依赖注入机制|5.2]]。
+
+## 3.5 Swagger 文档
+
+Nest 不像 FastAPI 自带 `/docs`，要靠 `@nestjs/swagger` 生成：
+
+```bash
+pnpm add @nestjs/swagger swagger-ui-express
+```
+
+`main.ts` 里（`listen` 之前）挂上：
+
+```ts
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+// ... create app、useGlobalPipes 之后：
+const config = new DocumentBuilder()
+  .setTitle('Notes API')
+  .setDescription('笔记接口文档')
+  .setVersion('1.0')
+  .build();
+const document = SwaggerModule.createDocument(app, config);
+SwaggerModule.setup('docs', app, document);   // 访问 /docs
+```
+
+给 controller 加接口描述、给 DTO 加字段描述：
+
+```ts
+// controller：接口级
+@ApiTags('notes')
+@Controller('notes')
+export class NotesController {
+  @Post()
+  @ApiOperation({ summary: '创建笔记' })
+  create(@Body() dto: CreateNoteDto) { ... }
+  // ...
+}
+
+// DTO：字段级
+@ApiProperty({ example: '买菜', description: '标题' })
+@IsString() @IsNotEmpty() @MaxLength(200)
+title!: string;
+```
+
+打开 `http://localhost:3000/docs` 就是交互式文档，每个接口能 "Try it out" 直接发请求。
+
+**更省事——CLI 插件自动生成 `@ApiProperty`**：在 `nest-cli.json` 的 `compilerOptions.plugins` 里开：
+
+```json
+"plugins": [{ "name": "@nestjs/swagger", "options": { "introspectComments": true } }]
+```
+
+开了之后 DTO 只写 **JSDoc 注释**，插件在**编译期**自动注入 `@ApiProperty`（源码干净，效果在 `/docs`）：
+
+```ts
+export class CreateNoteDto {
+  /** 标题，必填，最长 200 */       // ← JSDoc 自动变成 description
+  @IsString() @IsNotEmpty() @MaxLength(200)
+  title!: string;
+}
+```
+
+注意：插件是**编译期变换**，只在 `nest start` / `nest build` 下生效（`pnpm start:dev` 就是）；编辑器里看不到注入的装饰器，改完 `nest-cli.json` 要**彻底重启** dev server。
+
+## 3.6 这几个装饰器到底干了什么（源码视角）
 
 上面用到的 `@Controller` / `@Post` / `@Body` / `@Module` / `@Injectable`，去掉框架错误处理后，本质都是“往目标上贴 metadata 的普通函数”。以 `@Controller` / `@Post` 为例：
 
