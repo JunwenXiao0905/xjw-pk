@@ -548,7 +548,7 @@
               <strong>可靠性设计：</strong>硬性预算护栏对步数 / LLM 调用 / 工具调用 / 动作数超限即终止运行（强制阻断），叠加超时与路径 / 命令安全策略；AsyncSqliteSaver 做 checkpoint 持久化、interrupt/resume 支撑人机协同中断恢复；结构化运行日志记录每次 run 的状态 / 任务数 / 工具调用 / 产出动作。
             </li>
             <li>
-              <strong>CoderAgent 代码生成执行器：</strong>对未预制 GIS 需求，LLM 按 aider editblock 现场生成 Python，在受限执行环境（路径 + 命令双白名单、子进程超时）内运行，失败回灌 stderr 自修复重试至通过 Reviewer；高频任务物化为预置快路径，能力边界可扩展。
+              <strong>CoderAgent：</strong>根据分发任务生成 Python（aider editblock）并在加固 Docker 内执行（网络隔离、只读根、非 root 等）；失败则自修复至通过 Reviewer，镜像提供 GIS 运行环境并锁版本实现可复现运行时。
             </li>
             <li>
               <strong>地图上下文：</strong>将地图状态建模为 Agent 上下文，实现空间状态在人机之间双向流转；产出经单一 <span class="highlight">MapAction 契约</span>（Zod ↔ Pydantic 对齐、共 12 类动作）由 SSE 推送、Cesium 消费同一 schema 渲染。
