@@ -577,7 +577,7 @@
           </div>
           <div class="item-tech">
             <span>TypeScript</span><span>React</span><span>MapLibre</span><span>Zustand</span><span>NestJS</span><span>PostGIS</span
-            ><span>Redis</span>
+            ><span>Redis</span><span>BullMQ</span><span>MinIO</span><span>GDAL</span><span>TiTiler</span>
           </div>
           <ul class="bullets">
             <li>
@@ -585,21 +585,22 @@
               >围绕公司产业地图业务与重复性数据处理需求，建设具备在线制图、海量空间数据管理、分析可视化及项目空间复用能力的一体化平台。
             </li>
             <li>
-              <strong>全栈架构落地：</strong>搭建由 React/Vite Web 工作台、NestJS 业务服务和 Python/FastAPI Agent
-              组成的多服务平台架构，并基于 pnpm workspace 统一管理共享包与工程依赖，支撑地图平台功能复用与快速迭代。
+              <strong>异步空间数据接入与处理：</strong>主导设计 <strong>BullMQ + Redis</strong> 异步接入管线，以一套 <span class="highlight">7 态状态机</span>统一承接批量文件导入与实时 AIS/ADS-B 轨迹同步两类入库场景，内置幂等去重与失败重试。
             </li>
             <li>
-              <strong>地图运行时与性能治理：</strong>围绕
-              <strong>map-core</strong> 构建地图运行时抽象，按数据复杂度、设备类型与场景路由动态选择渲染路径，并通过 Cesium / MapLibre
-              双引擎、单飞控制与 benchmark 体系支撑海量空间数据场景下的稳定渲染与性能优化。
+              <strong>空间数据模型、矢量瓦片与实时编辑：</strong>基于 <strong>PostGIS</strong> 设计 <span class="highlight">12 张表</span>的空间数据模型，构建<span class="highlight">免离线预切</span>的动态矢量瓦片服务，并解决跨瓦片标注重复合并、瓦片属性类型漂移两个渲染正确性难题；前端实现要素实时编辑（几何顶点增删 / 平移、属性修改与字段计算），编辑回写后自动失效并重载相关瓦片、保证即时可见。
             </li>
             <li>
-              <strong>AI 控图与数据生产管线：</strong>打通基于 Socket.IO 的 AI 控图链路，形成意图解析、UI Action
-              执行与前端回执闭环；同时构建覆盖上传配置、异步解析、几何校验、版本快照、字段映射及外部源定时同步的空间数据生产管线。
+              <strong>栅格瓦片服务（COG 动态切片）：</strong>集成 <strong>TiTiler + COG</strong> 构建免预热的动态栅格瓦片服务，经 GDAL 虚拟文件系统直读对象存储中的遥感影像，与矢量底图统一接入前端瓦片栈，实现影像<span class="highlight">「上传即出图」</span>。
             </li>
             <li>
-              <strong>项目成果：</strong>落地 AI+GIS 平台底座，沉淀 3 个核心应用与 3 个特性库，实现 AI
-              对地图图层、视角与部分业务操作的实时驱动。
+              <strong>Web 制图、协同与分享：</strong>以 <strong>Canvas</strong> 合成含制图要素（指北针 / 比例尺 / 图例等）的高清地图，并接入 <strong>tldraw</strong> 白板进行标注与多页导出；配套 token 鉴权的只读分享，支持地图成果嵌入第三方系统与移动端。
+            </li>
+            <li>
+              <strong>渲染性能评估体系：</strong>自研渲染性能基准框架，以新旧渲染引擎对比与多轮采样量化帧率、内存、瓦片传输量等关键指标，以数据驱动渲染引擎的选型与迁移决策。
+            </li>
+            <li>
+              <strong>项目成果：</strong>作为团队 GIS 平台底座投入日常业务，累计产出 [X]+ 篇自媒体地图配图、纳管 [X] TB 项目影像与成果数据，成为团队制图与空间数据管理的统一底座。
             </li>
           </ul>
         </div>
