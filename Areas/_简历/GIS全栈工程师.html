@@ -1,623 +1,606 @@
 <!doctype html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>肖竣文 - 全栈工程师简历</title>
-    <style>
-      /* CSS for A4, clean typography, compact layout */
-      :root {
-        --text-main: #111827;
-        --text-sub: #4b5563;
-        --text-light: #6b7280;
-        --accent: #2563eb;
-        --border: #e5e7eb;
-      }
 
-      * {
-        box-sizing: border-box;
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>肖竣文 - 全栈工程师简历</title>
+  <style>
+    /* CSS for A4, clean typography, compact layout */
+    :root {
+      --text-main: #111827;
+      --text-sub: #4b5563;
+      --text-light: #6b7280;
+      --accent: #2563eb;
+      --border: #e5e7eb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: var(--text-main);
+      background: #f3f4f6;
+      margin: 0;
+      padding: 20px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 35px 45px;
+      box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      border-radius: 4px;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-bottom: 2px solid var(--text-main);
+      padding-bottom: 12px;
+      margin-bottom: 20px;
+      flex-wrap: nowrap;
+      /* 防止左右两块被挤换行 */
+    }
+
+    .header-main {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+      flex-shrink: 0;
+      /* 防止左侧标题被挤压变形 */
+      max-width: 55%;
+      /* 给左侧设定一个最大宽度，防止挤压右侧 */
+    }
+
+    .header-title-row {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      white-space: nowrap;
+      /* 姓名和职位不换行 */
+    }
+
+    .name {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin: 0;
+      line-height: 1;
+      color: var(--text-main);
+    }
+
+    .job-title {
+      font-size: 16px;
+      color: var(--text-sub);
+      font-weight: 500;
+      margin: 0;
+    }
+
+    .job-summary {
+      font-size: 12.5px;
+      font-weight: 400;
+      color: var(--text-sub);
+      margin: 0;
+      line-height: 1.5;
+      white-space: nowrap;
+      /* 强制简介不换行 */
+    }
+
+    .contact-info {
+      text-align: right;
+      font-size: 13.5px;
+      color: var(--text-main);
+      line-height: 1.6;
+      font-weight: 500;
+      flex-shrink: 0;
+      /* 防止右侧联系方式被挤压换行 */
+    }
+
+    .contact-group {
+      margin-bottom: 4px;
+      white-space: nowrap;
+      /* 强制整个 group 不换行 */
+    }
+
+    .contact-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .secondary-contact {
+      font-size: 12.5px;
+      font-weight: 400;
+      color: var(--text-sub);
+    }
+
+    .secondary-contact a {
+      color: var(--text-sub);
+    }
+
+    .contact-info span {
+      margin-left: 10px;
+      /* 略微减小间距以适应一行 */
+      display: inline-flex;
+      /* 防止图标和文字中间断行 */
+      align-items: center;
+      white-space: nowrap;
+      /* 强制不换行 */
+    }
+
+    .contact-info svg {
+      width: 14px;
+      height: 14px;
+      margin-right: 4px;
+      fill: currentColor;
+      color: var(--text-sub);
+    }
+
+    /* Sections */
+    section {
+      margin-bottom: 0px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-main);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 6px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Skills */
+    .skills-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .skills-list li {
+      margin-bottom: 6px;
+      display: flex;
+      line-height: 1.6;
+    }
+
+    .skills-list .skill-category {
+      font-weight: 600;
+      width: 140px;
+      flex-shrink: 0;
+      color: var(--text-main);
+    }
+
+    .skills-list .skill-detail {
+      color: var(--text-main);
+      flex-grow: 1;
+      text-align: justify;
+    }
+
+    .item-header {
+      display: flex;
+      align-items: baseline;
+      margin-bottom: 4px;
+      flex-wrap: wrap;
+      /* 允许小屏幕下换行 */
+      gap: 8px 12px;
+    }
+
+    .item-title-group {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      flex-grow: 1;
+    }
+
+    .item-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .item-subtitle {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+      /* 使用主题色拉开层级 */
+    }
+
+    .item-meta {
+      font-size: 13px;
+      color: var(--text-light);
+      font-weight: 400;
+      text-align: right;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+      /* 时间用等宽字体更有极客感 */
+    }
+
+    .item-desc {
+      font-size: 14px;
+      color: var(--text-sub);
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .item-tech {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .item-tech span {
+      background: #f8fafc;
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid #e2e8f0;
+      color: var(--text-sub);
+      font-weight: 500;
+      font-size: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    }
+
+    /* Project Styles Optimization */
+    .project-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .project-title-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .project-role {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      background: rgba(37, 99, 235, 0.08);
+      padding: 3px 10px;
+      border-radius: 4px;
+      border: 1px solid rgba(37, 99, 235, 0.15);
+    }
+
+    .project-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12.5px;
+      color: var(--text-sub);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    }
+
+    .project-link:hover {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+
+    .project-link svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+    }
+
+    .bullets {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 14px;
+      color: var(--text-main);
+    }
+
+    .bullets li {
+      margin-bottom: 6px;
+      text-align: justify;
+      line-height: 1.6;
+    }
+
+    .bullets strong {
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .bullets .highlight {
+      font-weight: 600;
+      color: var(--text-main);
+      background: rgba(37, 99, 235, 0.08);
+      padding: 0 4px;
+      border-radius: 2px;
+    }
+
+    .project-block {
+      margin-bottom: 24px;
+    }
+
+    .project-block:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Print styles */
+    @media print {
+      @page {
+        size: A4;
+        margin: 15mm 20mm;
+        /* 设置标准且舒适的物理打印边距 */
       }
 
       body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
-        font-size: 13.5px;
-        line-height: 1.5;
-        color: var(--text-main);
-        background: #f3f4f6;
-        margin: 0;
-        padding: 20px;
-        -webkit-font-smoothing: antialiased;
+        background: transparent;
+        padding: 0;
+        -webkit-print-color-adjust: exact;
+        /* 强制保留背景色和高亮颜色，导出 PDF 质感更好 */
+        print-color-adjust: exact;
       }
 
       .page {
-        max-width: 800px;
-        margin: 0 auto;
-        background: #fff;
-        padding: 35px 45px;
-        box-shadow:
-          0 4px 6px -1px rgba(0, 0, 0, 0.1),
-          0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        border-radius: 4px;
+        box-shadow: none;
+        padding: 0;
+        max-width: 100%;
+      }
+
+      section,
+      .project-block,
+      .skills-list li {
+        page-break-inside: avoid;
+        /* 防止模块跨页截断，保证阅读连贯性 */
+        break-inside: avoid;
       }
 
       a {
-        color: var(--accent);
+        color: var(--text-main);
         text-decoration: none;
-      }
-
-      a:hover {
-        text-decoration: underline;
-      }
-
-      /* Header */
-      .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        border-bottom: 2px solid var(--text-main);
-        padding-bottom: 12px;
-        margin-bottom: 20px;
-        flex-wrap: nowrap;
-        /* 防止左右两块被挤换行 */
-      }
-
-      .header-main {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
-        flex-shrink: 0;
-        /* 防止左侧标题被挤压变形 */
-        max-width: 55%;
-        /* 给左侧设定一个最大宽度，防止挤压右侧 */
-      }
-
-      .header-title-row {
-        display: flex;
-        align-items: baseline;
-        gap: 16px;
-        white-space: nowrap;
-        /* 姓名和职位不换行 */
-      }
-
-      .name {
-        font-size: 32px;
-        font-weight: 700;
-        letter-spacing: 2px;
-        margin: 0;
-        line-height: 1;
-        color: var(--text-main);
-      }
-
-      .job-title {
-        font-size: 16px;
-        color: var(--text-sub);
-        font-weight: 500;
-        margin: 0;
-      }
-
-      .job-summary {
-        font-size: 12.5px;
-        font-weight: 400;
-        color: var(--text-sub);
-        margin: 0;
-        line-height: 1.5;
-        white-space: nowrap;
-        /* 强制简介不换行 */
-      }
-
-      .contact-info {
-        text-align: right;
-        font-size: 13.5px;
-        color: var(--text-main);
-        line-height: 1.6;
-        font-weight: 500;
-        flex-shrink: 0;
-        /* 防止右侧联系方式被挤压换行 */
-      }
-
-      .contact-group {
-        margin-bottom: 4px;
-        white-space: nowrap;
-        /* 强制整个 group 不换行 */
-      }
-
-      .contact-group:last-child {
-        margin-bottom: 0;
-      }
-
-      .secondary-contact {
-        font-size: 12.5px;
-        font-weight: 400;
-        color: var(--text-sub);
-      }
-
-      .secondary-contact a {
-        color: var(--text-sub);
-      }
-
-      .contact-info span {
-        margin-left: 10px;
-        /* 略微减小间距以适应一行 */
-        display: inline-flex;
-        /* 防止图标和文字中间断行 */
-        align-items: center;
-        white-space: nowrap;
-        /* 强制不换行 */
-      }
-
-      .contact-info svg {
-        width: 14px;
-        height: 14px;
-        margin-right: 4px;
-        fill: currentColor;
-        color: var(--text-sub);
-      }
-
-      /* Sections */
-      section {
-        margin-bottom: 0px;
-      }
-
-      .section-title {
-        font-size: 20px;
-        font-weight: 700;
-        color: var(--text-main);
-        border-bottom: 1px solid var(--border);
-        padding-bottom: 6px;
-        margin-bottom: 12px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        display: flex;
-        align-items: center;
-      }
-
-      /* Skills */
-      .skills-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        font-size: 14px;
-      }
-
-      .skills-list li {
-        margin-bottom: 6px;
-        display: flex;
-        line-height: 1.6;
-      }
-
-      .skills-list .skill-category {
-        font-weight: 600;
-        width: 140px;
-        flex-shrink: 0;
-        color: var(--text-main);
-      }
-
-      .skills-list .skill-detail {
-        color: var(--text-main);
-        flex-grow: 1;
-        text-align: justify;
-      }
-
-      .item-header {
-        display: flex;
-        align-items: baseline;
-        margin-bottom: 4px;
-        flex-wrap: wrap;
-        /* 允许小屏幕下换行 */
-        gap: 8px 12px;
-      }
-
-      .item-title-group {
-        display: flex;
-        align-items: baseline;
-        gap: 12px;
-        flex-grow: 1;
-      }
-
-      .item-title {
-        font-size: 16px;
-        font-weight: 700;
-        color: var(--text-main);
-      }
-
-      .item-subtitle {
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--accent);
-        /* 使用主题色拉开层级 */
-      }
-
-      .item-meta {
-        font-size: 13px;
-        color: var(--text-light);
-        font-weight: 400;
-        text-align: right;
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-        /* 时间用等宽字体更有极客感 */
-      }
-
-      .item-desc {
-        font-size: 14px;
-        color: var(--text-sub);
-        margin-bottom: 8px;
-        font-weight: 500;
-      }
-
-      .item-tech {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-bottom: 10px;
-      }
-
-      .item-tech span {
-        background: #f8fafc;
-        padding: 2px 8px;
-        border-radius: 4px;
-        border: 1px solid #e2e8f0;
-        color: var(--text-sub);
-        font-weight: 500;
-        font-size: 12px;
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-      }
-
-      /* Project Styles Optimization */
-      .project-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 8px;
-      }
-
-      .project-title-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-
-      .project-role {
-        font-size: 13px;
-        font-weight: 600;
-        color: var(--accent);
-        background: rgba(37, 99, 235, 0.08);
-        padding: 3px 10px;
-        border-radius: 4px;
-        border: 1px solid rgba(37, 99, 235, 0.15);
-      }
-
-      .project-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        font-size: 12.5px;
-        color: var(--text-sub);
-        text-decoration: none;
-        font-weight: 500;
-        transition: all 0.2s ease;
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-      }
-
-      .project-link:hover {
-        color: var(--accent);
-        text-decoration: underline;
-      }
-
-      .project-link svg {
-        width: 14px;
-        height: 14px;
-        fill: currentColor;
-      }
-
-      .bullets {
-        margin: 0;
-        padding-left: 18px;
-        font-size: 14px;
-        color: var(--text-main);
-      }
-
-      .bullets li {
-        margin-bottom: 6px;
-        text-align: justify;
-        line-height: 1.6;
-      }
-
-      .bullets strong {
-        font-weight: 600;
-        color: var(--text-main);
       }
 
       .bullets .highlight {
-        font-weight: 600;
-        color: var(--text-main);
-        background: rgba(37, 99, 235, 0.08);
-        padding: 0 4px;
-        border-radius: 2px;
+        background: rgba(37, 99, 235, 0.08) !important;
+        border-bottom: 1px solid rgba(37, 99, 235, 0.3) !important;
+        /* 打印时提升高亮质感 */
       }
 
-      .project-block {
-        margin-bottom: 24px;
+      .item-tech span {
+        border: 1px solid #cbd5e1 !important;
+        /* 打印时略微加深标签边框，防止太淡 */
       }
+    }
+  </style>
+</head>
 
-      .project-block:last-child {
-        margin-bottom: 0;
-      }
-
-      /* Print styles */
-      @media print {
-        @page {
-          size: A4;
-          margin: 15mm 20mm;
-          /* 设置标准且舒适的物理打印边距 */
-        }
-
-        body {
-          background: transparent;
-          padding: 0;
-          -webkit-print-color-adjust: exact;
-          /* 强制保留背景色和高亮颜色，导出 PDF 质感更好 */
-          print-color-adjust: exact;
-        }
-
-        .page {
-          box-shadow: none;
-          padding: 0;
-          max-width: 100%;
-        }
-
-        section,
-        .project-block,
-        .skills-list li {
-          page-break-inside: avoid;
-          /* 防止模块跨页截断，保证阅读连贯性 */
-          break-inside: avoid;
-        }
-
-        a {
-          color: var(--text-main);
-          text-decoration: none;
-        }
-
-        .bullets .highlight {
-          background: rgba(37, 99, 235, 0.08) !important;
-          border-bottom: 1px solid rgba(37, 99, 235, 0.3) !important;
-          /* 打印时提升高亮质感 */
-        }
-
-        .item-tech span {
-          border: 1px solid #cbd5e1 !important;
-          /* 打印时略微加深标签边框，防止太淡 */
-        }
-      }
-    </style>
-  </head>
-
-  <body>
-    <div class="page">
-      <!-- Header Section -->
-      <header class="header">
-        <div class="header-main">
-          <div class="header-title-row">
-            <h1 class="name">肖竣文</h1>
-            <h2 class="job-title">全栈工程师</h2>
-          </div>
-          <p class="job-summary">围绕智能体、空间数据与二三维可视化提供解决方案</p>
+<body>
+  <div class="page">
+    <!-- Header Section -->
+    <header class="header">
+      <div class="header-main">
+        <div class="header-title-row">
+          <h1 class="name">肖竣文</h1>
+          <h2 class="job-title">GIS全栈工程师</h2>
         </div>
-        <div class="contact-info">
-          <div class="contact-group primary-contact">
-            <span
-              ><svg viewBox="0 0 24 24">
-                <path d="M20 10.999h2C22 5.869 18.127 2 12.99 2v2C17.052 4 20 7.001 20 10.999z" />
-                <path
-                  d="M13 8c2.103 0 3 .897 3 3h2c0-3.225-1.775-5-5-5v2zm3.422 5.443a1.001 1.001 0 0 0-1.391.043l-2.393 2.461c-.576-.11-1.734-.471-2.926-1.66-1.192-1.193-1.553-2.354-1.66-2.926l2.459-2.394a1 1 0 0 0 .043-1.391L6.859 3.513a1 1 0 0 0-1.391-.087l-2.17 1.861a1 1 0 0 0-.29.649c-.015.25-.301 6.172 4.291 10.766C11.305 20.707 16.323 21 17.705 21c.202 0 .326-.006.359-.008a.992.992 0 0 0 .648-.291l1.86-2.171a1 1 0 0 0-.086-1.391l-4.064-3.696z"
-                />
-              </svg>
-              173 4531 7582</span
-            >
-            <span
-              ><svg viewBox="0 0 24 24">
-                <path
-                  d="M20 4H4c-1.103 0-2 .897-2 2v12c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2zm0 2v.511l-8 6.223-8-6.222V6h16zM4 18V9.044l7.386 5.745a.994.994 0 0 0 1.228 0L20 9.044 20.002 18H4z"
-                />
-              </svg>
-              3249554887@qq.com</span
-            >
-          </div>
-          <div class="contact-group secondary-contact">
-            <span
-              ><svg viewBox="0 0 24 24">
-                <path
-                  d="M11.999 1.993C6.486 1.994 2 6.48 1.999 11.994c0 5.514 4.486 10 9.999 10 5.514 0 10-4.486 10-10S17.514 1.993 11.999 1.993zM12 19.958c-4.385-.04-7.954-3.606-7.994-7.991C4.053 7.625 7.616 4.053 12 4.013c4.386.04 7.954 3.606 7.994 7.991C19.947 16.353 16.384 19.919 12 19.958z"
-                />
-                <path d="M12.983 6.942h-1.991v6l5.244 3.125.992-1.636-4.245-2.522z" />
-              </svg>
-              公众号：瓜姐正在VibeCoding</span
-            >
-            <span
-              ><svg viewBox="0 0 24 24">
-                <path
-                  d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm7.931 9h-2.764a14.67 14.67 0 0 0-1.792-6.243A8.013 8.013 0 0 1 19.931 11zM12.53 4.027c1.035 1.364 2.427 3.78 2.627 6.973H9.03c.139-2.596.994-5.028 2.451-6.974.172-.01.344-.026.519-.026.179 0 .354.016.53.027zm-3.842.7C7.677 6.646 6.107 8.9 5.827 11H3.069a8.013 8.013 0 0 1 5.619-6.273zM3.069 13h2.758c.28 2.1 1.849 4.354 2.861 6.273A8.014 8.014 0 0 1 3.069 13zm5.961 6.973C7.573 18.027 6.181 15.611 5.981 12.418h6.176c-.139 2.596-.995 5.028-2.451 6.974-.172.01-.344.026-.519.026-.179 0-.355-.016-.53-.027zm4.339-1.216c1.036-1.364 2.427-3.78 2.627-6.973h6.176c-.139 2.596-.994 5.028-2.451 6.974-.172.01-.344.026-.519.026-.179 0-.354-.016-.53-.027z"
-                />
-              </svg>
-              <a href="https://www.x-dimension.top/">个人网站：x-dimension.top</a></span
-            >
-          </div>
+        <p class="job-summary">围绕智能体、空间数据与二三维可视化提供解决方案</p>
+      </div>
+      <div class="contact-info">
+        <div class="contact-group primary-contact">
+          <span><svg viewBox="0 0 24 24">
+              <path d="M20 10.999h2C22 5.869 18.127 2 12.99 2v2C17.052 4 20 7.001 20 10.999z" />
+              <path
+                d="M13 8c2.103 0 3 .897 3 3h2c0-3.225-1.775-5-5-5v2zm3.422 5.443a1.001 1.001 0 0 0-1.391.043l-2.393 2.461c-.576-.11-1.734-.471-2.926-1.66-1.192-1.193-1.553-2.354-1.66-2.926l2.459-2.394a1 1 0 0 0 .043-1.391L6.859 3.513a1 1 0 0 0-1.391-.087l-2.17 1.861a1 1 0 0 0-.29.649c-.015.25-.301 6.172 4.291 10.766C11.305 20.707 16.323 21 17.705 21c.202 0 .326-.006.359-.008a.992.992 0 0 0 .648-.291l1.86-2.171a1 1 0 0 0-.086-1.391l-4.064-3.696z" />
+            </svg>
+            173 4531 7582</span>
+          <span><svg viewBox="0 0 24 24">
+              <path
+                d="M20 4H4c-1.103 0-2 .897-2 2v12c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2zm0 2v.511l-8 6.223-8-6.222V6h16zM4 18V9.044l7.386 5.745a.994.994 0 0 0 1.228 0L20 9.044 20.002 18H4z" />
+            </svg>
+            3249554887@qq.com</span>
         </div>
-      </header>
-
-      <!-- Professional Skills -->
-      <section>
-        <h2 class="section-title">专业技能</h2>
-        <ul class="skills-list">
-          <li>
-            <div class="skill-category">Harness Engineering</div>
-            <div class="skill-detail">
-              基于 LangGraph 构建具备<strong>可观测、评估与成本控制</strong>能力的生产级 Agent，通过 AI Action 协议实现<strong>
-                Agent 操控 Cesium 地图</strong
-              >，了解多层记忆系统<strong>（Working Memory + Semantic Memory）</strong>设计，了解 <strong>Mastra</strong>、<strong
-                >Hermes</strong
-              >
-              的架构方案。
-            </div>
-          </li>
-          <li>
-            <div class="skill-category">Vibe Coding</div>
-            <div class="skill-detail">
-              持续将
-              <strong>Claude Code / Codex</strong> 引入真实研发流程，围绕需求拆解、规范沉淀、代码生成、评审构建可复用工作流；在团队内推动
-              <strong>SDD</strong> 实践，沉淀专属 SKILL与Workflow，并输出 AI 编码教程内容，系列公众号阅读量 <strong>2000+</strong>。
-            </div>
-          </li>
-          <li>
-            <div class="skill-category">前端与工程化</div>
-            <div class="skill-detail">
-              熟练使用 <strong>React / TypeScript</strong> 构建复杂前端应用，具备性能优化与模块化设计能力；熟悉
-              <strong>pnpm workspaces / Vite / Docker</strong>，能够支撑多人协作与持续迭代。
-            </div>
-          </li>
-          <li>
-            <div class="skill-category">GIS 与 三维</div>
-            <div class="skill-detail">
-              熟练构建基于 <strong>CesiumJS / MapLibre / Deck.gl</strong> 的二维三维可视化应用；熟悉
-              <strong>PostGIS 与 OGC 标准</strong>，能够处理空间数据接入、服务发布与前端渲染联动。
-            </div>
-          </li>
-          <li>
-            <div class="skill-category">全栈交付</div>
-            <div class="skill-detail">
-              熟悉多服务全栈架构：<strong>NestJS</strong> 承担完整业务后端，<strong>Python / FastAPI</strong> 承载 AI Agent 运行时，通过
-              RESTful API 与 OpenAPI 规范打通前后端与 Agent 服务。
-            </div>
-          </li>
-        </ul>
-      </section>
-
-      <!-- Work Experience -->
-      <section>
-        <h2 class="section-title">工作经历</h2>
-        <div class="item-header">
-          <div class="item-title-group">
-            <div class="item-title">成都天巡微小卫星科技有限责任公司</div>
-            <div class="item-subtitle">前端与 GIS 核心开发</div>
-          </div>
-          <div class="item-meta">2024.11 — 至今</div>
+        <div class="contact-group secondary-contact">
+          <span><svg viewBox="0 0 24 24">
+              <path
+                d="M11.999 1.993C6.486 1.994 2 6.48 1.999 11.994c0 5.514 4.486 10 9.999 10 5.514 0 10-4.486 10-10S17.514 1.993 11.999 1.993zM12 19.958c-4.385-.04-7.954-3.606-7.994-7.991C4.053 7.625 7.616 4.053 12 4.013c4.386.04 7.954 3.606 7.994 7.991C19.947 16.353 16.384 19.919 12 19.958z" />
+              <path d="M12.983 6.942h-1.991v6l5.244 3.125.992-1.636-4.245-2.522z" />
+            </svg>
+            公众号：瓜姐正在VibeCoding</span>
+          <span><svg viewBox="0 0 24 24">
+              <path
+                d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm7.931 9h-2.764a14.67 14.67 0 0 0-1.792-6.243A8.013 8.013 0 0 1 19.931 11zM12.53 4.027c1.035 1.364 2.427 3.78 2.627 6.973H9.03c.139-2.596.994-5.028 2.451-6.974.172-.01.344-.026.519-.026.179 0 .354.016.53.027zm-3.842.7C7.677 6.646 6.107 8.9 5.827 11H3.069a8.013 8.013 0 0 1 5.619-6.273zM3.069 13h2.758c.28 2.1 1.849 4.354 2.861 6.273A8.014 8.014 0 0 1 3.069 13zm5.961 6.973C7.573 18.027 6.181 15.611 5.981 12.418h6.176c-.139 2.596-.995 5.028-2.451 6.974-.172.01-.344.026-.519.026-.179 0-.355-.016-.53-.027zm4.339-1.216c1.036-1.364 2.427-3.78 2.627-6.973h6.176c-.139 2.596-.994 5.028-2.451 6.974-.172.01-.344.026-.519.026-.179 0-.354-.016-.53-.027z" />
+            </svg>
+            <a href="https://www.x-dimension.top/">个人网站：x-dimension.top</a></span>
         </div>
-        <div class="item-desc">负责三维可视化平台的前端开发、GIS 能力建设与部分架构设计，参与需求分析、方案落地与项目交付。</div>
+      </div>
+    </header>
+
+    <!-- Professional Skills -->
+    <section>
+      <h2 class="section-title">专业技能</h2>
+      <ul class="skills-list">
+        <li>
+          <div class="skill-category">服务设计与实现</div>
+          <div class="skill-detail">
+            熟悉基于 <strong>Node.js / NestJS</strong> 与 <strong>Python / FastAPI</strong> 的服务设计与实现，具备服务拆分、接口抽象、
+            业务流程编排与多服务协同经验，能够支撑复杂业务系统与平台型应用的后端建设。
+          </div>
+        </li>
+        <li>
+          <div class="skill-category">GIS 与 三维</div>
+          <div class="skill-detail">
+            熟练构建基于 <strong>CesiumJS / MapLibre / Deck.gl</strong> 的二维三维可视化应用；熟悉
+            <strong>PostGIS 与 OGC 标准</strong>，能够处理空间数据接入、服务发布与前端渲染联动。
+          </div>
+        </li>
+        <li>
+          <div class="skill-category">前端与工程化</div>
+          <div class="skill-detail">
+            熟练使用 <strong>React / TypeScript</strong> 构建复杂前端应用，具备性能优化与模块化设计能力；熟悉
+            <strong>pnpm workspaces / Vite / Docker</strong>，能够支撑多人协作与持续迭代。
+          </div>
+        </li>
+        <li>
+          <div class="skill-category">AI Coding</div>
+          <div class="skill-detail">
+            持续将
+            <strong>Claude Code / Codex</strong> 引入真实研发流程，围绕需求拆解、规范沉淀、代码生成、评审构建可复用工作流；在团队内推动
+            <strong>SDD</strong> 实践，沉淀专属 SKILL与Workflow，并输出 AI 编码教程内容，系列公众号阅读量 <strong>2000+</strong>。
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Work Experience -->
+    <section>
+      <h2 class="section-title">工作经历</h2>
+      <div class="item-header">
+        <div class="item-title-group">
+          <div class="item-title">成都天巡微小卫星科技有限责任公司</div>
+          <div class="item-subtitle">全栈与 GIS 核心开发</div>
+        </div>
+        <div class="item-meta">2024.11 — 至今</div>
+      </div>
+      <div class="item-desc">
+        负责公司 GIS
+        平台与项目型应用的全栈开发，参与视觉导航、智慧机场、农险等项目建设，围绕空间数据接入、地图服务联动、二三维可视化及业务工作台建设，攻克空间数据渲染与动态轨迹展示等问题，完成前后端功能落地、性能优化与项目交付。
+      </div>
+    </section>
+
+    <!-- Project Experience -->
+    <section>
+      <h2 class="section-title">项目经历</h2>
+
+      <!-- Project 1 -->
+      <div class="project-block">
+        <div class="project-header">
+          <div class="project-title-wrapper">
+            <div class="item-title">GeoLens · 对话式地理空间分析 Agent</div>
+            <div class="project-role">全栈开发</div>
+          </div>
+          <a href="https://github.com/JunwenXiao0905/geolens" target="_blank" class="project-link">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+            </svg>
+            github.com/JunwenXiao0905/geolens
+          </a>
+        </div>
+        <div class="item-tech">
+          <span>React</span><span>TypeScript</span><span>Cesium</span><span>Zod</span><span>Python</span><span>FastAPI</span><span>LangGraph</span><span>Langfuse</span><span>Pydantic</span><span>SSE</span>
+        </div>
         <ul class="bullets">
           <li>
-            <strong>WebGIS 核心研发与性能攻坚：</strong>参与视觉导航、智慧机场、农险等项目开发，基于 React + Cesium/MapLibre
-            构建高性能二/三维可视化底座。通过<span class="highlight">LOD层级优化与瓦片缓存策略</span>，实现
-            <span class="highlight">TB级</span> 数据秒级加载，支撑 <span class="highlight">10万+</span> 动态轨迹点实时渲染。
+            <strong>项目背景：</strong>空间分析长期被专家工具垄断。本项目面向不懂 GIS 和代码的用户，用自然语言描述复合空间分析任务，能即时生成代码以计算与可视化，结果直接在web地图上渲染，形成"需求 →
+            数据 →
+            可视化"的完整闭环。
           </li>
           <li>
-            <strong>AI 协作开发规范落地：</strong>统一项目级 CLAUDE.md、Git 规范与文档架构，基于
-            <strong>OpenSpec</strong> 规范需求拆解、任务推进与文档沉淀，并通过 AI 自检结合人工 review
-            完善交付闭环，提升团队研发效率与代码质量。
+            <strong>多智能体编排：</strong>基于 <strong>LangGraph StateGraph</strong> 构建对话式地理空间分析的多智能体编排——InteractionAgent（意图判断 +
+            用户交互）→ Manager（规划调度 + 结果收敛）⇄ SubAgents（执行）→ Reviewer（反馈审阅，返工上限防死循环）→ InteractionAgent 最终回复。
+          </li>
+          <li>
+            <strong>可靠性设计：</strong>硬预算护栏——对单次运行的迭代步数、LLM 调用、工具调用、地图动作数设硬上限，超限即强制终止；接入 <span
+              class="highlight">Langfuse</span> 自托管做全链路 trace（覆盖每个 LLM 调用、工具调用、agent 步骤）+ per-token 成本归集 + 延迟监控；18
+            题意图分类回归集 + 二元 LLM-judge，作为 prompt 改动的回归测试。
+          </li>
+          <li>
+            <strong>CoderAgent：</strong>根据分发任务生成 Python（aider editblock）并在加固 Docker 内执行（网络隔离、只读根、非 root 等）；失败则自修复至通过
+            Reviewer，镜像提供 GIS 运行环境并锁版本实现可复现运行时。
+          </li>
+          <li>
+            <strong>地图上下文：</strong>将地图状态建模为 Agent 上下文，实现空间状态在人机之间双向流转；产出经单一 <span class="highlight">MapAction
+              契约</span>（Zod ↔ Pydantic 对齐、共 12 类动作）由 SSE 推送、Cesium 消费同一 schema 渲染。
+          </li>
+          <li>
+            <strong>项目成果：</strong>以自然语言驱动数据加载 / POI 搜索 / 路径规划 / 影像识别 / 视角描述 5 类 GIS 分析，将地图操作门槛从"需编程 + GIS 基础"降为"一句话交互"。
           </li>
         </ul>
-      </section>
+      </div>
 
-      <!-- Project Experience -->
-      <section>
-        <h2 class="section-title">项目经历</h2>
-
-        <!-- Project 1 -->
-        <div class="project-block">
-          <div class="project-header">
-            <div class="project-title-wrapper">
-              <div class="item-title">GeoLens · 对话式地理空间分析 Agent</div>
-              <div class="project-role">全栈开发</div>
-            </div>
-            <a href="https://github.com/JunwenXiao0905/geolens" target="_blank" class="project-link">
-              <svg viewBox="0 0 24 24">
-                <path
-                  d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
-                />
-              </svg>
-              github.com/JunwenXiao0905/geolens
-            </a>
+      <!-- Project 2 -->
+      <div class="project-block">
+        <div class="project-header">
+          <div class="project-title-wrapper">
+            <div class="item-title">SpaceMV-CoAI-Map</div>
+            <div class="project-role">全栈开发</div>
           </div>
-          <div class="item-tech">
-            <span>React</span><span>TypeScript</span><span>Cesium</span><span>Zod</span><span>Python</span><span>FastAPI</span><span>LangGraph</span><span>Langfuse</span><span>Pydantic</span><span>SSE</span>
-          </div>
-          <ul class="bullets">
-            <li>
-              <strong>多智能体编排：</strong>基于 <strong>LangGraph StateGraph</strong> 构建对话式地理空间分析的多智能体编排——InteractionAgent（意图判断 + 用户交互）→ Manager（规划调度 + 结果收敛）⇄ SubAgents（执行）→ Reviewer（反馈审阅，返工上限防死循环）→ InteractionAgent 最终回复。
-            </li>
-            <li>
-              <strong>可靠性设计：</strong>硬预算护栏——对单次运行的迭代步数、LLM 调用、工具调用、地图动作数设硬上限，超限即强制终止；接入 <span class="highlight">Langfuse</span> 自托管做全链路 trace（覆盖每个 LLM 调用、工具调用、agent 步骤）+ per-token 成本归集 + 延迟监控；18 题意图分类回归集 + 二元 LLM-judge，作为 prompt 改动的回归测试。
-            </li>
-            <li>
-              <strong>CoderAgent：</strong>根据分发任务生成 Python（aider editblock）并在加固 Docker 内执行（网络隔离、只读根、非 root 等）；失败则自修复至通过 Reviewer，镜像提供 GIS 运行环境并锁版本实现可复现运行时。
-            </li>
-            <li>
-              <strong>地图上下文：</strong>将地图状态建模为 Agent 上下文，实现空间状态在人机之间双向流转；产出经单一 <span class="highlight">MapAction 契约</span>（Zod ↔ Pydantic 对齐、共 12 类动作）由 SSE 推送、Cesium 消费同一 schema 渲染。
-            </li>
-            <li>
-              <strong>项目成果：</strong>以自然语言驱动数据加载 / POI 搜索 / 路径规划 / 影像识别 / 视角描述 5 类 GIS 分析，将地图操作门槛从"需编程 + GIS 基础"降为"一句话交互"。
-            </li>
-          </ul>
+          <a href="https://github.com/spacemv-lab/SpaceMV-CoAI-Map" target="_blank" class="project-link">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+            </svg>
+            github.com/spacemv-lab/SpaceMV-CoAI-Map
+          </a>
         </div>
-
-        <!-- Project 2 -->
-        <div class="project-block">
-          <div class="project-header">
-            <div class="project-title-wrapper">
-              <div class="item-title">SpaceMV-CoAI-Map</div>
-              <div class="project-role">全栈开发</div>
-            </div>
-            <a href="https://github.com/spacemv-lab/SpaceMV-CoAI-Map" target="_blank" class="project-link">
-              <svg viewBox="0 0 24 24">
-                <path
-                  d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
-                />
-              </svg>
-              github.com/spacemv-lab/SpaceMV-CoAI-Map
-            </a>
-          </div>
-          <div class="item-tech">
-            <span>TypeScript</span><span>React</span><span>MapLibre</span><span>Zustand</span><span>NestJS</span><span>PostGIS</span
-            ><span>Redis</span>
-          </div>
-          <ul class="bullets">
-            <li>
-              <strong>项目背景：</strong
-              >围绕公司产业地图业务与重复性数据处理需求，建设具备在线制图、海量空间数据管理、分析可视化及项目空间复用能力的一体化平台。
-            </li>
-            <li>
-              <strong>全栈架构落地：</strong>搭建由 React/Vite Web 工作台、NestJS 业务服务和 Python/FastAPI Agent
-              组成的多服务平台架构，并基于 pnpm workspace 统一管理共享包与工程依赖，支撑地图平台功能复用与快速迭代。
-            </li>
-            <li>
-              <strong>地图运行时与性能治理：</strong>围绕
-              <strong>map-core</strong> 构建地图运行时抽象，按数据复杂度、设备类型与场景路由动态选择渲染路径，并通过 Cesium / MapLibre
-              双引擎、单飞控制与 benchmark 体系支撑海量空间数据场景下的稳定渲染与性能优化。
-            </li>
-            <li>
-              <strong>AI 控图与数据生产管线：</strong>打通基于 Socket.IO 的 AI 控图链路，形成意图解析、UI Action
-              执行与前端回执闭环；同时构建覆盖上传配置、异步解析、几何校验、版本快照、字段映射及外部源定时同步的空间数据生产管线。
-            </li>
-            <li>
-              <strong>项目成果：</strong>落地 AI+GIS 平台底座，沉淀 3 个核心应用与 3 个特性库，实现 AI
-              对地图图层、视角与部分业务操作的实时驱动。
-            </li>
-          </ul>
+        <div class="item-tech">
+          <span>TypeScript</span><span>React</span><span>MapLibre</span><span>Zustand</span><span>NestJS</span><span>PostGIS</span><span>Redis</span><span>BullMQ</span><span>MinIO</span><span>GDAL</span><span>TiTiler</span>
         </div>
-      </section>
+        <ul class="bullets">
+          <li>
+            <strong>项目背景：</strong>围绕公司产业地图业务与重复性数据处理需求，建设具备在线制图、空间数据管理、分析可视化及项目空间复用能力的一体化平台。
+          </li>
+          <li>
+            <strong>异步空间数据接入与处理：</strong>主导设计 <strong>BullMQ + Redis</strong> 异步接入管线，以一套 <span class="highlight">7
+              态状态机</span>统一承接批量文件导入与实时 AIS/ADS-B 轨迹同步两类入库场景，内置幂等去重与失败重试。
+          </li>
+          <li>
+            <strong>空间数据模型、矢量瓦片与实时编辑：</strong>基于 <strong>PostGIS</strong> 设计 <span class="highlight">12
+              张表</span>的空间数据模型，构建<span
+              class="highlight">免离线预切</span>的动态矢量瓦片服务，并解决跨瓦片标注重复合并、瓦片属性类型漂移两个渲染正确性难题；前端实现要素实时编辑（几何顶点增删 /
+            平移、属性修改与字段计算），编辑回写后自动失效并重载相关瓦片、保证即时可见。
+          </li>
+          <li>
+            <strong>栅格瓦片服务（COG 动态切片）：</strong>集成 <strong>TiTiler + COG</strong> 构建免预热的动态栅格瓦片服务，经 GDAL
+            虚拟文件系统直读对象存储中的遥感影像，与矢量底图统一接入前端瓦片栈，实现影像<span class="highlight">「上传即出图」</span>。
+          </li>
+          <li>
+            <strong>Web 制图、协同与分享：</strong>以 <strong>Canvas</strong> 合成含制图要素（指北针 / 比例尺 / 图例等）的高清地图，并接入
+            <strong>tldraw</strong> 白板进行标注与多页导出；配套 token 鉴权的只读分享，支持地图成果嵌入第三方系统与移动端。
+          </li>
+          <li>
+            <strong>渲染性能评估体系：</strong>自研渲染性能基准框架，以新旧渲染引擎对比与多轮采样量化帧率、内存、瓦片传输量等关键指标，以数据驱动渲染引擎的选型与迁移决策。
+          </li>
+          <li>
+            <strong>项目成果：</strong>作为团队 GIS 平台底座投入日常业务，累计产出 10+ 篇自媒体地图配图、纳管 100+GB 项目影像与成果数据，成为团队制图与空间数据管理的统一底座。
+          </li>
+        </ul>
+      </div>
+    </section>
 
-      <!-- Education -->
-      <section>
-        <h2 class="section-title">教育背景</h2>
-        <div class="item-header" style="margin-bottom: 0">
-          <div class="item-title-group" style="gap: 16px">
-            <div class="item-title">西南科技大学</div>
-            <div class="item-subtitle">地理信息科学（本科）</div>
-            <div class="item-meta" style="color: var(--text-sub); text-align: left; font-family: inherit">
-              获得 2 项国家级奖项，担任社团会长并获得十佳社团之首
-            </div>
+    <!-- Education -->
+    <section>
+      <h2 class="section-title">教育背景</h2>
+      <div class="item-header" style="margin-bottom: 0">
+        <div class="item-title-group" style="gap: 16px">
+          <div class="item-title">西南科技大学</div>
+          <div class="item-subtitle">地理信息科学（本科）</div>
+          <div class="item-meta" style="color: var(--text-sub); text-align: left; font-family: inherit">
+            获得 2 项国家级奖项，担任社团会长并获得十佳社团之首
           </div>
         </div>
-      </section>
-    </div>
-  </body>
+      </div>
+    </section>
+  </div>
+</body>
+
 </html>
