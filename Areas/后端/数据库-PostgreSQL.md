@@ -49,6 +49,16 @@
   - [7.4 左表与右表](#74-左表与右表)
   - [7.5 裸表名陷阱](#75-裸表名陷阱)
   - [7.6 对照 SQLAlchemy relationship](#76-对照-sqlalchemy-relationship)
+- [第8章 PostGIS 专题（空间数据库）](#第8章-postgis-专题空间数据库)
+  - [8.1 安装与启用](#81-安装与启用)
+  - [8.2 geometry 类型与 WKT](#82-geometry-类型与-wkt)
+  - [8.3 SRID 与 geometry vs geography](#83-srid-与-geometry-vs-geography)
+  - [8.4 ST_ 函数家族](#84-st_-函数家族)
+  - [8.5 空间索引 GiST](#85-空间索引-gist)
+  - [8.6 实战查询](#86-实战查询)
+  - [8.7 栅格与数据导入](#87-栅格与数据导入)
+  - [8.8 面试要点速记](#88-面试要点速记)
+  - [8.9 参考来源](#89-参考来源)
 
 ## 第0章 前置基础
 
@@ -823,3 +833,198 @@ ORM 的 `relationship` 是 JOIN 的封装：
 notes: Mapped[list["Note"]] = relationship(back_populates="user")
 # 访问 user.notes 时，SQLAlchemy 自动生成 JOIN 或子查询拉取关联行
 ```
+
+## 第8章 PostGIS 专题（空间数据库）
+
+> PostGIS 是 PostgreSQL 的空间扩展，把 PG 变成**空间数据库**，是 GIS 行业的事实标准。本章覆盖面试与实战核心：几何类型、坐标系、ST_ 函数、空间索引、KNN、数据导入。
+
+### 8.1 安装与启用
+
+PostGIS 用独立 Docker 镜像 `postgis/postgis`（PG + PostGIS 预装）：
+
+```powershell
+docker run --name postgis16 -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=gisdb -p 5435:5432 -v postgisdata:/var/lib/postgresql/data -d --restart unless-stopped postgis/postgis:16-3.4
+```
+
+每个库要**手动启用**扩展（二进制预装，但不自动开）：
+
+```sql
+CREATE EXTENSION postgis;
+SELECT PostGIS_Version();   -- 返回 3.x 即成功
+```
+
+### 8.2 geometry 类型与 WKT
+
+PostGIS 给 PG 加了 `geometry` 类型。建空间列时可约束**类型 + SRID**：
+
+```sql
+CREATE TABLE pois (
+    id serial PRIMARY KEY,
+    name varchar(100),
+    geom geometry(Point, 4326)   -- 只能存点，SRID 锁 4326
+);
+
+INSERT INTO pois (name, geom) VALUES
+  ('天安门', ST_GeomFromText('POINT(116.397 39.908)', 4326));
+```
+
+**WKT（Well-Known Text）** 是几何的文本写法：
+
+| 几何 | WKT |
+|------|-----|
+| 点 | `POINT(x y)` |
+| 线 | `LINESTRING(0 0, 1 1, 2 2)` |
+| 面 | `POLYGON((0 0, 1 0, 1 1, 0 0))`（首尾闭合） |
+
+> ⚠️ **经度（lon）在前，纬度（lat）在后**：`POINT(116.397 39.908)` = `POINT(经度 纬度)` = `POINT(x y)`。这是 PostGIS 最经典的坑——人脑习惯"纬度在前"，但 GIS 标准**永远是 X=经度、Y=纬度**。面试官超爱问。
+
+`geometry` 列存的是**二进制（WKB）**，直接 SELECT 看不懂，要转文本：
+
+- `ST_AsText(geom)` → WKT：`POINT(116.397 39.908)`
+- `ST_AsGeoJSON(geom)` → GeoJSON：`{"type":"Point","coordinates":[116.397,39.908]}`
+
+输入用 `ST_GeomFromText(WKT, SRID)`（或更快的 `ST_SetSRID(ST_MakePoint(x,y), SRID)`）。
+
+### 8.3 SRID 与 geometry vs geography（面试高频）
+
+**SRID（Spatial Reference ID）= 你的坐标数字是哪套坐标系**：
+
+| SRID | 坐标系 | 单位 | 用途 |
+|------|--------|------|------|
+| `4326` | WGS84 | 度（经纬度） | GPS、GeoJSON 默认 |
+| `3857` | Web Mercator | 米 | Web 地图（高德 / Google） |
+
+**geometry vs geography**（核心区别）：
+
+| | `geometry` | `geography` |
+|---|---|---|
+| 把地球当成 | 平面（笛卡尔） | 球面（椭球） |
+| 距离 / 面积单位 | 跟坐标系的单位（4326 就是度） | **永远是米** |
+| 适合 | 已投影数据（3857 米）、局部小区域 | 经纬度（4326）做全球距离 / 面积 |
+| 速度 | 快 | 慢 |
+
+> ⚠️ **经典坑**：把经纬度（4326）存成 `geometry` 再 `ST_Distance`，得到的是**度**，不是米，完全没意义。经纬度算距离 / 面积，**要么用 geography 类型，要么 `geom::geography` 转一下**。面试官爱挖："你 ST_Distance 算出 0.035，这是啥单位？"
+
+**ST_SetSRID vs ST_Transform**（另一个面试陷阱）：
+
+| 函数 | 作用 | 改坐标数值吗 |
+|------|------|--------------|
+| `ST_SetSRID(geom, 4326)` | 只是**贴标签** | **不改** |
+| `ST_Transform(geom, 3857)` | 真正**重投影** | **改**（重新计算） |
+
+### 8.4 ST_ 函数家族
+
+| 家族 | 代表函数 | 返回 |
+|------|----------|------|
+| **测量** | `ST_Distance`、`ST_Length`、`ST_Area`、`ST_Perimeter` | 数值 |
+| **关系（谓词）** | `ST_Intersects`、`ST_Within`、`ST_Contains`、`ST_DWithin`、`ST_Touches`、`ST_Crosses` | 布尔 |
+| **生成 / 集合** | `ST_Buffer`、`ST_Intersection`、`ST_Union`、`ST_Centroid`、`ST_MakePoint` | 几何 |
+
+- **空间连接（spatial join）**：JOIN 条件用空间函数，如 `JOIN districts d ON ST_Within(p.geom, d.geom)`——这是 GIS 查询的精髓。
+- "找附近"用 `ST_DWithin`（能用索引），别用 `ST_Distance < N`。
+
+### 8.5 空间索引 GiST（性能，面试超爱）
+
+没索引时，空间查询**逐行扫整张表**（N 行算 N 次几何运算），大数据量慢到不能用。
+
+**GiST（Generalized Search Tree）** 是空间索引类型：
+
+```sql
+CREATE INDEX pois_geom_gist ON pois USING GIST (geom);
+VACUUM ANALYZE pois;        -- 让规划器知道新索引
+```
+
+**原理**：GiST 存每个几何的**外包框（bounding box）**。查询时先用 `&&`（外包框相交）操作符**快速粗筛**绝大多数不可能匹配的几何，只剩少量候选再做精确检测。
+
+- 普通 btree 索引对几何**没用**（几何没"大小顺序"），空间必须 `USING GIST`。
+- 空间谓词（`ST_Intersects` / `ST_Within` / `ST_DWithin`）检测到 GiST 索引就**自动走**，查询不用改。
+- 建完索引要 `VACUUM ANALYZE`，否则规划器可能还全表扫。
+
+**用 EXPLAIN 验证**：
+
+```
+建索引前：Seq Scan on pois (cost=0.00..125231)              ← 全表扫，慢
+建索引后：Index Scan using pois_geom_gist (cost=0.28..20.79) ← 用索引，快 ~6000 倍
+         Index Cond: geom && st_expand(...)   ← 外包框粗筛
+         Filter:     st_dwithin(...)          ← 精确检测，只对候选
+```
+
+> 💡 面试经典问："ST_DWithin 查询慢怎么优化？"答：**确认 geom 列有 GiST 索引、统计信息最新（ANALYZE）**。会读 EXPLAIN 是加分项。
+
+### 8.6 实战查询
+
+**① KNN：找最近的 N 个**（用 `<->` 操作符）：
+
+```sql
+SELECT name,
+       ST_Distance(geom::geography, ST_GeogFromText('POINT(116.397 39.908)')) AS dist_m
+FROM pois
+ORDER BY geom <-> ST_GeomFromText('POINT(116.397 39.908)', 4326)
+LIMIT 3;
+```
+
+- `<->` 是 KNN 距离操作符，在 ORDER BY 里**能走 GiST 索引**。
+- "找最近 N 个"用 `ORDER BY geom <-> 点 LIMIT N`，别用 `ORDER BY ST_Distance(...)`（全算慢）。
+
+**② 空间连接 + 统计**（多边形内有多少点）：
+
+```sql
+SELECT count(*) FROM pois p JOIN districts d ON ST_Within(p.geom, d.geom);
+```
+
+**③ 缓冲区**（给点画 500 米圈）：
+
+```sql
+SELECT name, ST_AsGeoJSON(ST_Buffer(geom::geography, 500)) AS buffer_500m
+FROM pois WHERE name IN ('天安门','故宫','天坛');
+```
+
+### 8.7 栅格与数据导入
+
+**矢量 vs 栅格**：
+
+| | 矢量 | 栅格 |
+|---|------|------|
+| 是什么 | 点 / 线 / 面 | 像素网格 |
+| 典型 | POI、边界、路网 | 卫星图、高程、温度 |
+| 用得多 | **99% 业务** | 影像 / 遥感 |
+
+**数据导入**（面试常问"怎么把空间数据导进 PostGIS"）：
+
+| 来源 | 工具 | 说明 |
+|------|------|------|
+| **GeoJSON** | `ST_GeomFromGeoJSON` | SQL 直接转 |
+| **Shapefile** | `shp2pgsql`（PostGIS 自带 CLI） | shp → SQL 灌入 |
+| **多格式直读** | `ogr_fdw` 扩展 | GeoJSON / KML / GPKG 当外表查 |
+| **OpenStreetMap** | `osm2pgsql` | OSM → PostGIS |
+
+```sql
+-- 从 GeoJSON 插多边形
+INSERT INTO districts (name, geom)
+SELECT '从GeoJSON', ST_SetSRID(ST_GeomFromGeoJSON(
+  '{"type":"Polygon","coordinates":[[[116.40,39.91],[116.43,39.91],[116.43,39.94],[116.40,39.94],[116.40,39.91]]]}'
+), 4326);
+```
+
+> ⚠️ GeoJSON Polygon 坐标是**三层方括号** `[[[x,y],...]]`（多边形 → 环 → 点），少一层报错；且 `ST_GeomFromGeoJSON` 不带 SRID，要 `ST_SetSRID(..., 4326)` 补上（GeoJSON 默认 WGS84）。
+
+### 8.8 面试要点速记
+
+1. **PostGIS 是啥**：PG 的空间扩展，把 PG 变空间数据库；`CREATE EXTENSION postgis`。
+2. **经度在前**：`POINT(lon lat)` = `POINT(x y)`。
+3. **geometry vs geography**：经纬度算距离用 geography（米），否则得到度。
+4. **ST_SetSRID 贴标签 / ST_Transform 真重投影**。
+5. **找附近用 `ST_DWithin`**（能索引）；**找最近用 `<->` + LIMIT**（KNN，能索引）。
+6. **空间索引用 GiST**（`USING GIST`），不是 btree；建完 `VACUUM ANALYZE`。
+7. **GiST 原理**：外包框粗筛 → 精确检测。
+8. **读 EXPLAIN**：Seq Scan（慢 / 无索引）vs Index Scan + `&&`（快 / 用上索引）。
+9. **空间连接**：JOIN ON 用空间函数。
+10. **导入**：GeoJSON 用 `ST_GeomFromGeoJSON`（三层括号 + 补 SRID）；shapefile 用 `shp2pgsql`。
+
+### 8.9 参考来源（均为官方 / 权威一手）
+
+- **PostGIS 官方文档**：postgis.net/docs（几何类型、ST_ 函数、GiST 索引、栅格全在这）
+- **PostGIS 项目 / 镜像**：postgis.net、hub.docker.com/r/postgis/postgis
+- **坐标系 / SRID**：spatialreference.org（EPSG 4326 / 3857 等）；PostGIS 内置 `spatial_ref_sys` 表
+- **WKT / WKB 标准**：OGC Simple Features for SQL（SFS）
+- **导入工具**：shp2pgsql、ogr_fdw、osm2pgsql（各自官方仓库）
