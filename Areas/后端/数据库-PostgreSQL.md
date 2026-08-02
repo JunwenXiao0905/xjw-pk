@@ -16,10 +16,13 @@
   - [1.3 pgAdmin:官方图形工具](#13-pgadmin官方图形工具)
   - [1.4 VS Code 数据库插件](#14-vs-code-数据库插件)
   - [1.5 图形 vs 命令行(psql)](#15-图形-vs-命令行psql)
-  - [1.6 参考来源](#16-参考来源)
+  - [1.6 PG 客户端工具家族](#16-pg-客户端工具家族)
+  - [1.7 参考来源](#17-参考来源)
 - [第2章 数据库结构](#第2章-数据库结构)
   - [2.1 层级结构](#21-层级结构)
-  - [2.2 数据库操作](#22-数据库操作)
+  - [2.2 Schema 详解](#22-schema-详解)
+  - [2.3 Schema 划分实践](#23-schema-划分实践)
+  - [2.4 数据库操作](#24-数据库操作)
 - [第3章 用户、角色与权限](#第3章-用户角色与权限)
   - [3.1 用户与角色](#31-用户与角色)
   - [3.2 角色属性](#32-角色属性)
@@ -30,6 +33,7 @@
   - [4.2 查看表结构](#42-查看表结构)
   - [4.3 约束](#43-约束)
   - [4.4 自增主键与 Sequence](#44-自增主键与-sequence)
+  - [4.5 标识符与大小写](#45-标识符与大小写)
 - [第5章 SQL 增删改查](#第5章-sql-增删改查)
   - [5.1 INSERT 插入](#51-insert-插入)
   - [5.2 SELECT 查询](#52-select-查询)
@@ -313,7 +317,62 @@ psql 里两类命令：
 | **VS Code 插件** | 已在写代码，顺手查库改库，不想切窗口 |
 | **psql** | 服务器无 GUI、写脚本 / 自动化、轻量快速 |
 
-### 1.6 参考来源
+### 1.6 PG 客户端工具家族
+
+psql / pg_dump / pg_restore / pgAdmin 都是**客户端工具**，平级，连同一个 PG 服务端干活，本身都不是数据库。区别只在"各管一摊"：
+
+```
+PostgreSQL 引擎（后台服务）
+   │
+   │  你不直接和引擎对话，要用客户端工具连它
+   │
+   ├── psql         交互式写 SQL、查数据（连进去敲命令）
+   ├── pg_dump      把数据库导出成 .sql 备份文件
+   ├── pg_restore   从备份文件恢复
+   ├── createdb / dropdb   命令行快捷建库/删库
+   └── pgAdmin      图形界面（独立软件，不在引擎里）
+```
+
+| 工具 | 干什么 | 怎么用 | 出来什么 |
+|------|--------|--------|----------|
+| **psql** | 交互式连库写 SQL | `psql -U postgres -d appdb` 进去敲命令 | 查询结果、表结构（`\d`） |
+| **pg_dump** | 导出数据库为备份文件 | `pg_dump -U postgres -d appdb > backup.sql` | 一个 `.sql` 文件（建表+插数据语句） |
+| **pg_restore** | 从备份文件恢复 | `pg_restore -d appdb < backup.sql` | 把数据导回库 |
+
+**日常就用 psql（读写数据）+ pg_dump/pg_restore（备份迁移）这两个**。Docker 里这俩工具都在镜像内：
+
+```bash
+# 进容器用 psql
+docker exec -it postgis16 psql -U postgres -d gisdb
+
+# 用 pg_dump 备份（输出重定向到宿主机文件）
+docker exec postgis16 pg_dump -U postgres -d gisdb > backup.sql
+
+# 只导某个表的建表语句（DDL）
+docker exec postgis16 pg_dump -U postgres -d gisdb -t notes --schema-only
+```
+
+#### SHOW 命令差异：从 MySQL 过来的坑
+
+**PostgreSQL 没有 MySQL 那套 `SHOW` 命令**——`SHOW DATABASES` / `SHOW TABLES` / `SHOW CREATE TABLE` 在 PG 里全失效，照搬会语法报错。PG 的设计是「**看结构 = 查元数据表**」，把这事统一成了 SELECT。
+
+| MySQL 用的 | PG 对应 |
+|------------|---------|
+| `SHOW DATABASES;` | `\l`（psql）或 `SELECT datname FROM pg_database;` |
+| `SHOW TABLES;` | `\dt`（psql）或 `SELECT tablename FROM pg_tables WHERE schemaname='public';` |
+| `SHOW CREATE TABLE x;` | `\d x`（psql，非完整 DDL）/ pgAdmin 右键表 → Scripts → CREATE Script / `pg_dump -t x --schema-only` |
+| `DESC x;` / `SHOW COLUMNS FROM x;` | `\d x`（psql）或查 `information_schema.columns` |
+
+> ⚠️ **`SHOW` 关键字在 PG 里存在，但用法完全不同**——它用来**查看服务器配置参数**，不是看对象结构：
+> ```sql
+> SHOW search_path;    -- 查看当前搜索路径（配置参数）
+> SHOW timezone;       -- 查看时区设置
+> ```
+> 习惯性敲 `SHOW CREATE TABLE` 时，PG 会按"SHOW 配置参数"理解然后报错说没这个参数，**不会直接告诉你"这命令不存在"**，容易懵。
+
+> 💡 **pgAdmin 看 DDL**：右键表 → **Scripts → CREATE Script**，就是完整可重新执行的 `CREATE TABLE ...`，最接近 MySQL `SHOW CREATE TABLE` 的体验。
+
+### 1.7 参考来源
 
 - [1][2] Docker 官方 `docker run` 文档（docs.docker.com）；postgres 镜像 PGDATA 说明（hub.docker.com/_/postgres）
 - [3] Docker daemon `registry-mirrors` 配置（docs.docker.com/engine/reference/commandline/dockerd/）；国内源现状以实测为准
@@ -346,7 +405,120 @@ PostgreSQL 实例（一个 pg 进程/容器）
 - **一个 Schema** 下有 N 张**表**
 - **一张表**有 N 列（字段）、N 行（数据）
 
-### 2.2 数据库操作
+#### Schema 是什么 + pgAdmin 树对应
+
+**Schema（模式）= 数据库内部的一层命名空间**，用来把表、函数等对象逻辑分组。pgAdmin 左侧树的 `数据库 → Schema → public → 表` 这个顺序，就是 PG 真实层级的如实展示：
+
+```
+数据库（database）   ← 完全隔离的数据集合
+  └── schema          ← 库内的命名空间 / 文件夹
+        ├── public             ← 默认 schema，不指定就建到这里
+        │     └── 表 / 视图 / 序列 / 函数 ...
+        ├── information_schema ← 系统自带，元数据视图（查表/列信息）
+        └── pg_catalog         ← 系统自带，系统表和内置函数
+```
+
+**`public` 不是关键字，是一个真实存在、名字就叫 `public` 的 schema**。每个库自带它，建表时不写 schema 名就落这里。前面 3.3 节报的 `permission denied for schema public`，拒绝的就是这个 schema。
+
+**不写 schema 名时，PG 按搜索路径（search_path）找表**：默认 `"$user", public`——先找跟用户同名的 schema（没有就跳过），再找 `public`。所以 `SELECT * FROM notes` 等价于 `SELECT * FROM public.notes`。
+
+> ⚠️ **从 MySQL 过来的人会懵这层**：MySQL 没有 schema 这个独立概念，`database` 和 `schema` 是同义词（`CREATE DATABASE` ≡ `CREATE SCHEMA`），只有两层 `实例 → 库 → 表`。PG 多出来的 schema 层是标准 SQL 设计，MySQL 砍掉了。详见 2.2。
+
+### 2.2 Schema 详解
+
+> Schema 不只是"表的文件夹"。它是一整套数据库对象的命名空间——表、视图、序列、函数、自定义类型、索引、触发器都能放进同一个 schema。这正是 PostgreSQL「对象关系型」的体现：schema 不只装数据，还装逻辑。
+
+#### Schema 里能放什么
+
+| 对象 | 作用 | 例子 |
+|------|------|------|
+| **表（table）** | 存数据 | `notes`、`users` |
+| **视图（view）** | 存一条 SELECT 查询，当虚拟表用 | 把复杂 JOIN 存成视图，查时像查表 |
+| **序列（sequence）** | 自增数字生成器 | 见 4.4，自增主键的 `notes_id_seq` 就是它供数 |
+| **函数（function）** | 可调用逻辑，可嵌入 SQL | 内置 `lower()`/`now()`，也可自定义 |
+| **数据类型（type）** | 自定义类型 | PostGIS 的 `geometry`、`geography` |
+| **索引（index）** | 加速查询（表的附属，但属 schema） | btree、GiST |
+| **触发器（trigger）** | 表上事件钩子（INSERT/UPDATE 时自动跑） | 自动填 `deleted_at` 可用它 |
+| **聚合、操作符、转换（cast）** | 高级扩展点 | PostGIS 让 `<->` 算空间距离，就是操作符重载 |
+
+**关键认知**：`CREATE EXTENSION postgis` 一条命令，往（默认）`public` schema 里塞进了一整套——`geometry` 类型 + 几百个 `ST_*` 函数 + `<->`/`&&` 操作符 + GiST 索引方法实现。**这之所以可能，是因为 PG 的 schema 允许放这些非表对象**。你的 `public` schema 此刻就混着你的业务表和 PostGIS 的全套扩展对象（靠前缀和类型区分：`ST_` 开头是函数，`geometry` 是类型）。
+
+> 这也是为什么 2.3 会说"扩展自带对象建议放独立 schema"——分开更干净，但 PostGIS 默认就进 public，大家都习惯了。
+
+#### 这个设计模式是 PostgreSQL 特有的吗
+
+**不是"独有"，但 PG 把 schema 做得最通用。** 各数据库对比：
+
+| 数据库 | 对应概念 | 默认值 | 特点 |
+|--------|----------|--------|------|
+| **PostgreSQL** | schema | `public` | 可独立建、独立授权、能放任意对象（函数/类型/操作符） |
+| **SQL Server** | schema | `dbo` | 表写 `dbo.users`；可独立建，不绑用户 |
+| **Oracle** | schema | 绑定用户名 | **一个用户 = 一个 schema**，不能脱离用户独立建 |
+| **MySQL** | 无 | —— | `database` ≡ `schema`（同义词），只有两层 |
+
+SQL 标准本身定义了 schema（SQL:1999 起），所以"库 → schema → 表"是**标准设计**：PG 严格遵循、做得最通用；MySQL 砍掉这层；Oracle/SQL Server 有但绑用户或绑 owner。
+
+### 2.3 Schema 划分实践
+
+#### 三种分法（从最常用到最讲究）
+
+**① 不分——中小项目全用 `public`（最常见）**
+
+绝大多数 Web 业务项目一个 `public` schema 干到底。表不多（几十张）、团队都熟、工具默认指 public。**分了反而要在每个 SQL 里写前缀，徒增心智负担。不分是合理默认。**
+
+**② 按扩展/模块隔离——系统级，几乎都这么干**
+
+第三方扩展自带的对象各自圈在独立 schema，不污染 public。PostGIS 就是教科书例子（见下表）。建扩展时可指定 schema：
+
+```sql
+CREATE SCHEMA postgis;
+CREATE EXTENSION postgis SCHEMA postgis;   -- 之后用 ST_* 要写 postgis.ST_*，
+                                            -- 或把 postgis 加进 search_path
+```
+
+**③ 按业务模块/租户分——业务级，中大型系统才用**
+
+一个库里有多个清晰独立的子系统或多租户需求时才切：
+
+```
+-- 按业务模块
+public.users, public.orders      ← 交易域
+cms.articles, cms.categories     ← 内容管理域
+analytics.events                 ← 分析域
+
+-- 按租户（SaaS 一库多客户）
+tenant_acme.users, tenant_globex.users
+```
+
+代价：跨 schema JOIN 要写前缀、迁移工具要适配、权限更复杂。**除非真有强隔离需求，否则别上。**
+
+#### PostGIS 自动建的 schema 来历
+
+你 `CREATE EXTENSION postgis` 后会发现库里有 `tiger` / `tiger_data` / `topology` 等额外 schema——**不是你建的，是 PostGIS 相关扩展自动建的**：
+
+| Schema | 谁建的 | 装了什么 | 你用得到吗 |
+|--------|--------|----------|-----------|
+| `public` | PG 默认 | 你的业务表 + PostGIS 核心函数/类型 | 用 |
+| `topology` | `postgis_topology` 扩展 | 拓扑结构（路网、地块相邻关系） | 几乎用不到 |
+| `tiger` / `tiger_data` | `tiger_geocoder` / `address_standardizer` | **美国**人口普查 TIGER 地址数据 + 标准化函数 | 国内项目用不到 |
+
+> 这些 schema 是 `postgis/postgis` 官方镜像把这些扩展全预装并启用才出现的。**做普通 GIS 业务可以无视**——`tiger` 是美国地址专用，国内项目八成一辈子不碰。它们恰好示范了「扩展自带对象进独立 schema」的最佳实践。
+
+#### 决策表
+
+| 场景 | 怎么分 |
+|------|--------|
+| 普通业务项目 | **不分**，全放 `public` |
+| 装了多个扩展 | 让扩展对象进各自 schema（系统级，自动发生） |
+| 库里有多个独立子系统 / 多租户 | 按模块或租户分（业务级，要权衡） |
+
+查自己库里有几个 schema：
+
+```sql
+SELECT schema_name FROM information_schema.schemata ORDER BY schema_name;
+```
+
+### 2.4 数据库操作
 
 ```sql
 -- 创建数据库，指定拥有者
@@ -426,6 +598,46 @@ REVOKE DELETE ON notes FROM fastapi_user;   -- 收回某个权限
 
 > ⚠️ **新用户默认建不了表（PG15+ 安全变更）**：`public` schema 默认只给所有人 `USAGE`（能用），**不再给 `CREATE`**（PG15 起改的安全默认）。所以新建的普通用户（如 `app_user`）直接 `CREATE TABLE` 会报 `permission denied for schema public`。解决：`GRANT CREATE ON SCHEMA public TO app_user;`。
 
+#### 对象属主（OWNER）与 ALTER 动词
+
+前面那句「`OWNER fastapi_user` 创建时该用户自动拥有该库全部权限」里的 **OWNER（属主）**，是 PG 权限体系的关键概念：
+
+**每个数据库对象（表、数据库、schema、序列、函数...）都有一个"属主"**，自动 = 创建它的那个用户。属主对该对象有**全部权限**，无需 GRANT；想彻底删/改结构也要属主或超级用户。
+
+```
+用户 touyou 执行 CREATE TABLE raw_tracks ...
+  → raw_tracks 的 OWNER 自动 = touyou
+  → touyou 对这张表有全部权限（DROP / ALTER / GRANT 给别人...）
+```
+
+**改属主**用 `ALTER ... OWNER TO`（pgAdmin 的 CREATE Script 里经常附带这条，用来恢复属主信息）：
+
+```sql
+ALTER TABLE IF EXISTS public.raw_tracks OWNER TO touyou;
+-- IF EXISTS：表不存在时不报错（默认会报），让脚本更健壮
+```
+
+`ALTER` 是 SQL 改对象的通用动词，和 `CREATE` / `DROP` 一组：
+
+| 动词 | 干什么 | 例子 |
+|------|--------|------|
+| `CREATE` | 新建 | `CREATE TABLE ...`、`CREATE USER ...` |
+| `ALTER` | **修改已存在的** | `ALTER TABLE ... ADD COLUMN`、`ALTER USER ... PASSWORD` |
+| `DROP` | 删除 | `DROP TABLE ...`、`DROP USER ...` |
+
+`ALTER TABLE` 能改的事很多——加列/删列/改列类型/加约束/改属主/重命名表，都是它：
+
+```sql
+ALTER TABLE raw_tracks ADD COLUMN speed float;                      -- 加列
+ALTER TABLE raw_tracks DROP COLUMN speed;                           -- 删列
+ALTER TABLE raw_tracks ALTER COLUMN speed TYPE double precision;    -- 改列类型
+ALTER TABLE raw_tracks ADD CONSTRAINT ... ;                         -- 加约束
+ALTER TABLE raw_tracks OWNER TO touyou;                             -- 改属主
+ALTER TABLE raw_tracks RENAME TO tracks;                            -- 改表名
+```
+
+> 💡 **`IF EXISTS` 的两个方向别混**：`ALTER/DROP TABLE IF EXISTS` = 表存在才执行（避免"不存在"报错）；`CREATE TABLE IF NOT EXISTS` = 表不存在才建（避免"已存在"报错）。
+
 ### 3.4 认证机制（pg_hba.conf）
 
 为什么 `docker exec` 进容器后 `psql -U postgres` 不需要密码，但 pgAdmin / VS Code 从外部连 `localhost:5432` 必须密码？
@@ -504,6 +716,65 @@ Foreign-key constraints:
     "notes_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(id)
 ```
 
+#### 元数据（metadata）与系统目录
+
+上面 `SELECT ... FROM information_schema.columns` 查的不是笔记内容，是**元数据**——**描述数据库自身结构的信息**（有哪些表、每列什么类型、哪个是主键、有哪些索引）。
+
+| | 是什么 | 例子 |
+|---|--------|------|
+| **数据** | 表里存的业务内容 | notes 表一行行笔记 |
+| **元数据** | 描述这些数据怎么组织的信息 | "notes 表有 id/title/content 列，id 是主键" |
+
+PG 把元数据存在专门的**系统目录（system catalog）**——它们本身也是表，只是系统自带、描述数据库自己的：
+
+| 看这个 | 查什么元数据 |
+|--------|-------------|
+| `information_schema.columns` | 所有表的所有列信息（**SQL 标准**规定的，MySQL/PG/SQL Server 都有，代码可移植） |
+| `information_schema.tables` | 所有表的信息 |
+| `pg_catalog.pg_tables` | 所有表（PG 专有系统表） |
+| `pg_catalog.pg_database` | 所有数据库 |
+| `pg_catalog.pg_class` | 所有"表类"对象（表、索引、视图、序列…） |
+
+**pgAdmin 左侧树看到的层级、`\d` 输出的表结构，背后全是从这些元数据表 SELECT 出来的。** PG 没有 MySQL 的 `SHOW` 命令，就是因为把"看结构"统一成了"查元数据表"——更标准，但写起来比 `SHOW CREATE TABLE` 啰嗦。
+
+> 💡 **代码里查元数据永远查 `information_schema.*`**：写程序（Go/Python）需要知道表结构时（ORM、迁移工具、代码生成器），不要去解析 `\d` 的输出（那是 psql 客户端的快捷命令，程序里用不了），直接 `SELECT ... FROM information_schema.columns WHERE ...`。它是 SQL 标准，跨数据库可移植。
+
+```python
+# Python 示例：查 notes 表的列名和类型
+rows = db.execute("""
+    SELECT column_name, data_type
+    FROM information_schema.columns
+    WHERE table_name = 'notes'
+    ORDER BY ordinal_position;
+""")
+# [('id','integer'), ('title','character varying'), ...]
+```
+
+#### 查看对象占用空间（pg_relation_size 等）
+
+PostgreSQL 提供一组系统函数用于查看**表/索引等对象**占用的磁盘空间（单位：bytes），通常会配合 `pg_size_pretty()` 做人类可读显示：
+
+```sql
+SELECT pg_size_pretty(pg_relation_size('testfragement'));
+```
+
+常用函数（建议优先记 `pg_total_relation_size`）：
+
+| 函数 | 返回什么 | 典型用途 |
+|---|---|---|
+| `pg_relation_size(rel)` | 对象本体大小（常见：表数据文件或索引文件） | 快速看“表本体/某个索引”多大 |
+| `pg_table_size(rel)` | 表大小（包含 TOAST 等表自身附属存储，不含索引） | 看“表自身”实际占用 |
+| `pg_indexes_size(rel)` | 该表的所有索引总大小 | 判断索引是否过大 |
+| `pg_total_relation_size(rel)` | 表总大小（表 + TOAST + 索引） | 看“这张表最终占多少空间”（最常用） |
+
+更稳妥的对象引用写法（避免 schema 同名/搜索路径差异）：
+
+```sql
+SELECT pg_size_pretty(pg_total_relation_size('public.testfragement'::regclass));
+```
+
+> ⚠️ 观察空间变化时要记住：`DELETE`/`UPDATE` 往往不会立刻让文件变小（MVCC 会留下旧版本/空洞供复用）。需要“真正归还给操作系统”的场景通常要用 `VACUUM FULL`/`CLUSTER` 等重写表的操作（代价较高，且会长时间锁表）。
+
 ### 4.3 约束
 
 | 约束            | 含义                    | 违反时        |
@@ -544,6 +815,76 @@ PostgreSQL 无 MySQL 的 `AUTO_INCREMENT`，自增靠 **Sequence（序列）** �
 
 > ⚠️ 所以**别拿自增 id 当"第几条"来算**——它只是个唯一标识，会有空洞。业务需要连续序号得另外设计。
 
+### 4.5 标识符与大小写
+
+#### 默认情况：标识符什么都不加，字符串用单引号
+
+```sql
+-- 标识符（表名/列名）裸写，字符串值用单引号
+CREATE TABLE notes (
+    id serial PRIMARY KEY,
+    title varchar(100),
+    content text
+);
+
+SELECT id, title FROM notes WHERE title = '测试';
+```
+
+**核心规则两条，记住即可应付 95% 场景：**
+
+1. **标识符（表名/列名）裸写，不加任何引号**——PG 自动按小写处理
+2. **字符串值永远用单引号 `'...'`**
+
+#### PG 默认折叠小写（关键机制）
+
+**未加引号的标识符，PG 一律折叠成小写**——这是和 MySQL 最大的区别之一（MySQL 在 Linux 上大小写敏感、依文件系统；PG 永远折叠）。
+
+```sql
+CREATE TABLE Users (id int);    -- PG 实际建的是 users 表
+SELECT * FROM Users;            -- 折叠成 users，能查到
+SELECT * FROM USERS;            -- 同样折叠成 users，能查到
+SELECT * FROM "Users";          -- ❌ 报错：没有叫 "Users"（大写 U）的表
+```
+
+**唯一能保留大小写的方式是双引号 `"..."`**——但一旦用了，之后每次访问都得加，漏一次就报错：
+
+```sql
+CREATE TABLE "Users" (id int);  -- 这次真建了叫 "Users" 的表
+SELECT * FROM Users;            -- ❌ 折叠成 users，查不到
+SELECT * FROM "Users";          -- ✅ 才能查到
+```
+
+#### 双引号 `"..."` 的三个被迫场景
+
+双引号是"逃生口"，不是日常工具。只有这些场景**被迫**用：
+
+| 场景 | 例子 | 说明 |
+|------|------|------|
+| **迁移来的大写表名**（最常见） | `CREATE TABLE "PartTimeRoutePointImages" (...)` | 从 MySQL 驼峰命名迁移时；**强烈建议改 snake_case**，否则全工程每次访问都要加引号 |
+| **列名撞 PG 保留字** | `CREATE TABLE t ("order" int, "type" varchar)` | `order`/`from`/`select`/`user`/`type` 等当列名；**建议起名避开**（用 `order_no`、`contract_type`） |
+| **标识符含空格/特殊字符**（极少） | `CREATE TABLE "my table" (...)` | 基本只在导入带空格表头的 CSV 时碰到，正常设计不会用 |
+
+#### 从 MySQL 迁移的命名建议
+
+MySQL 那套 PascalCase 命名（`Id`/`RouteId`/`CreateTime`）到 PG 强烈建议转 snake_case：
+
+```
+MySQL:    Id, RouteId, CreateTime, PartTimeRoutePointImages
+PG 推荐:  id, route_id, create_time, part_time_route_point_images
+```
+
+一劳永逸：省掉之后所有 SQL / ORM 配置 / 迁移脚本里加双引号的麻烦，团队里有人漏一处就够头疼一天。这也是 Go/Python 主流 ORM（sqlx、GORM、SQLAlchemy）默认期待的命名风格——它们一般自动做 snake_case 映射。
+
+#### 决策表
+
+| 想做的事 | 怎么写 |
+|---------|--------|
+| 正常建表/查询 | 标识符**裸写**，字符串用**单引号** |
+| 标识符必须用大写/保留字/特殊字符（迁移、老表） | 用**双引号**包，之后每次访问都得加 |
+| 字符串值 | 永远**单引号** |
+
+> 💡 **心法**：坚持「标识符全小写、避开关键字」，就一辈子不用碰双引号。需要双引号的几乎都是历史包袱（迁移来的大写表名、老系统的关键字列名），那是被迫用，不是主动用。
+
 ## 第5章 SQL 增删改查
 
 `INSERT`/`SELECT`/`UPDATE`/`DELETE` 是 SQL 关键字（DML，数据操作语言），不是函数。
@@ -573,6 +914,23 @@ VALUES ('笔记A', '内容A', false, 1),
 - 有默认值（如 `id` 的 nextval）→ 自动填默认值
 - 允许 NULL → 自动填 NULL
 - `NOT NULL` 且无默认值 → 必须提供
+
+#### INSERT ... SELECT：把查询结果当数据源（批量插入）
+
+PostgreSQL 常用 `INSERT INTO ... SELECT ...` 批量插入：**先用 SELECT 造出一批行，再一次性写入目标表**（造测试数据、从别表导入都靠它）。
+
+```sql
+INSERT INTO testfragement (tid, tname)
+SELECT n, 'myname_' || n
+FROM generate_series(1, 50000000) AS g(n);
+```
+
+关键点：
+
+- `INSERT INTO ... (tid, tname)`：显式写列名更稳（避免表结构变更导致列顺序对不上）。
+- `generate_series(1, 50000000)` 是**集合返回函数（SRF）**：返回 `SETOF integer`，可直接放在 `FROM` 里当“虚拟表数据源”。
+- `AS g(n)`：`g` 是表别名，`n` 是列名（`SELECT` 里能引用 `n`，本质上是对 `FROM` 产生的那一列起名）。
+- `'myname_' || n`：`||` 是字符串拼接（等价 `concat('myname_', n)`）。
 
 ### 5.2 SELECT 查询
 
