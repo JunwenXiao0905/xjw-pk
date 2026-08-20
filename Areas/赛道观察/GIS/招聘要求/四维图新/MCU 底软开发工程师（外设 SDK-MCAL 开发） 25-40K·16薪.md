@@ -1,0 +1,16 @@
+> 来源：BOSS直聘 · 四维图新
+> 岗位：MCU 底软开发工程师（外设 SDK/MCAL 开发）｜25-40K·16薪｜深圳 3-5年 本科｜状态：招聘中
+> 链接：https://www.zhipin.com/job_detail/1b95bf57760a05b20nF43d65ElJY.html
+> 抓取时间：2026-08-18
+
+负责 I2C、PORT、DIO、SENT、MSC 等 MCU 外设模块的 SDK，MCAL 开发与维护
+负责项目中对应模块的需求分析、模块设计、代码实现、白盒测试等开发交付
+配合项目完成模块交付节奏与质量目标
+任职要求：
+2年及以上 MCU I2C/SENT/GPIO/SPI等相关模块底软开发经验
+本科及以上学历，985/211 院校毕业；电⼦ / 通信 / ⾃动化 / 计算机等相关专业
+有 AI 辅助开发（通义灵码 / Cursor/Claude Code 等）实践经验
+熟悉 AUTOSAR MCAL 架构，了解 EB tresos/Vector DaVinci/ETAS 等 MCAL 配置⼯具
+了解 CMMI/ASPICE 软件开发流程，有ISO 26262 功能安全开发经验更佳
+熟练使用 KEIL/IAR/GCC 等编译调试工具，熟悉MISRA C 规范，会使⽤QAC等静态代码扫描工具
+熟练使用示波器、逻辑分析仪、图莫斯，Total Phase 等测试工具
