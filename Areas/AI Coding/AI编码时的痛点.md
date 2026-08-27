@@ -44,3 +44,12 @@ reviewer
 安全问题：不小心删库了怎么办？
 
 
+
+路径问题——Git Bash 的 `/tmp` 和 Windows 原生 Node 的路径不一致。转换一下真实路径再解析。
+
+$
+
+TMPWIN=$(cygpath -w /tmp); echo "tmp=$TMPWIN"; node -e "
+const fs = require('fs');
+const html = fs.readFileSync(process.argv[1] + '\\\\douyin_share.html', 'utf8');
+

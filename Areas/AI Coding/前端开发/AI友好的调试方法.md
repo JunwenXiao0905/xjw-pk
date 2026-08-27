@@ -1,0 +1,1 @@
+：前端日志直落 `frontend/logs/dev.log`（Vite 中间件，NDJSON 可 grep，全局错误自动捕获）+ `probe-cdp.mjs` DOM 探针（自启/CDP 直连双模式，报告落盘 JSON）
