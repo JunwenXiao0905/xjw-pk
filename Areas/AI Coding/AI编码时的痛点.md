@@ -53,3 +53,4 @@ TMPWIN=$(cygpath -w /tmp); echo "tmp=$TMPWIN"; node -e "
 const fs = require('fs');
 const html = fs.readFileSync(process.argv[1] + '\\\\douyin_share.html', 'utf8');
 
+ Windows Git Bash 的 curl 发中文 body 的编码问题（GBK→UTF-8 损坏），不是服务端问题。换 ASCII 名称重跑
