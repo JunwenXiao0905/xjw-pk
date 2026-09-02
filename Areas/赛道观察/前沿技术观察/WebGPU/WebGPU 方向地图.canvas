@@ -1,7 +1,7 @@
 {
 	"nodes":[
 		{"id":"webgpu-overview","type":"text","text":"# WebGPU 方向观察\n\n底层图形能力、Canvas UI、3D 编辑器和 AI 原生编辑器正在汇合。","x":0,"y":0,"width":360,"height":180},
-		{"id":"webgpu-projects-note","type":"file","file":"Areas/赛道观察/GIS/02_技术专项/地图引擎/WebGPU/开源项目观察.md","x":-460,"y":-260,"width":360,"height":180},
+		{"id":"webgpu-projects-note","type":"file","file":"Areas/赛道观察/前沿技术观察/WebGPU/开源项目观察.md","x":-460,"y":-260,"width":360,"height":180},
 		{"id":"canvas-ui-note","type":"file","file":"Areas/赛道观察/前沿技术观察/Canvas UI/HTML in Canvas.md","x":460,"y":-260,"width":360,"height":180},
 		{"id":"wgpu","type":"text","text":"## wgpu\n\nRust / WASM / WebGPU 的底层基础设施代表。","x":-500,"y":80,"width":300,"height":140},
 		{"id":"pascal-editor","type":"text","text":"## pascalorg/editor\n\nWebGPU + React Three Fiber 的 3D 建筑编辑器样本。","x":-130,"y":300,"width":360,"height":150},
