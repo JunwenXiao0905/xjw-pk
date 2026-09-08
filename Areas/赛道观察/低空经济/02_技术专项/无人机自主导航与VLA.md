@@ -20,6 +20,14 @@ GNSS 受限（GPS-denied）环境是低空巡检的刚需场景：
 - **端侧可部署规模**是关键卖点（对比英伟达 Alpamayo 2 Super 34B 的算力门槛）——无人机/机器狗能跑才用得起来
 - 训练用英伟达 AlpaSim 闭环仿真，**以神经渲染重建真实场景**支撑训练（real2sim 标配化 → [[Areas/赛道观察/具身智能/02_技术专项/物理AI与世界模型/世界模型|世界模型]]）
 
+## 技术供给：SimpleNav 框架（2026.09 开源，OpenBMB/清华 THUNLP）
+
+- 导航 VLA **全链路研究框架**：异构数据统一（LeRobot v3 格式）、模块化模型（Qwen3.5-VL 骨干参考实现）、统一训练、闭环评测
+- **六个 benchmark 中三个是空中导航**（OpenFly、TravelUAV、AerialVLN），另含室内导航（R2R-CE/RxR-CE）与移动目标跟踪（EVT-Bench）
+- 与 Qwen-Drive 互补：那边是**模型**（车企向、闭环训练），这边是**框架**（研究向、跨场景）——"导航 VLA 平民化"的两个实证
+- 仓库：https://github.com/OpenBMB/SimpleNav ｜ 团队入口 → [[Areas/赛道观察/具身智能/05_公司高校研究院库/OpenBMB（清华THUNLP）/基本信息|OpenBMB 条目]]
+- 注意：仿真闭环评测、离真机有距离；框架价值在降门槛，参考模型分数不代表技术风向
+
 ## 实测派的务实结论（对技术选型有用）
 
 社区实测（"深度抑郁患者"，2026.09）：单目稠密 SLAM 框架（DROID-SLAM、VGGT-SLAM、LingBot-Map）在无人机平台上鲁棒性均不佳；务实方案 = **位姿用硬件（IMU/深度相机/GNSS 可用时用 GNSS），空间理解交给端到端模型**。
@@ -30,3 +38,4 @@ GNSS 受限（GPS-denied）环境是低空巡检的刚需场景：
 
 - [ ] Qwen-Drive 系在无人机/机器狗上的社区部署案例（作者预告会做迁移实测）
 - [ ] 低空经济系公司（中科云图、纵横等）导航栈的技术口径变化
+- [ ] SimpleNav 仓库 3 个月 commit 活跃度（决定是否深入投入：跑通空中 benchmark）
