@@ -38,7 +38,10 @@ python $S/watch.py 159608          # 持续盯,10秒原地刷新,Ctrl+C停
 python $S/watch.py --log           # 日志模式,更像在跑任务,最低调
 python $S/kline.py 515880 --png    # K线图片(MA5/10/20+成交量),存charts/
 python $S/kline.py 515880 --week   # 周K,看大趋势
+python $S/daily.py --save --pool   # 每日复盘骨架一键生成→每日信息/{当日}/今日持仓和盈亏.md
 ```
+
+**daily.py 复盘生成器**:`python $S/daily.py --save` 一键在 [[每日信息]] 当日文件夹生成两个文件——`今日持仓和盈亏.md`(持仓表自动,操作/反思手填)+ `大盘分析.md`(指数量能/行业前5/板块轮动/池内全景全自动)。持仓登记在 [[持仓登记]](Obsidian里直接编辑表格;份额从支付宝抄一次,只在买卖后更新)。
 
 ## 三、文件与分组
 
