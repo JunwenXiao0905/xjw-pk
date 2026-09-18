@@ -11,7 +11,7 @@ summary: ZCode里的低调盯盘工具:/stock对话查行情、watch.py持续盯
 
 解决"同花顺都永不顺"+上班看盘太张扬的问题。装在 ZCode 里,免费接口(东财为主,腾讯/新浪自动兜底),数据实时。
 
-- 代码位置:`C:\Users\PC\ZCodeProject\stockwatch\`
+- 代码位置:`D:\projects\xjw-pk\Projects\stockwatch\`
 - 依赖:无(纯Python标准库,matplotlib仅K线图片用)
 - 详情:见该目录 README.md
 
@@ -33,7 +33,7 @@ summary: ZCode里的低调盯盘工具:/stock对话查行情、watch.py持续盯
 ## 二、终端方式
 
 ```bash
-S=C:/Users/PC/ZCodeProject/stockwatch
+S=D:/projects/xjw-pk/Projects/stockwatch
 python $S/watch.py 159608          # 持续盯,10秒原地刷新,Ctrl+C停
 python $S/watch.py --log           # 日志模式,更像在跑任务,最低调
 python $S/kline.py 515880 --png    # K线图片(MA5/10/20+成交量),存charts/
