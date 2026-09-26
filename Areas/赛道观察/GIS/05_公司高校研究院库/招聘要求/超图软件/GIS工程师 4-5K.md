@@ -2,7 +2,7 @@
 > 岗位：GIS工程师｜4-5K｜庆阳 1-3年 大专｜状态：招聘中
 > BOSS：王强（4月内活跃）｜职位更新：2026-08-09
 > 链接：https://www.zhipin.com/job_detail/e1d9eb619f8ba6620nd63ty9ElZZ.html
-> 抓取时间：2026-09-08
+> 抓取时间：2026-09-24
 
 技能标签：ArcGIS、地理信息/测绘工程相关专业、MapGIS、PostgreSQL、MySQL、其他、SuperMap、Oracle
 

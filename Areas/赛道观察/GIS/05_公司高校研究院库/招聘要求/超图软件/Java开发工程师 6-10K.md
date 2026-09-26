@@ -2,7 +2,7 @@
 > 岗位：Java开发工程师｜6-10K｜乌鲁木齐 1-3年 本科｜状态：招聘中
 > BOSS：陈国考（半年前活跃）｜职位更新：2026-08-09
 > 链接：https://www.zhipin.com/job_detail/b110dd724b47acdf1nx709m6GVBT.html
-> 抓取时间：2026-09-08
+> 抓取时间：2026-09-24
 
 技能标签：CSS、Spring、Hibernate、SpringBoot、Oracle、MySQL、Linux、GIT、西安/乌鲁木齐同步招聘
 

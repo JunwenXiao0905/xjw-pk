@@ -2,7 +2,7 @@
 > 岗位：java开发工程师（应届硕士）｜8-12K｜南京 1年以内 硕士｜状态：招聘中
 > BOSS：钱海军（本月活跃）｜职位更新：2026-08-16
 > 链接：https://www.zhipin.com/job_detail/f34f8fc3ee91612b0nF52N-7EFNT.html
-> 抓取时间：2026-09-08
+> 抓取时间：2026-09-24
 
 技能标签：Java、SpringCloud、MySQL、MyBatis、Redis、Spring、Oracle
 

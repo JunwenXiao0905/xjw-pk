@@ -2,7 +2,7 @@
 > 岗位：java开发工程师｜10-15K｜北京 3-5年 本科｜状态：招聘中
 > 职位更新：2026-09-08
 > 链接：https://www.zhipin.com/job_detail/a2fa0a6c8dbc7ee80nN62Nq0E1JU.html
-> 抓取时间：2026-09-08
+> 抓取时间：2026-09-24
 
 技能标签：Java、PostgreSQL、SpringCloud、MySQL、MongoDB、SQL Server、Spring
 
