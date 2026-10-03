@@ -2,3 +2,7 @@
 .obsidian/workspace.json
 
 Resources/408/*
+
+# independent code repos, keep out of the vault
+Projects/miniQMT/
+Projects/tradewatch/
